@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --toastify-color-error: rgb(164, 48, 48);
+    --toastify-color-success: rgb(48, 164, 58);
+}
