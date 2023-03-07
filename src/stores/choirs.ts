@@ -1,13 +1,26 @@
 import axios from '@/lib/axios'
 import type { Choir } from '@/types/Choir';
 import type { AxiosResponse } from 'axios';
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { defineStore } from 'pinia';
+import { useFetch } from '@/composables/fetch';
+
+const fetch = useFetch();
+
+export declare type ChoirOrderOptions = 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc'
 
 export const useChoirs = defineStore('choirs', {
 
     state: () => {
         return {
-            
+            filterSearchInput: '',
+            filterOrder: 'name_asc' as ChoirOrderOptions,
+            filterOrderOptions: [
+                { 'id': 'name_asc', 'name': 'Name ASC' },
+                { 'id': 'name_desc', 'name': 'Name DESC' },
+                { 'id': 'date_asc', 'name': 'Oldest' },
+                { 'id': 'date_desc', 'name': 'Newest' },
+            ],
+            choirs: undefined as Choir[] | undefined,
         }
     },
 
@@ -16,15 +29,12 @@ export const useChoirs = defineStore('choirs', {
     },
 
     actions: {
+        changeOrder(name: ChoirOrderOptions) {
+            this.filterOrder = name
+        },
         async getChoirs() {
-            return await axios
-                .get('/api/choirs')
-                .then(response => {
-                    return response.data
-                })
-                .catch(error => {
-                    return error.response
-                })
+            const response = await fetch.index<Choir[]>('/api/choirs');
+            this.choirs = response.data;
         },
         async getChoir(id: number) {
             return await axios

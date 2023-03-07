@@ -12,5 +12,6 @@ export interface Choir {
     contact_email: string,
     contact_website: string,
     description: string,
-    videos: Array<Video>
+    videos: Video[] | undefined,
+    created_at: string
 }

@@ -2,8 +2,7 @@
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
 import InputLabel from '@/components/InputLabel.vue';
 import TextInput from '@/components/TextInput.vue';
-import { ref, watch } from 'vue';
-import type { Choir } from '@/types/Choir';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useChoirs } from '@/stores/choirs';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -17,7 +16,7 @@ const choirName = ref('');
 
 const processing = ref(false);
 
-const storeRecord = async (event : Event) => {
+const storeRecord = async () => {
 
     processing.value = true;
 
@@ -28,7 +27,7 @@ const storeRecord = async (event : Event) => {
     fetchStatusHandler(response, 'store')
 
     if (response.status === 201) {
-        router.push({ name: 'choirs-edit', params: { id: response.data.id } })
+        await router.push({ name: 'choirs-edit', params: { id: response.data.id } })
     }
     processing.value = false;
 }
@@ -53,7 +52,7 @@ const storeRecord = async (event : Event) => {
                                 <div class="mb-5">
                                     <InputLabel for="name" value="Chor Name" />
                                     <div class="grid grid-flow-col mt-1 grid-cols-[1fr_auto] gap-3">
-                                        <TextInput type="text" class="block w-full" autocomplete="name" autofocus v-model="choirName" />
+                                        <TextInput v-model="choirName" type="text" class="block w-full" autocomplete="name" autofocus />
                                         <PrimaryButton type="submit" :processing="processing">Next steps</PrimaryButton>
                                     </div>
                                 </div>

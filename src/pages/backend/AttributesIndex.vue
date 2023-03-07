@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
-import AttributesNavbar from './components/AttributesNavbar.vue'
+import AttributesNavbar from './components/AttributesNavbar.vue';
 
 </script>
 
@@ -14,7 +14,7 @@ import AttributesNavbar from './components/AttributesNavbar.vue'
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 pt-10 bg-white sm:rounded-lg border-b border-gray-200">
                         <div class="max-w-3xl mx-auto">
-                        
+
                         </div>
                     </div>
                 </div>

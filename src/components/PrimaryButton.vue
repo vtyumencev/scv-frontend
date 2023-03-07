@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import { ref, computed } from 'vue'
+import type { PropType } from 'vue';
 
-type ButtonStyle = 'filled' | 'simple' | 'outline' | 'danger'
+type ButtonStyle = 'filled' | 'simple' | 'outline' | 'danger';
 
 const props = defineProps({
     type: {
@@ -17,7 +16,7 @@ const props = defineProps({
         type: String as PropType<ButtonStyle>,
         default: 'filled'
     }
-})
+});
 
 </script>
 
@@ -30,7 +29,7 @@ const props = defineProps({
         <svg
             role="status"
             v-if="processing"
-            class="inline mr-2 w-2 h-2 text-gray-200 animate-spin fill-blue-600"
+            class="inline mr-2 w-2 h-2 text-gray-200 animate-spin fill-blue-600 text-gray"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">

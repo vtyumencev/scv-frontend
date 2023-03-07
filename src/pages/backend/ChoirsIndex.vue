@@ -1,19 +1,59 @@
 <script setup lang="ts">
-import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue'
-import { useChoirs } from '@/stores/choirs'
-import PrimaryButton from '@/components/PrimaryButton.vue'
-import { onMounted, ref } from 'vue'
-import type { PaginatedRecordsList } from '@/types/PaginatedRecordsList'
-import type { Choir } from '@/types/Choir'
-import Skeleton from './components/Skeleton.vue'
+import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
+import { useChoirs } from '@/stores/choirs';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import {computed, onMounted, watch} from 'vue';
+import Skeleton from './components/Skeleton.vue';
+import TextInput from "@/components/TextInput.vue";
+import Select from "@/components/Select.vue";
+import type { Choir } from "@/types/Choir";
 
-const choirsStorage = useChoirs()
-
-const choirs = ref<PaginatedRecordsList<Choir[]>>()
+const choirsStorage = useChoirs();
 
 onMounted(async () => {
-    choirs.value = await choirsStorage.getChoirs()
-})
+    if (choirsStorage.choirs) {
+        return;
+    }
+    await choirsStorage.getChoirs();
+});
+
+const dateCalc = (date: string) => {
+    return new Date (date).toLocaleDateString(
+        'de-de',
+        {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        }
+    );
+}
+
+const filteredList = computed(() : Choir[] => {
+    if (!choirsStorage.choirs) {
+        return [];
+    }
+    let result = [...choirsStorage.choirs].sort((firstItem, secondItem) => {
+        if (choirsStorage.filterOrder === 'name_asc') {
+            return firstItem.name.localeCompare(secondItem.name);
+        } else if (choirsStorage.filterOrder === 'name_desc') {
+            return secondItem.name.localeCompare(firstItem.name);
+        } else if (choirsStorage.filterOrder === 'date_asc') {
+            return firstItem.created_at.localeCompare(secondItem.created_at);
+        } else if (choirsStorage.filterOrder === 'date_desc') {
+            return secondItem.created_at.localeCompare(firstItem.created_at);
+        }
+        return 0;
+    })
+
+    result = result.filter(item => {
+        return item.name.toLowerCase().includes(choirsStorage.filterSearchInput.toLowerCase())
+    })
+
+    return result;
+});
 
 </script>
 
@@ -36,16 +76,37 @@ onMounted(async () => {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="px-6 py-10 bg-white border-b border-gray-200">
                         <div class="max-w-3xl mx-auto">
-                            <template v-if="choirs">
-                                <router-link 
-                                    :to="{ name: 'choirs-edit', params: { id: item.id }}"
-                                    v-for="item in choirs?.data" 
-                                    class="block py-3 text-indigo-500 border-b last:border-0">
-                                    {{ item.name }}
-                                </router-link>
+                            <div class="mb-5 grid grid-flow-col gap-4 grid-cols-[1fr_auto]">
+                                <TextInput v-model="choirsStorage.filterSearchInput" type="text" class="block w-full" placeholder="Filter name" autocomplete="name" />
+                                <Select v-model="choirsStorage.filterOrder" :items="choirsStorage.filterOrderOptions"></Select>
+                            </div>
+                            <div class="grid grid-cols-[3fr_1fr] font-bold mb-2">
+                                <div
+                                    class="cursor-pointer"
+                                    @click="choirsStorage.filterOrder !== 'name_asc' ? choirsStorage.changeOrder('name_asc') : choirsStorage.changeOrder('name_desc')">Name</div>
+                                <div
+                                    class="cursor-pointer"
+                                    @click="choirsStorage.filterOrder !== 'date_desc' ? choirsStorage.changeOrder('date_desc') : choirsStorage.changeOrder('date_asc')">Created At</div>
+                            </div>
+                            <template v-if="choirsStorage.choirs">
+                                <TransitionGroup v-if="filteredList.length" name="list" tag="ul">
+                                    <li v-for="item in filteredList" :key="item" class="py-3 border-b last:border-0 grid grid-cols-[3fr_1fr]">
+                                        <router-link
+                                            :to="{ name: 'choirs-edit', params: { id: item.id }}"
+                                            class="text-indigo-500">
+                                            {{ item.name }}
+                                        </router-link>
+                                        <span class="text-gray-500">
+                                            {{ dateCalc(item.created_at) }}
+                                        </span>
+                                    </li>
+                                </TransitionGroup>
+                                <template v-else>
+                                    No results.
+                                </template>
                             </template>
                             <template v-else>
-                                <Skeleton />
+                                <Skeleton class="px-0" />
                             </template>
                         </div>
                     </div>
@@ -54,3 +115,23 @@ onMounted(async () => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<style scoped>
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    //transform: translateX(30px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.list-leave-active {
+    position: absolute;
+}
+</style>

@@ -5,7 +5,7 @@ import { onMounted } from 'vue';
 const attributesStorage =  useAttributes();
 
 onMounted(() => {
-    attributesStorage.getAttributes()
+    attributesStorage.getAttributes();
 });
 
 </script>

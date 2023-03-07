@@ -49,6 +49,7 @@ const isAddNew = computed(() => {
         </div>
         <template #modals>
             <AttributeForm v-if="attributeID || isAddNew" :isAddNew="isAddNew" :attributeName="attributeName" :attributeID="attributeID" />
+
         </template>
     </AuthenticatedLayout>
 </template>

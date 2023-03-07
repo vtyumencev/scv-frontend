@@ -1,6 +1,6 @@
-import axios from './../lib/axios'
-import { defineStore } from 'pinia'
-import type { Attributes } from '@/types/Attributes'
+import axios from './../lib/axios';
+import { defineStore } from 'pinia';
+import type { Attributes } from '@/types/Attributes';
 import type { Attribute } from '@/types/Attribute';
 import type { AxiosResponse } from 'axios';
 

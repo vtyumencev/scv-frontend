@@ -1,0 +1,171 @@
+import axios from '@/lib/axios';
+import type { Method } from 'axios';
+import { toast, type ToastOptions } from "vue3-toastify";
+import {h, type Ref, type RendererElement} from "vue";
+import NotifyCallback from "@/pages/backend/components/NotifyCallback.vue";
+import type NotifyCallbackOptions from "@/pages/backend/components/NotifyCallback.vue";
+import type { AxiosResponse } from "axios";
+
+export declare type FetchResponse<T> = {
+    error?: AxiosResponse,
+    data?: T,
+}
+
+const RESPONSE_UNPROCESSABLE = 422
+const RESPONSE_NOT_FOUND = 404
+
+const NOTIFY_AUTO_CLOSE_TIMEOUT = 5000
+
+type Action = 'index' | 'show' | 'store' | 'update' | 'delete' | 'restore'
+
+type ActionComments = {
+    success?: string,
+    error: string,
+    errorNotFound: string,
+}
+
+const actionCommentBase = {
+    error: 'An unknown error has occurred',
+    errorNotFound: 'Resource not found',
+}
+
+const actionComments : Record<string, ActionComments> = {
+    index: {
+        ...actionCommentBase
+    },
+    show: {
+        ...actionCommentBase
+    },
+    store: {
+        success: 'New record has been added',
+        ...actionCommentBase
+    },
+    update: {
+        success: 'Changes have been saved successfully',
+        ...actionCommentBase
+    },
+    delete: {
+        success: 'The record has been deleted',
+        ...actionCommentBase
+    },
+    restore: {
+        success: 'The record has been restored',
+        ...actionCommentBase
+    }
+}
+
+const success : ToastOptions = {
+    autoClose: NOTIFY_AUTO_CLOSE_TIMEOUT,
+    type: 'success',
+    transition: 'slide',
+}
+
+const error : ToastOptions = {
+    autoClose: NOTIFY_AUTO_CLOSE_TIMEOUT,
+    type: 'error',
+    transition: 'slide',
+}
+
+type HandlerOption = {
+    formEl?: Element,
+    notifyOptions?: NotifyCallbackOptions,
+    processing?: Ref,
+    // eslint-disable-next-line no-unused-vars
+    onSuccess?(response: AxiosResponse): void
+}
+type HandlerOptionFull = HandlerOption & {
+    action: Action,
+}
+
+export function useFetch() {
+
+    const notify = <T>(response: FetchResponse<T>, options: HandlerOptionFull) => {
+
+        const action = options.action;
+        const actionComment = actionComments[action];
+
+        if (response.error?.status === RESPONSE_UNPROCESSABLE) {
+            Object.entries(response.error.data.errors as Record<string, Array<string>>).forEach(entry => {
+                const [key, value] = entry
+
+                toast(value[0], error)
+
+                if (options?.formEl) {
+                    const errorTextBox = options?.formEl.querySelector(`[data-error-for="${ key }"]`)
+                    if (errorTextBox) {
+                        errorTextBox.innerHTML = value[0]
+                    }
+                }
+            });
+        }
+        else if (response.error?.status === RESPONSE_NOT_FOUND) {
+            toast(actionComment.errorNotFound, error);
+        }
+        else if (response.error) {
+            toast(actionComment.error, error);
+        }
+        else if (options.notifyOptions) {
+            toast(
+                ({ closeToast, toastProps }) => h(<RendererElement>NotifyCallback, { closeToast, toastProps }),
+                { ...success, data: { comment: actionComment.success, onClick: options.notifyOptions.onClick }, closeOnClick: false },
+            );
+        }
+        else if (actionComment.success) {
+            toast(actionComment.success, success);
+        }
+
+    }
+    const execute = async <T>(method: Method, path: string, params: object = { }, requestData: object = { }, options?: HandlerOptionFull) : Promise<FetchResponse<T>> => {
+        if (options?.processing) {
+            options.processing.value = true;
+        }
+
+        const response = await axios({
+            method: method,
+            url: path,
+            data: requestData,
+            params: params,
+        }).then((response) => {
+            if (options?.onSuccess) {
+                options?.onSuccess(response);
+            }
+            return { data: response.data };
+        }).catch((error) => {
+            console.log(error.response);
+            return { error: error.response };
+        });
+
+        if (options) {
+            notify<T>(response, options);
+        }
+
+        if (options?.processing) {
+            options.processing.value = false;
+        }
+
+        return response;
+    }
+
+    return {
+        async index<T>(path: string, params?: object, options?: HandlerOption) {
+            return await execute<T>('get', path, params, { }, { action: 'index', ...options });
+        },
+        async show<T>(resource: string, id: number) {
+            return await execute<T>('get', `/api/${resource}/${id}`, {}, {}, { action: 'show' });
+        },
+        async store(resource: string, data: object = { }, options?: HandlerOption) {
+            return await execute('post', `/api/${resource}`, {}, data, { action: 'update', ...options });
+        },
+        async update(resource: string, id: number, data: object, options?: HandlerOption) {
+            return await execute('put', `/api/${resource}/${id}`, {}, data, { action: 'update', ...options });
+        },
+        async delete(resource: string, id: number, options?: HandlerOption) {
+            return await execute<void>('delete', `/api/${resource}/${id}`, {},
+                { },
+                { action: 'delete', ...options });
+        },
+        async restore(resource: string, id: number) {
+            return await execute<void>('put', `/api/${resource}/${id}/restore`, {}, {}, { action: 'restore' });
+        }
+    }
+}

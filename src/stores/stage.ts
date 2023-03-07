@@ -1,6 +1,7 @@
 import axios from './../lib/axios'
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { defineStore } from 'pinia'
 import type { Attributes } from '@/types/Attributes'
+import type { AxiosResponse } from 'axios';
 
 export const useStage = defineStore('stage', {
 
@@ -10,33 +11,33 @@ export const useStage = defineStore('stage', {
                 {
                     'slug': 'dresden',
                     'name': 'Dresden',
-                    'color': '#550C18',
+                    'color': '#FFFFFF',
                 },
                 {
                     'slug': 'leipzig',
                     'name': 'Leipzig',
-                    'color': '#443730',
+                    'color': '#FFFFFF',
                     'background': '/bg-1.jpg',
                 },
                 {
                     'slug': 'chemnitz',
                     'name': 'Chemnitz',
-                    'color': '#786452',
+                    'color': '#FFFFFF',
                 },
                 {
                     'slug': 'nord-sachsen',
                     'name': 'Nord-Sachsen',
-                    'color': '#A5907E',
+                    'color': '#FFFFFF',
                 },
                 {
                     'slug': 'west-sachsen',
                     'name': 'West-Sachsen',
-                    'color': '#A5907E',
+                    'color': '#FFFFFF',
                 },
                 {
                     'slug': 'ost-sachsen',
                     'name': 'Ost-Sachsen',
-                    'color': '#A5907E',
+                    'color': '#FFFFFF',
                 },
             ],
             attributes: { } as Attributes,
@@ -59,14 +60,14 @@ export const useStage = defineStore('stage', {
                     if (error.response.status !== 409) throw error
                 })
         },
-        getVideos() {
-            axios
+        async getVideos() : Promise<AxiosResponse> {
+            return await axios
                 .get('/api/videos')
                 .then(response => {
-                    this.videos = response.data.data.data
+                    return response
                 })
                 .catch(error => {
-                    if (error.response.status !== 409) throw error
+                    return error.response
                 })
         }
     }

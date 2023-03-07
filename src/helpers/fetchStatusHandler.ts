@@ -1,7 +1,7 @@
-import { toast, type Content, type ToastOptions } from 'vue3-toastify'
+import { toast, type ToastOptions } from 'vue3-toastify'
 import type { AxiosResponse } from 'axios'
-import { type Component, h, type RendererElement } from 'vue'
-import RestoreRecord from '@/pages/backend/components/RestoreRecord.vue'
+import { h, type RendererElement } from 'vue'
+import RestoreRecord from '@/pages/backend/components/NotifyCallback.vue'
 
 const RESPONSE_OK = 200
 const RESPONSE_CREATED = 201

@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import 'tom-select/dist/css/tom-select.min.css'
 import { onMounted, ref, watch } from 'vue'
 import type { Video } from '@/types/Video'
 import TextInput from '@/components/TextInput.vue'
 import InputLabel from '@/components/InputLabel.vue'
 import { initTooltips } from 'flowbite'
 import PrimaryButton from '@/components/PrimaryButton.vue'
-import { useVideos } from '@/stores/videos'
-import { fetchStatusHandler } from '@/helpers/fetchStatusHandler'
 import { useRouter } from 'vue-router'
+import {useFetch} from "@/composables/fetch";
+
+const fetch = useFetch();
 
 const router = useRouter()
-
-const videoStorage = useVideos()
 
 const emits = defineEmits(['updateVideos'])
 const props = defineProps({
@@ -28,15 +26,15 @@ onMounted(() => {
 })
 
 const submitVideo = async (event : Event) => {
-    newVideoProcessing.value = true
-    const response = await videoStorage.addVideo(newVideoURL.value, props.choirID)
-    fetchStatusHandler(response, 'store', { formEl: <Element>event.target })
-    newVideoProcessing.value = false
-    if (response.status === 201) {
-        newVideoURL.value = ''
-        router.push({ name: 'choirs-edit-videos-edit', params: { 'videoID': response.data.id } })
-        emits('updateVideos')
-    }
+    await fetch.store('videos', { video_url: newVideoURL.value, choir_id: props.choirID }, {
+        processing: newVideoProcessing,
+        formEl: <Element>event.target,
+        async onSuccess(response) {
+            newVideoURL.value = ''
+            emits('updateVideos')
+            await router.push({ name: 'choirs-edit-videos-edit', params: { 'videoID': response.data.id } })
+        }
+    });
 }
 </script>
 

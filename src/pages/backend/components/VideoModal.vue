@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useVideos } from '@/stores/videos';
 import type { Video } from '@/types/Video';
 import { Modal } from 'flowbite';
 import { onMounted, onUnmounted, ref, computed } from 'vue';
@@ -11,23 +10,24 @@ import Select from '@/components/Select.vue'
 import { useStage } from '@/stores/stage';
 import Editor from '@tinymce/tinymce-vue';
 import Skeleton from './Skeleton.vue'
-import { fetchStatusHandler } from '@/helpers/fetchStatusHandler';
+import Checkbox from '@/components/Checkbox.vue';
+import { useFetch } from "@/composables/fetch";
 
-const emits = defineEmits(['updateVideos'])
+const emits = defineEmits(['updateVideos']);
 const props = defineProps({
     videoID: {
         type: String,
         default: null
     }
-})
+});
 
-const stageStore = useStage()
+const fetch = useFetch();
+
+const stageStore = useStage();
 
 const router = useRouter()
 
 let modal : Modal
-
-const videosStore = useVideos()
 
 const data = ref<Video>()
 const processing = ref(false)
@@ -44,7 +44,7 @@ onMounted(async () => {
     })
     modal.show()
 
-    const response = await videosStore.getVideo(videoID)
+    const response = await fetch.show<Video>('videos', videoID)
     data.value = response.data
 })
 
@@ -73,24 +73,32 @@ const saveRecord = async (event : Event) => {
     if (!data.value) {
         return
     }
-    processing.value = true
-    const response = await videosStore.saveVideo(data.value.id, data.value)
-    fetchStatusHandler(response, 'update', { formEl: <Element>event.target })
-    processing.value = false
-    if (response.status === 204) {
-        emits('updateVideos')
-    }
-}
 
+    await fetch.update('videos', videoID, data.value, {
+        processing: processing,
+        formEl: <Element>event.target,
+        onSuccess() {
+            emits('updateVideos')
+        }
+    });
+}
 const deleteRecord = async () => {
-    deleteProcessing.value = true
-    const response = await videosStore.deleteVideo(videoID)
-    fetchStatusHandler(response, 'delete')
-    if (response.status === 204) {
-        router.push({ name: 'choirs-edit' })
-        emits('updateVideos')
-    }
-    deleteProcessing.value = false
+
+    await fetch.delete('videos', videoID, {
+        processing: deleteProcessing,
+        notifyOptions: {
+            onClick: async () => {
+                const response = await fetch.restore('videos', videoID);
+                if (! response.error) {
+                    await router.push({ name: 'choirs-edit-videos-edit', params: { videoID: videoID } });
+                }
+            }
+        },
+        onSuccess: async () => {
+            emits('updateVideos');
+            await router.push({ name: 'choirs-edit' });
+        }
+    });
 }
 
 </script>
@@ -150,6 +158,22 @@ const deleteRecord = async () => {
                         <div class="mb-5">
                             <InputLabel value="Stil" />
                             <Select class="mt-1 block w-full" v-model="data.style_id" :items="stageStore.attributes.styles"></Select>
+                        </div>
+                        <div class="mt-5">
+                            <label class="flex items-center">
+                                <Checkbox 
+                                    :checked="data.is_kids_and_youth"
+                                    v-model="data.is_kids_and_youth" />
+                                <span class="ml-2 text-sm text-gray-600">Kinder&Jugend</span>
+                            </label>
+                        </div>
+                        <div class="mt-5">
+                            <label class="flex items-center">
+                                <Checkbox 
+                                    :checked="data.is_rehearsal"
+                                    v-model="data.is_rehearsal" />
+                                <span class="ml-2 text-sm text-gray-600">Probenraum</span>
+                            </label>
                         </div>
                         <div class="mb-5">
                             <InputLabel value="Lied Text" />

@@ -6,6 +6,10 @@ import ChoirForm from "./components/ChoirForm.vue"
 import type { Choir } from '@/types/Choir'
 import VideoForm from './components/VideoModal.vue'
 import Skeleton from './components/Skeleton.vue'
+import type {Video} from "@/types/Video";
+import { useFetch } from "@/composables/fetch";
+
+const fetch = useFetch();
 
 const props = defineProps({
     id: {
@@ -29,9 +33,10 @@ onMounted(async () => {
 })
 
 const updateVideos = async () => {
-    isVideosProcessing.value = true
-    const response = await choirsStorage.getVideos(choirID)
-    isVideosProcessing.value = false
+    const response = await fetch.index<Video[]>('videos', { 'no_limit': 1, 'choir_id': choirID }, {
+        processing: isVideosProcessing
+    })
+
     if (choir.value) {
         choir.value.videos = response.data
     }
