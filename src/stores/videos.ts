@@ -1,14 +1,14 @@
-import axios from '@/lib/axios';
-import type { Choir } from '@/types/Choir';
 import type { Video } from '@/types/Video';
-import type { AxiosResponse } from 'axios';
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { defineStore } from 'pinia';
+import { useFetch } from "@/composables/fetch";
+
+const fetch = useFetch();
 
 export const useVideos = defineStore('videos', {
 
     state: () => {
         return {
-            
+            videos: [] as Video[]
         }
     },
 
@@ -17,5 +17,11 @@ export const useVideos = defineStore('videos', {
     },
 
     actions: {
+        async getVideos() {
+            const response = await fetch.index<Video[]>('videos', { 'no_limit': 1 });
+            if (! response.error) {
+                this.videos = response.data ?? [];
+            }
+        }
     }
 });

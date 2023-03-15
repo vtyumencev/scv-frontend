@@ -1,205 +1,247 @@
 <script setup lang="ts">
-import { useStage } from '../stores/stage'
+import { useLibrary } from '@/stores/library'
 import { onMounted, onUnmounted, ref, reactive, watch, computed } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router';
 import Select from '../components/Select.vue';
-import type { PaginatedRecordsList } from '@/types/PaginatedRecordsList';
 import type { Video } from '@/types/Video';
+import type { Choir } from "@/types/Choir";
+import StageVideoPlayer from "@/components/StageVideoPlayer.vue";
+import ConcertLayout from "@/layouts/ConcertLayout.vue";
+import StageDecorationElement from "@/components/StageDecorationElement.vue";
 
-const stageStore = useStage();
+const libraryStore = useLibrary();
+
 const router = useRouter();
 const route = useRoute();
 
-const isStageWindowEnabled = ref(false);
-
-const filters = reactive<Record<string, string>>({
-    'style': route.query.style as string ?? '',
-    'genre': route.query.genre as string ?? '' ,
-    'place': route.query.place as string ?? '' ,
-    'season': route.query.season as string ?? '' ,
+const props = defineProps({
+    videoID: {
+        type: String,
+        default: ''
+    },
+    playListIDs: {
+        type: String,
+        default: ''
+    }
 });
 
-const videos = ref<PaginatedRecordsList<Video[]>>();
+const dataIsReady = ref(false);
+const videoID = parseInt(props.videoID);
 
-const currentRoute = computed(() => route.query);
-
-watch(filters,  (newFilters) => {
-    const query = { ...route.query, ...newFilters };
-
-    Object.keys(query).forEach(function(key) {
-        if (!query[key]) {
-            delete query[key];
-        }
-    });
-
-    router.push({ query: query });
-    applyFilters();
+const videoController = reactive({
+    isPlaying: false,
+    videoToggle: () => { },
 });
 
-watch(() => route.query, async () => {
-    Object.keys(filters).forEach(function(key) {
-        filters[key] = route.query[key] as string ?? '';
-    })
-})
+// const filters = reactive<Record<string, string>>({
+//     'style': route.query.style as string ?? '',
+//     'genre': route.query.genre as string ?? '' ,
+//     'place': route.query.place as string ?? '' ,
+//     'season': route.query.season as string ?? '' ,
+// });
+//
+// watch(filters,  (newFilters) => {
+//     const query = { ...route.query, ...newFilters };
+//
+//     Object.keys(query).forEach(function(key) {
+//         if (!query[key]) {
+//             delete query[key];
+//         }
+//     });
+//
+//     router.push({ query: query });
+//     applyFilters();
+// });
+//
+// watch(() => route.query, async () => {
+//     Object.keys(filters).forEach(function(key) {
+//         filters[key] = route.query[key] as string ?? '';
+//     })
+// });
 
-onMounted(() => {
-    window.addEventListener('resize', () => stageSize());
-    stageSize();
-    applyStage(route.query.preset as string);
-    stageStore.getAttributes();
-    applyFilters();
+const onDataIsReady = () => {
+    if (!currentVideo.value) {
+        router.push({ name: 'page-not-found' });
+        return;
+    }
+    dataIsReady.value = true;
+};
+
+onMounted( () => {
+
 });
 
 onUnmounted(() => {
-    window.removeEventListener('resize', () => stageSize())
+
 });
 
-onBeforeRouteUpdate((to: RouteLocationNormalized) => {
-    const presetName = to.query.preset as string;
-    applyStage(presetName);
-})
+const currentPreset = computed(() => {
+    if (currentVideo.value) {
+        libraryStore.getChoirByID(currentVideo.value.choir_id);
 
-const applyFilters = async () => {
-    const response = await stageStore.getVideos();
-    videos.value = response.data;
-}
-
-const applyStage = (presetName: string) : void => {
-    const stageEl = document.querySelector('.stage') as HTMLElement;
-    if (! stageEl) {
-        return;
     }
-    const preset = stageStore.presets.find(obj => {
-        return obj.slug === presetName;
-    })
-    if (! preset) {
-        stageEl.style.backgroundColor = ``;
-        stageEl.style.backgroundImage = ``;
-        isStageWindowEnabled.value = false;
-        return;
-    }
-    isStageWindowEnabled.value = true;
-    stageEl.style.backgroundColor = preset.color;
-    if (preset.background) {
-        stageEl.style.backgroundImage = `url(${ preset.background })`;
-    }
-}
-
-const stageSize = () : void => {
-    const stageWrapperEl = document.querySelector('.stage-wrapper') as HTMLElement;
-    const stageEl = document.querySelector('.stage') as HTMLElement;
-    if (! stageWrapperEl || ! stageEl) {
-        return;
-    }
-    const ar = 16/9;
-    const sw = stageWrapperEl.clientWidth;
-    const ch = window.innerHeight;
-    let clh = sw / ar;
-    if (clh > ch) {
-        clh = ch;
-        stageEl.style.width = (clh * ar) + 'px';
-    } else {
-        stageEl.style.width = '';
-    }
-    stageEl.style.height = clh + 'px';
-}
-
-const getCurrentVideo = computed(() : string => {
-    if (!videos.value) {
-        return '';
-    }
-    return videos.value?.data.find((video) => video.id === parseInt(route.query.watch as string))?.source_vid ?? '';
+    return libraryStore.presets['leipzig'];
 });
+
+
+const currentVideo = computed(() : Video | false => {
+    return libraryStore.videos.find((video) => video.id === videoID) || false;
+});
+
+const currentChoir = computed(() : Choir | false => {
+    return libraryStore.getChoirByID(videoID);
+});
+
+const currentPlaceSlug = computed(() : string | false => {
+    if (! dataIsReady.value) {
+        return false;
+    }
+    const value = libraryStore.attributes.places.find(place => place.id === (currentVideo.value ? currentVideo.value.place_id : 0 ));
+    return value?.slug || false;
+});
+
+const playlist = computed(() : Video[] => {
+    if (!dataIsReady.value) {
+        return [];
+    }
+
+    const playListRawIDs = props.playListIDs.split(',');
+
+    return playListRawIDs
+        .map(item => Number.parseInt(item))
+        .filter(item => !isNaN(item))
+        .map(item => libraryStore.videos.find(video => video.id === item) as Video)
+        .filter(item => item !== undefined);
+});
+
+// const getChoirByID = () => {
+//
+// }
+
+// onBeforeRouteUpdate((to: RouteLocationNormalized) => {
+//     const presetName = to.query.preset as string;
+//     applyStage(presetName);
+// })
+//
+// const applyFilters = async () => {
+//     //const response = await libraryStore.getVideos();
+//     //videos.value = response.data;
+// }
+//
+// const applyStage = (presetName: string) : void => {
+//     const stageEl = document.querySelector('.stage') as HTMLElement;
+//     const stageBgEl = document.querySelector('.stage-bg') as HTMLElement;
+//     if (! stageEl) {
+//         return;
+//     }
+//     const preset = libraryStore.presets.find(obj => {
+//         return obj.slug === presetName;
+//     })
+//     if (! preset) {
+//         stageBgEl.style.backgroundColor = ``;
+//         stageBgEl.style.backgroundImage = ``;
+//         return;
+//     }
+//     stageBgEl.style.backgroundColor = preset.color;
+//     if (preset.background) {
+//         stageBgEl.style.backgroundImage = `url(${ preset.background })`;
+//     }
+// }
 
 </script>
 <template>
-    <div class="bg-white h-screen">
-        <div class="stage-container max-w-7xl- mx-auto h-full">
-            <div class="stage-container__wrapper stage-wrapper h-full flex justify-center items-center">
-                <div class="stage w-full">
-                    <div class="stage-presets" v-if="!isStageWindowEnabled">
-                        <template v-for="preset in stageStore.presets">
-                            <router-link :to="{ query: { 'preset': preset.slug } }" class="text-sm text-black">
-                                {{ preset.name }}
-                            </router-link>
-                        </template>
-                    </div>
-                    <div v-else class="relative stage-inner flex flex-col h-full">
-                        <div class="stage-body absolute w-full grow-1 h-full flex justify-center items-center">
-                            <div class="aspect-video -mt-[10%] w-[42%] border-2 border-black bg-white">
-                                <div class="h-full overflow-auto">
-                                    <template v-if="route.query.watch">
-                                        <iframe class="h-full w-[calc(100%+1px)]" :src="'https://www.youtube-nocookie.com/embed/' + getCurrentVideo + '?autoplay=1&controls=0'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                                    </template>
-                                    <template v-else>
-                                        <div class="sticky top-1 z-10 flex justify-center">
-                                            <div class="grid grid-flow-col gap-5 py-2 px-5 bg-white bg-opacity-80 backdrop-blur-sm rounded-md">
-                                                <button class="flex items-center">
-                                                    <svg class="mr-1 w-3.5 h-3.5" width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M4 5.49683V18.5032C4 20.05 5.68077 21.0113 7.01404 20.227L18.0694 13.7239C19.384 12.9506 19.384 11.0494 18.0694 10.2761L7.01404 3.77296C5.68077 2.98869 4 3.95 4 5.49683Z" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                    </svg>
-                                                    Play
-                                                </button>
-                                                <button class="flex items-center">
-                                                    <svg class="mr-1 w-4 h-4" fill="#000000" width="800px" height="800px" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M237.65723,178.34277a8.00122,8.00122,0,0,1,0,11.31446l-24,24A8.00066,8.00066,0,0,1,200,208V191.98584a72.13911,72.13911,0,0,1-57.65332-30.13721L100.63379,103.4502A56.11029,56.11029,0,0,0,55.06445,80H32a8,8,0,0,1,0-16H55.06445a72.14126,72.14126,0,0,1,58.58887,30.15137l41.71289,58.39843A56.0996,56.0996,0,0,0,200,175.97168V160a8.00065,8.00065,0,0,1,13.65723-5.65723Zm-94.64356-71.36132a7.99621,7.99621,0,0,0,11.15918-1.86036l1.19336-1.67089A56.0996,56.0996,0,0,1,200,80.02832V96a8.00053,8.00053,0,0,0,13.65723,5.65723l24-24a8.00122,8.00122,0,0,0,0-11.31446l-24-24A8.00065,8.00065,0,0,0,200,48V64.01416a72.13911,72.13911,0,0,0-57.65332,30.13721l-1.19336,1.6709A7.9986,7.9986,0,0,0,143.01367,106.98145Zm-30.02734,42.0371a7.99642,7.99642,0,0,0-11.15918,1.86036l-1.19336,1.67089A56.11029,56.11029,0,0,1,55.06445,176H32a8,8,0,0,0,0,16H55.06445a72.14126,72.14126,0,0,0,58.58887-30.15137l1.19336-1.6709A7.9986,7.9986,0,0,0,112.98633,149.01855Z"/>
-                                                    </svg>
-                                                    Shuffle
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="p-3 grid grid-cols-2 gap-3">
-                                            <router-link 
-                                                v-for="video in videos?.data" :to="{ query: { ...currentRoute, watch: video.id } }"
-                                                class="relative block">
-                                                <img :src="video.source_thumbnail_url" class="block">
-                                                <div class="absolute bottom-0 left-0 w-full h-[50%] bg-gradient-to-t from-black to-transparent"></div>
-                                                <div class="absolute bottom-0 left-0 w-full text-[12px] leading-normal text-white px-3 py-3">
-                                                    <div class="">{{ video.title }}</div>
-                                                </div>
-                                            </router-link>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-full absolute flex justify-between items-center py-5 px-8">
-                            <router-link :to="{ query: { } }" class="rounded-md border border-gray-300 bg-white bg-opacity-60 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
-                                Hauptmenü
-                            </router-link>
-                            <div class="grid grid-flow-col gap-4">
-                                <Select name="Stil" :items="stageStore.attributes.styles" v-model="filters.style"></Select>
-                                <Select name="Genre" :items="stageStore.attributes.genres" v-model="filters.genre"></Select>
-                                <Select name="Veranstaltungsort" :items="stageStore.attributes.places" v-model="filters.place"></Select>
-                                <Select name="Saison" :items="stageStore.attributes.seasons" v-model="filters.season"></Select>
-                            </div>
-                        </div>
+    <ConcertLayout :background-image="currentPreset.backgroundImage" @on-data-is-ready="onDataIsReady">
+        <div class="relative flex flex-col h-full">
+            <div class="absolute w-full grow-1 h-full flex justify-center items-center">
+                <div class="aspect-video bg-black -mt-[10%] -ml-[4px] w-[42%] text">
+                    <div class="h-full overflow-auto">
+                        <StageVideoPlayer
+                            v-if="currentVideo"
+                            class="h-full w-full"
+                            :video-id="currentVideo.source_vid"
+                            :video-controller="videoController"
+                        />
                     </div>
                 </div>
             </div>
+            <div v-if="currentPlaceSlug" class="stage-elements absolute w-full h-full overflow-hidden pointer-events-none">
+                <Transition name="stage-elements-light">
+                    <div v-show="!videoController.isPlaying">
+                        <StageDecorationElement
+                            v-for="element in libraryStore.places[currentPlaceSlug].stageElements"
+                            :key="element"
+                            :element="element"
+                            mode="light"
+                        />
+                    </div>
+                </Transition>
+                <Transition name="stage-elements-dark">
+                    <div v-show="videoController.isPlaying">
+                        <StageDecorationElement
+                            v-for="element in libraryStore.places[currentPlaceSlug].stageElements"
+                            :key="element"
+                            :element="element"
+                            mode="dark"
+                        />
+                    </div>
+                </Transition>
+            </div>
+            <div class="w-full absolute flex justify-between items-center py-5 px-8">
+                <div class=""></div>
+                <div class="flex space-x-2">
+                    <div v-show="playlist.length">
+                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                            Playlist
+                            <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[300px] dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                                <li
+                                    v-for="item in playlist"
+                                    class="px-5 py-1 flex space-x-2 hover:bg-gray-100 cursor-pointer">
+                                    <img :src="item.source_thumbnail_url" class="h-[40px] rounded-md">
+                                    <div class="">
+                                        {{ item.title }}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button
+                        class="rounded-md border border-gray-300 bg-white bg-opacity-60 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        @click="videoController.videoToggle">
+                        Pause / Play
+                    </button>
+                </div>
+<!--                            <div class="grid grid-flow-col gap-4">-->
+<!--                                <Select v-model="filters.style" name="Stil" :items="libraryStore.attributes.styles"></Select>-->
+<!--                                <Select v-model="filters.genre" name="Genre" :items="libraryStore.attributes.genres"></Select>-->
+<!--                                <Select v-model="filters.place" name="Veranstaltungsort" :items="libraryStore.attributes.places"></Select>-->
+<!--                                <Select v-model="filters.season" name="Saison" :items="libraryStore.attributes.seasons"></Select>-->
+<!--                            </div>-->
+            </div>
         </div>
-    </div>
+    </ConcertLayout>
 </template>
 
 <style scoped lang="scss">
-    .stage-container {
-        &__wrapper {
-            
-        }
+    .stage-elements-light-enter-active {
+        transition: all 0.2s 0s cubic-bezier(1, 0.5, 0.8, 1);
     }
-    .stage {
-        background-color: rgba($color: #fff, $alpha: 0.2);
-        transition: background-color 0.2s, background-image 0.2s;
-        background-size: cover;
-        background-position: center;
-        position: relative;
+    .stage-elements-light-leave-active {
+        transition: all 1s 1s cubic-bezier(1, 0.5, 0.8, 1);
     }
-    .stage-presets {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+
+    .stage-elements-dark-enter-active,
+    .stage-elements-dark-leave-active {
+        transition: all 1s 0s cubic-bezier(1, 0.5, 0.8, 1);
+    }
+
+    .stage-elements-dark-enter-from,
+    .stage-elements-dark-leave-to,
+    .stage-elements-light-enter-from,
+    .stage-elements-light-leave-to {
+        opacity: 0;
     }
 </style>

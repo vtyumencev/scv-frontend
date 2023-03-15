@@ -20,7 +20,7 @@ export const useChoirs = defineStore('choirs', {
                 { 'id': 'date_asc', 'name': 'Oldest' },
                 { 'id': 'date_desc', 'name': 'Newest' },
             ],
-            choirs: undefined as Choir[] | undefined,
+            choirs: [] as Choir[],
         }
     },
 
@@ -33,8 +33,8 @@ export const useChoirs = defineStore('choirs', {
             this.filterOrder = name
         },
         async getChoirs() {
-            const response = await fetch.index<Choir[]>('/api/choirs');
-            this.choirs = response.data;
+            const response = await fetch.index<Choir[]>('choirs');
+            this.choirs = response.data ?? [];
         },
         async getChoir(id: number) {
             return await axios
@@ -69,16 +69,6 @@ export const useChoirs = defineStore('choirs', {
         async deleteChoir(choirID: number) : Promise<AxiosResponse> {
             return await axios
                 .delete('/api/choirs/' + choirID)
-                .then(response => {
-                    return response
-                })
-                .catch(error => {
-                    return error.response
-                })
-        },
-        async restoreChoir(choirID: number) : Promise<AxiosResponse> {
-            return await axios
-                .post('/api/choirs/' + choirID + '/restore')
                 .then(response => {
                     return response
                 })

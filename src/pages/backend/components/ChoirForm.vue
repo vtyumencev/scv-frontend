@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { Choir } from '@/types/Choir';
-import { onMounted, ref, type PropType } from 'vue';
+import type {Choir} from '@/types/Choir';
+import {onMounted, type PropType, ref} from 'vue';
 import TextInput from '@/components/TextInput.vue';
 import InputLabel from '@/components/InputLabel.vue';
 import Select from '@/components/Select.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import { useStage } from '@/stores/stage';
-import { useChoirs } from '@/stores/choirs';
-import { fetchStatusHandler } from '@/helpers/fetchStatusHandler';
+import {useLibrary} from '@/stores/library';
 import Editor from '@tinymce/tinymce-vue';
 import VideoExplorer from './VideoExplorer.vue';
-import { useRouter } from 'vue-router';
+import {useRouter} from 'vue-router';
+import {useFetch} from "@/composables/fetch";
+
+const fetch = useFetch();
 
 const router = useRouter();
-const stageStore = useStage();
-const choirsStore = useChoirs();
+const stageStore = useLibrary();
 
 const processing = ref(false);
 const deleteProcessing = ref(false);
@@ -23,77 +23,75 @@ const formEl = ref();
 const props = defineProps({
     data: {
         type: Object as PropType<Choir>,
-        default: { }
+        default: { } as object
     },
     isVideosProcessing: {
         type: Boolean
     }
 });
 
+const data = ref<Choir>(props.data);
+
 onMounted(async () => {
     stageStore.getAttributes()
 });
 
-const save = async (e : Event) => {
-    processing.value = true;
-    const response = await choirsStore.saveChoir(props.data.id, props.data);
-    fetchStatusHandler(response, 'update', { formEl: formEl.value });
-    processing.value = false;
-    return response.status;
+const save = async () => {
+    return await fetch.update('choirs', props.data.id, props.data, {
+        processing: processing,
+        formEl: formEl.value
+    });
 }
 
-const saveAndNew = async (e : Event) => {
+const saveAndNew = async () => {
     if (processing.value) {
         return;
     }
-    const status = await save(e);
-    if (status === 204) {
-        router.push({ name: 'choirs-new' });
+    const response = await save();
+    if (! response.error) {
+        await router.push({ name: 'choirs-new' });
     }
 }
 
 const deleteRecord = async () => {
-    deleteProcessing.value = true
-    const response = await choirsStore.deleteChoir(props.data.id);
-    fetchStatusHandler(response, 'delete', {
-        restore: {
-            title: '',
-            onRestore: async () => {
-                const response = await choirsStore.restoreChoir(props.data.id);
-                fetchStatusHandler(response, 'restore');
-                if (response.status === 204) {
-                    router.push({ name: 'choirs-edit', params: { id: props.data.id } });
+
+    await fetch.delete('choirs', props.data.id, {
+        processing: deleteProcessing,
+        notifyOptions: {
+            onClick: async () => {
+                const response = await fetch.restore('choirs', props.data.id);
+                if (! response.error) {
+                    await router.push({ name: 'choirs-edit', params: { id: props.data.id } });
                 }
             }
+        },
+        onSuccess: async () => {
+            await router.push({ name: 'choirs-index' });
         }
     });
-    if (response.status === 204) {
-        router.push({ name: 'choirs-index' });
-    }
-    deleteProcessing.value = false
 }
 
 </script>
 
 <template>
-    <form ref="formEl" @submit.prevent="save" action="">
+    <form ref="formEl" action="" @submit.prevent="save">
         <div class="mb-5">
             <InputLabel for="name" value="Name" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.name" autocomplete="name" />
+            <TextInput v-model="data.name" type="text" class="mt-1 block w-full" autocomplete="name" />
             <div class="text-sm text-red-600" data-error-for="name"></div>
         </div>
         <div class="mb-5">
             <InputLabel value="Region" />
-            <Select class="mt-1 block w-full" name="Region is not selected" :items="stageStore.attributes.regions" v-model="data.region_id"></Select>
+            <Select v-model="data.region_id" class="mt-1 block w-full" name="Region is not selected" :items="stageStore.attributes.regions"></Select>
         </div>
         <div class="mb-5">
             <InputLabel value="Chortyp" />
-            <Select class="mt-1 block w-full" name="Type is not selected" :items="stageStore.attributes.choir_types" v-model="data.type_id"></Select>
+            <Select v-model="data.type_id" class="mt-1 block w-full" name="Type is not selected" :items="stageStore.attributes.choir_types"></Select>
         </div>
         <div class="mb-5">
             <InputLabel value="Videos" />
             <div class="mt-1 p-4 border rounded-md relative">
-                <VideoExplorer :items="data.videos" :choirID="data.id" v-bind="$attrs"></VideoExplorer>
+                <VideoExplorer :items="data.videos" :choir-i-d="data.id" v-bind="$attrs"></VideoExplorer>
                 <template v-if="isVideosProcessing">
                     <div class="absolute top-0 left-0 h-full w-full rounded-md bg-white bg-opacity-80"></div>
                     <div role="status" class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
@@ -105,27 +103,27 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Chorleitung" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.director" />
+            <TextInput v-model="data.director" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Adresse" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.contact_address" />
+            <TextInput v-model="data.contact_address" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Probenzeit" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.rehearsal_time" />
+            <TextInput v-model="data.rehearsal_time" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Telefonnumer" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.contact_phone" />
+            <TextInput v-model="data.contact_phone" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Mailadresse" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.contact_email" />
+            <TextInput v-model="data.contact_email" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Website" />
-            <TextInput type="text" class="mt-1 block w-full" v-model="data.contact_website" />
+            <TextInput v-model="data.contact_website" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel value="Beschreibung" />
@@ -145,9 +143,9 @@ const deleteRecord = async () => {
         <div class="flex justify-between mb-5 sticky bottom-0 py-3 bg-white z-[2] border-t">
             <div class="">
                 <PrimaryButton type="submit" :processing="processing">Save</PrimaryButton>
-                <PrimaryButton @click="saveAndNew" type="button" class="ml-2" :class="{'opacity-80' : processing}">Save and add new</PrimaryButton>
+                <PrimaryButton type="button" class="ml-2" :class="{'opacity-80' : processing}" @click="saveAndNew">Save and add new</PrimaryButton>
             </div>
-            <PrimaryButton @click="deleteRecord" type="button" button-style="danger" :processing="deleteProcessing">Delete</PrimaryButton>
+            <PrimaryButton type="button" button-style="danger" :processing="deleteProcessing" @click="deleteRecord">Delete</PrimaryButton>
         </div>
     </form>
 </template>

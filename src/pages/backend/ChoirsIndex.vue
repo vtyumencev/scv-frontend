@@ -2,33 +2,28 @@
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
 import { useChoirs } from '@/stores/choirs';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import {computed, onMounted, watch} from 'vue';
+import {computed, onMounted} from 'vue';
 import Skeleton from './components/Skeleton.vue';
 import TextInput from "@/components/TextInput.vue";
 import Select from "@/components/Select.vue";
 import type { Choir } from "@/types/Choir";
+import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 const choirsStorage = useChoirs();
 
 onMounted(async () => {
-    if (choirsStorage.choirs) {
+    if (choirsStorage.choirs.length) {
         return;
     }
     await choirsStorage.getChoirs();
 });
 
 const dateCalc = (date: string) => {
-    return new Date (date).toLocaleDateString(
-        'de-de',
-        {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-        }
-    );
+    return formatDistanceToNow(new Date(date), {
+        locale: de,
+        addSuffix: true
+    })
 }
 
 const filteredList = computed(() : Choir[] => {
@@ -88,7 +83,7 @@ const filteredList = computed(() : Choir[] => {
                                     class="cursor-pointer"
                                     @click="choirsStorage.filterOrder !== 'date_desc' ? choirsStorage.changeOrder('date_desc') : choirsStorage.changeOrder('date_asc')">Created At</div>
                             </div>
-                            <template v-if="choirsStorage.choirs">
+                            <template v-if="choirsStorage.choirs.length">
                                 <TransitionGroup v-if="filteredList.length" name="list" tag="ul">
                                     <li v-for="item in filteredList" :key="item" class="py-3 border-b last:border-0 grid grid-cols-[3fr_1fr]">
                                         <router-link

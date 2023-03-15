@@ -7,7 +7,7 @@ import InputLabel from '@/components/InputLabel.vue'
 import TextInput from '@/components/TextInput.vue'
 import PrimaryButton from '@/components/PrimaryButton.vue'
 import Select from '@/components/Select.vue'
-import { useStage } from '@/stores/stage';
+import { useLibrary } from '@/stores/library';
 import Editor from '@tinymce/tinymce-vue';
 import Skeleton from './Skeleton.vue'
 import Checkbox from '@/components/Checkbox.vue';
@@ -23,7 +23,7 @@ const props = defineProps({
 
 const fetch = useFetch();
 
-const stageStore = useStage();
+const stageStore = useLibrary();
 
 const router = useRouter()
 
@@ -124,7 +124,7 @@ const deleteRecord = async () => {
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto" v-if="data">
+                <div v-if="data" class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto">
                     <div class="mb-5 relative">
                         <img class="aspect-video rounded-md h-[120px] block" :src="data.source_thumbnail_url" alt="">
                         <div class="absolute bottom-2 left-2 text-white text-sm leading-none bg-black bg-opacity-30 px-2 py-0.5 rounded-md">{{ videoDurationText }}</div>

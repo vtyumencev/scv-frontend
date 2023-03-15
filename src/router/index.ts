@@ -1,6 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import { useUsers } from '@/stores/user';
-import Welcome from '@/pages/Welcome.vue';
 import Stage from '@/pages/Stage.vue';
 import PageNotFound from '@/pages/errors/404.vue';
 import Dashboard from '@/pages/Dashboard.vue';
@@ -10,6 +9,9 @@ import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 import ResetPassword from '@/pages/auth/ResetPassword.vue';
 import VerifyEmail from '@/pages/auth/VerifyEmail.vue';
 import type { RouteRecordRaw } from 'vue-router';
+import Index from "@/pages/Index.vue";
+
+import PresetsShow from "@/pages/PresetsShow.vue";
 
 import Choirs from '@/pages/backend/Choirs.vue';
 import ChoirsIndex from '@/pages/backend/ChoirsIndex.vue';
@@ -17,7 +19,6 @@ import ChoirsEdit from '@/pages/backend/ChoirsEdit.vue';
 import ChoirsNew from '@/pages/backend/ChoirsNew.vue';
 
 import Attributes from '@/pages/backend/Attributes.vue';
-import AttributesIndex from '@/pages/backend/AttributesIndex.vue';
 import Attribute from '@/pages/backend/Attribute.vue';
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
@@ -25,43 +26,38 @@ const APP_NAME = import.meta.env.VITE_APP_NAME;
 const routes : Array<RouteRecordRaw> = [
     {
         path: '/',
-        name: 'welcome',
-        component: Welcome,
-        meta: {
-            title: 'Welcome',
-            metaTags: [
-                {
-                    name: 'Welcome',
-                    content:
-                        'An application / authentication starter kit frontend in Vue.js 3 for Laravel Breeze.',
-                },
-                {
-                    property: 'og:Welcome',
-                    content:
-                        'An application / authentication starter kit frontend in Vue.js 3 for Laravel Breeze.',
-                },
-            ],
-        },
+        name: 'index',
+        component: Index,
     },
     {
-        path: '/stage',
-        name: 'Stage',
+        path: '/library',
+        name: 'library',
         component: Stage,
         meta: {
             title: 'Stage',
-            metaTags: [
-                {
-                    name: '',
-                    content:
-                        '',
-                },
-                {
-                    property: '',
-                    content:
-                        '',
-                },
-            ],
         },
+    },
+    {
+        path: '/presets/:presetName',
+        name: 'presets-show',
+        component: PresetsShow,
+        props: true
+    },
+    {
+        path: '/stage/:videoID(\\d+)',
+        name: 'stage',
+        component: Stage,
+        props: true,
+        meta: {
+            title: 'Stage',
+        },
+        children: [
+            {
+                path: 'playlist/:playListIDs',
+                name: 'stage-playlist',
+                component: Stage
+            }
+        ]
     },
     {
         path: '/dashboard',

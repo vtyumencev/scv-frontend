@@ -147,8 +147,8 @@ export function useFetch() {
     }
 
     return {
-        async index<T>(path: string, params?: object, options?: HandlerOption) {
-            return await execute<T>('get', path, params, { }, { action: 'index', ...options });
+        async index<T>(resource: string, params?: object, options?: HandlerOption) {
+            return await execute<T>('get', `/api/${resource}`, params, { }, { action: 'index', ...options });
         },
         async show<T>(resource: string, id: number) {
             return await execute<T>('get', `/api/${resource}/${id}`, {}, {}, { action: 'show' });
