@@ -2,12 +2,25 @@
 
 import FrontendLayout from "@/layouts/FrontendLayout.vue";
 import {onMounted, onUnmounted, ref} from "vue";
+import ApplicationLogo from "@/components/ApplicationLogo.vue";
+import navigation from '../../public/storage/navigation.json';
+import type { SiteNavigation } from "@/types/SiteNavigation";
+
+const navigationLinks = navigation as SiteNavigation;
 
 defineProps({
     backgroundImage: {
         type: String,
-        default: ''
-    }
+        default: '',
+    },
+    backgroundImageDark: {
+        type: String,
+        default: '',
+    },
+    isDark: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const dataIsReady = ref(false);
@@ -67,31 +80,36 @@ const concertSize = () : void => {
             <div id="concert-container" class="concert-container mx-auto h-full">
                 <div class="concert-container__wrapper concert-wrapper h-full flex justify-center items-center">
                     <div class="concert relative w-full">
-                        <img
-                            :src="backgroundImage"
-                            class="absolute w-full h-full object-cover object-center"
-                            alt="">
+                        <div class="pointer-events-none">
+                            <img
+                                :src="backgroundImage"
+                                class="absolute w-full h-full object-cover object-center"
+                                alt="">
+                            <Transition>
+                                <template v-if="isDark && backgroundImageDark">
+                                        <img
+                                            :src="backgroundImageDark"
+                                            class="absolute w-full h-full object-cover object-center"
+                                            alt="">
+                                </template>
+                            </Transition>
+                        </div>
                         <slot/>
                         <div class="absolute left-0 top-0">
-                            <router-link
-                                :to="{ name: 'index' }"
-                                class="block w-[150px] mt-5 ml-5">
-                                <img src="/public/logo.png" class="w-full" alt="">
-                            </router-link>
+                            <ApplicationLogo class="mt-5 ml-5" />
                         </div>
-                        <div class="absolute bottom-0 w-full flex justify-between text-white text-xs px-3 py-1 font-serif">
+                        <div class="absolute bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="grid grid-flow-col gap-2">
                                 <router-link
-                                    to=""
-                                    class="bg-black px-1.5 bg-opacity-50 rounded-sm">
-                                    Datenschutz
-                                </router-link>
-                                <router-link
-                                    to=""
-                                    class="bg-black px-1.5 bg-opacity-50 rounded-sm">
-                                    Impressum
+                                    v-for="navLink in navigationLinks.footer"
+                                    :key="navLink"
+                                    class="bg-black px-1.5 bg-opacity-50 rounded-sm"
+                                    :to="{ name: navLink.routeName }">
+                                    {{ navLink.name }}
                                 </router-link>
                             </div>
+                        </div>
+                        <div class="absolute right-0 bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="bg-black px-1.5 bg-opacity-50 rounded-sm">
                                 © Sächsischer Chorverband e.V.
                             </div>
@@ -105,11 +123,13 @@ const concertSize = () : void => {
 
 <style lang="scss">
 
-.concert {
-    background-color: rgba($color: #fff, $alpha: 0.2);
-    transition: background-color 0.2s, background-image 0.2s;
-    background-size: cover;
-    background-position: center;
-    position: relative;
+.v-enter-active,
+.v-leave-active {
+    transition: all 1s cubic-bezier(1, 0.5, 0.8, 1);
 }
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
+
 </style>

@@ -17,10 +17,10 @@ const attributesStorage = useAttributes();
             <div
                 class="space-x-5 ml-10 flex">
                 <router-link
-                    :to="{ name: 'attribute', params: { attributeName: attribute.slug } }"
                     v-for="attribute in attributesStorage?.navigation"
-                    custom
-                    v-slot="{ href, isActive, navigate }">
+                    v-slot="{ href, isActive, navigate }"
+                    :to="{ name: 'attribute', params: { attributeName: attribute.slug } }"
+                    custom>
                     <NavLink
                         :href="href"
                         :active="isActive"

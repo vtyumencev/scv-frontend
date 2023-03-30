@@ -1,32 +1,36 @@
 import axios from '@/lib/axios';
 import type { Method } from 'axios';
 import { toast, type ToastOptions } from "vue3-toastify";
-import {h, type Ref, type RendererElement} from "vue";
+import { h, type Ref, type RendererElement } from "vue";
 import NotifyCallback from "@/pages/backend/components/NotifyCallback.vue";
 import type NotifyCallbackOptions from "@/pages/backend/components/NotifyCallback.vue";
 import type { AxiosResponse } from "axios";
+import { useUsers } from "@/stores/user";
 
 export declare type FetchResponse<T> = {
     error?: AxiosResponse,
     data?: T,
 }
 
-const RESPONSE_UNPROCESSABLE = 422
-const RESPONSE_NOT_FOUND = 404
+const RESPONSE_UNAUTHORIZED = 401;
+const RESPONSE_NOT_FOUND = 404;
+const RESPONSE_UNPROCESSABLE = 422;
 
-const NOTIFY_AUTO_CLOSE_TIMEOUT = 5000
+const NOTIFY_AUTO_CLOSE_TIMEOUT = 5000;
 
-type Action = 'index' | 'show' | 'store' | 'update' | 'delete' | 'restore'
+type Action = 'index' | 'show' | 'store' | 'update' | 'delete' | 'restore' | 'login';
 
 type ActionComments = {
     success?: string,
     error: string,
     errorNotFound: string,
+    errorUnauthorized: string
 }
 
 const actionCommentBase = {
     error: 'An unknown error has occurred',
     errorNotFound: 'Resource not found',
+    errorUnauthorized: 'Unauthorized action',
 }
 
 const actionComments : Record<string, ActionComments> = {
@@ -37,7 +41,7 @@ const actionComments : Record<string, ActionComments> = {
         ...actionCommentBase
     },
     store: {
-        success: 'New record has been added',
+        success: 'New entry has been added',
         ...actionCommentBase
     },
     update: {
@@ -45,11 +49,14 @@ const actionComments : Record<string, ActionComments> = {
         ...actionCommentBase
     },
     delete: {
-        success: 'The record has been deleted',
+        success: 'The entry has been deleted',
         ...actionCommentBase
     },
     restore: {
-        success: 'The record has been restored',
+        success: 'The entry has been restored',
+        ...actionCommentBase
+    },
+    login: {
         ...actionCommentBase
     }
 }
@@ -70,6 +77,7 @@ type HandlerOption = {
     formEl?: Element,
     notifyOptions?: NotifyCallbackOptions,
     processing?: Ref,
+    disableNotify?: boolean
     // eslint-disable-next-line no-unused-vars
     onSuccess?(response: AxiosResponse): void
 }
@@ -77,7 +85,7 @@ type HandlerOptionFull = HandlerOption & {
     action: Action,
 }
 
-export function useFetch() {
+export function useAPI() {
 
     const notify = <T>(response: FetchResponse<T>, options: HandlerOptionFull) => {
 
@@ -86,20 +94,23 @@ export function useFetch() {
 
         if (response.error?.status === RESPONSE_UNPROCESSABLE) {
             Object.entries(response.error.data.errors as Record<string, Array<string>>).forEach(entry => {
-                const [key, value] = entry
+                const [key, value] = entry;
 
-                toast(value[0], error)
+                toast(value[0], error);
 
                 if (options?.formEl) {
-                    const errorTextBox = options?.formEl.querySelector(`[data-error-for="${ key }"]`)
+                    const errorTextBox = options?.formEl.querySelector(`[data-error-for="${ key }"]`);
                     if (errorTextBox) {
-                        errorTextBox.innerHTML = value[0]
+                        errorTextBox.innerHTML = value[0];
                     }
                 }
             });
         }
         else if (response.error?.status === RESPONSE_NOT_FOUND) {
             toast(actionComment.errorNotFound, error);
+        }
+        else if (response.error?.status === RESPONSE_UNAUTHORIZED) {
+            toast(actionComment.errorUnauthorized, error);
         }
         else if (response.error) {
             toast(actionComment.error, error);
@@ -115,16 +126,27 @@ export function useFetch() {
         }
 
     }
-    const execute = async <T>(method: Method, path: string, params: object = { }, requestData: object = { }, options?: HandlerOptionFull) : Promise<FetchResponse<T>> => {
+    const execute = async <T>(
+        method: Method,
+        path: string,
+        params: object = { },
+        requestData: object = { },
+        options?: HandlerOptionFull
+    ) : Promise<FetchResponse<T>> => {
         if (options?.processing) {
             options.processing.value = true;
         }
+
+        const userStore = useUsers();
 
         const response = await axios({
             method: method,
             url: path,
             data: requestData,
             params: params,
+            headers: {
+                Authorization: `Bearer ${userStore.userToken}`
+            }
         }).then((response) => {
             if (options?.onSuccess) {
                 options?.onSuccess(response);
@@ -135,7 +157,7 @@ export function useFetch() {
             return { error: error.response };
         });
 
-        if (options) {
+        if (options && !options.disableNotify) {
             notify<T>(response, options);
         }
 
@@ -154,7 +176,7 @@ export function useFetch() {
             return await execute<T>('get', `/api/${resource}/${id}`, {}, {}, { action: 'show' });
         },
         async store(resource: string, data: object = { }, options?: HandlerOption) {
-            return await execute('post', `/api/${resource}`, {}, data, { action: 'update', ...options });
+            return await execute('post', `/api/${resource}`, {}, data, { action: 'store', ...options });
         },
         async update(resource: string, id: number, data: object, options?: HandlerOption) {
             return await execute('put', `/api/${resource}/${id}`, {}, data, { action: 'update', ...options });
@@ -166,6 +188,9 @@ export function useFetch() {
         },
         async restore(resource: string, id: number) {
             return await execute<void>('put', `/api/${resource}/${id}/restore`, {}, {}, { action: 'restore' });
+        },
+        async login<T>(credentials: object, options?: HandlerOption) {
+            return await execute<T>('post', `/login`, {}, credentials, { action: 'login', ...options });
         }
     }
 }

@@ -7,11 +7,12 @@
       "@/*": ["./src/*"]
     },
     "lib": ["es2017"],
-    //"typeRoots": ["./node_modules/@types","./src/types/window.d.ts"]
+    //"typeRoots": ["./src/types.d.ts"]
   },
   "references": [
     {
       "path": "./tsconfig.config.json"
     }
-  ]
+  ],
+  "resolveJsonModule": true
 }

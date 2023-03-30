@@ -4,32 +4,25 @@ import InputLabel from '@/components/InputLabel.vue';
 import TextInput from '@/components/TextInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useChoirs } from '@/stores/choirs';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import { fetchStatusHandler } from '@/helpers/fetchStatusHandler';
+import {useAPI} from "@/composables/fetch";
+import type {AxiosResponse} from "axios";
 
 const router = useRouter();
 
-const choirsStore = useChoirs();
+const api = useAPI();
 
 const choirName = ref('');
 
 const processing = ref(false);
 
 const storeRecord = async () => {
-
-    processing.value = true;
-
-    const response = await choirsStore.storeChoir({
-        name: choirName.value
+    await api.store(`choirs`, { name: choirName.value },{
+        processing: processing,
+        onSuccess: (response: AxiosResponse) => {
+            router.push({ name: 'choirs-edit', params: { id: response.data.id } });
+        }
     });
-
-    fetchStatusHandler(response, 'store')
-
-    if (response.status === 201) {
-        await router.push({ name: 'choirs-edit', params: { id: response.data.id } })
-    }
-    processing.value = false;
 }
 
 </script>

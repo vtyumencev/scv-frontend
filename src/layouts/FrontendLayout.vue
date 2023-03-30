@@ -7,6 +7,7 @@ const stageStore = useLibrary();
 const emits = defineEmits(['onDataIsReady']);
 
 onMounted( async () => {
+
     if (! stageStore.dataIsReady) {
 
         const responses = await Promise.all([
@@ -25,8 +26,7 @@ onMounted( async () => {
     }
 
     emits('onDataIsReady');
-})
-
+});
 
 </script>
 

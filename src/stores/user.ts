@@ -1,154 +1,144 @@
-import axios from '@/lib/axios'
-import { useStorage } from '@vueuse/core'
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import axios from '@/lib/axios';
+import { useStorage } from '@vueuse/core';
+import { defineStore, acceptHMRUpdate } from 'pinia';
+import type {Ref} from "vue";
+import {useAPI} from "@/composables/fetch";
 
-const csrf = () => axios.get('/sanctum/csrf-cookie')
+const csrf = () => axios.get('/sanctum/csrf-cookie');
+
+const api = useAPI();
 
 export const useUsers = defineStore('users', {
     state: () => ({
-        userLogin: useStorage('userLogin', {}),
-        userData: useStorage('userData', []),
-        authStatus: useStorage('authStatus', []),
+        userToken: useStorage('userToken', '' as string | null),
+        userData: {},
     }),
 
     getters: {
-        authUser: state => state.authStatus === 204,
-        hasUserData: state => Object.keys(state.userData).length > 0,
-        hasVerified: state =>
-            Object.keys(state.userData).length > 0
-                ? state.userData.email_verified_at !== null
-                : false,
+        authUser: state => state.userToken,
+        hasUserData: state => Object.keys(state.userData).length > 0
     },
 
     actions: {
-        getData() {
-            axios
-                .get('/api/user')
-                .then(response => {
-                    this.userData = response.data
-                })
-                .catch(error => {
-                    if (error.response.status !== 409) throw error
+        async getData() {
+            const { data, error } = await api.index<Record<string, string>>(
+                'user',
+                {},
+                { disableNotify: true }
+            );
 
-                    this.router.push('/verify-email')
-                })
+            if (error) {
+                this.userToken = null;
+                this.router.push({ name: 'login' });
+                return;
+            }
+
+            if (data) {
+                this.userData = data;
+            }
         },
 
-        async register(form, setErrors, processing) {
-            await csrf()
+        async login(form: Ref<object>, processing: Ref<boolean>) {
 
-            processing.value = true
+            processing.value = true;
 
-            axios
-                .post('/register', form.value)
-                .then(response => {
-                    this.authStatus = response.status
-                    processing.value = false
+            await csrf();
 
-                    this.router.push({ name: 'dashboard' })
-                })
-                .catch(error => {
-                    if (error.response.status !== 422) throw error
+            const { error, data } = await api.login<{token: string}>(form.value);
 
-                    setErrors.value = Object.values(
-                        error.response.data.errors,
-                    ).flat()
-                    processing.value = false
-                })
+            if (error || ! data) {
+                processing.value = false;
+                return;
+            }
+
+            this.userToken = data.token;
+
+            await this.getData();
+
+            processing.value = false;
+
+            this.router.push({ name: 'choirs-index' });
         },
 
-        async login(setErrors, processing) {
-            await csrf()
+        // async register(form, setErrors, processing) {
+        //     await csrf()
+        //
+        //     processing.value = true
+        //
+        //     axios
+        //         .post('/register', form.value)
+        //         .then(response => {
+        //             this.authStatus = response.status
+        //             processing.value = false
+        //
+        //             this.router.push({ name: 'dashboard' })
+        //         })
+        //         .catch(error => {
+        //             if (error.response.status !== 422) throw error
+        //
+        //             setErrors.value = Object.values(
+        //                 error.response.data.errors,
+        //             ).flat()
+        //             processing.value = false
+        //         })
+        // },
 
-            processing.value = true
-
-            axios
-                .post('/login', this.userLogin)
-                .then(response => {
-                    this.authStatus = response.status
-                    processing.value = false
-
-                    this.router.push({ name: 'dashboard' })
-                })
-                .catch(error => {
-                    if (error.response.status !== 422) throw error
-
-                    setErrors.value = Object.values(
-                        error.response.data.errors,
-                    ).flat()
-                    processing.value = false
-                })
-        },
-
-        async forgotPassword(form, setStatus, setErrors, processing) {
-            await csrf()
-
-            processing.value = true
-
-            axios
-                .post('/forgot-password', form.value)
-                .then(response => {
-                    setStatus.value = response.data.status
-                    processing.value = false
-                })
-                .catch(error => {
-                    if (error.response.status !== 422) throw error
-
-                    setErrors.value = Object.values(
-                        error.response.data.errors,
-                    ).flat()
-                    processing.value = false
-                })
-        },
-
-        async resetPassword(form, setErrors, processing) {
-            await csrf()
-
-            processing.value = true
-
-            axios
-                .post('/reset-password', form.value)
-                .then(response => {
-                    this.router.push(
-                        '/login?reset=' + btoa(response.data.status),
-                    )
-                    processing.value = false
-                })
-                .catch(error => {
-                    if (error.response.status !== 422) throw error
-
-                    setErrors.value = Object.values(
-                        error.response.data.errors,
-                    ).flat()
-                    processing.value = false
-                })
-        },
-
-        resendEmailVerification(setStatus, processing) {
-            processing.value = true
-
-            axios.post('/email/verification-notification').then(response => {
-                setStatus.value = response.data.status
-                processing.value = false
-            })
-        },
+        // async forgotPassword(form, setStatus, setErrors, processing) {
+        //     await csrf()
+        //
+        //     processing.value = true
+        //
+        //     axios
+        //         .post('/forgot-password', form.value)
+        //         .then(response => {
+        //             setStatus.value = response.data.status
+        //             processing.value = false
+        //         })
+        //         .catch(error => {
+        //             if (error.response.status !== 422) throw error
+        //
+        //             setErrors.value = Object.values(
+        //                 error.response.data.errors,
+        //             ).flat()
+        //             processing.value = false
+        //         })
+        // },
+        //
+        // async resetPassword(form, setErrors, processing) {
+        //     await csrf()
+        //
+        //     processing.value = true
+        //
+        //     axios
+        //         .post('/reset-password', form.value)
+        //         .then(response => {
+        //             this.router.push(
+        //                 '/login?reset=' + btoa(response.data.status),
+        //             )
+        //             processing.value = false
+        //         })
+        //         .catch(error => {
+        //             if (error.response.status !== 422) throw error
+        //
+        //             setErrors.value = Object.values(
+        //                 error.response.data.errors,
+        //             ).flat()
+        //             processing.value = false
+        //         })
+        // },
+        //
+        // resendEmailVerification(setStatus, processing) {
+        //     processing.value = true
+        //
+        //     axios.post('/email/verification-notification').then(response => {
+        //         setStatus.value = response.data.status
+        //         processing.value = false
+        //     })
+        // },
 
         async logout() {
-            await axios
-                .post('/logout')
-                .then(() => {
-                    this.$reset()
-                    if (!this.userLogin.remember) {
-                        this.userLogin = {}
-                    }
-                    this.userData = {}
-                    this.authStatus = []
-
-                    this.router.push({ name: 'welcome' })
-                })
-                .catch(error => {
-                    if (error.response.status !== 422) throw error
-                })
+            this.userToken = '';
+            this.router.push({ name: 'login' });
         },
     },
 })

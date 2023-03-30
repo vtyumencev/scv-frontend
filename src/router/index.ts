@@ -4,10 +4,10 @@ import Stage from '@/pages/Stage.vue';
 import PageNotFound from '@/pages/errors/404.vue';
 import Dashboard from '@/pages/Dashboard.vue';
 import Login from '@/pages/auth/Login.vue';
-import Register from '@/pages/auth/Register.vue';
-import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
-import ResetPassword from '@/pages/auth/ResetPassword.vue';
-import VerifyEmail from '@/pages/auth/VerifyEmail.vue';
+// import Register from '@/pages/auth/Register.vue';
+// import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
+// import ResetPassword from '@/pages/auth/ResetPassword.vue';
+// import VerifyEmail from '@/pages/auth/VerifyEmail.vue';
 import type { RouteRecordRaw } from 'vue-router';
 import Index from "@/pages/Index.vue";
 
@@ -20,10 +20,17 @@ import ChoirsNew from '@/pages/backend/ChoirsNew.vue';
 
 import Attributes from '@/pages/backend/Attributes.vue';
 import Attribute from '@/pages/backend/Attribute.vue';
+import TestPage from "@/pages/TestPage.vue";
+import Library from "@/pages/Library.vue";
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
 
 const routes : Array<RouteRecordRaw> = [
+    {
+        path: '/test',
+        name: 'test',
+        component: TestPage,
+    },
     {
         path: '/',
         name: 'index',
@@ -32,16 +39,19 @@ const routes : Array<RouteRecordRaw> = [
     {
         path: '/library',
         name: 'library',
-        component: Stage,
-        meta: {
-            title: 'Stage',
-        },
+        component: Library,
     },
     {
         path: '/presets/:presetName',
         name: 'presets-show',
         component: PresetsShow,
-        props: true
+        props: true,
+    },
+    {
+        path: '/presets/:presetName/stage/:videoID(\\d+)',
+        name: 'preset-stage',
+        component: Stage,
+        props: true,
     },
     {
         path: '/stage/:videoID(\\d+)',
@@ -153,48 +163,48 @@ const routes : Array<RouteRecordRaw> = [
             guard: 'guest',
         },
     },
-    {
-        path: '/register',
-        name: 'register',
-        component: Register,
-        meta: {
-            title: 'Register',
-            guard: 'guest',
-        },
-    },
-    {
-        path: '/forgot-password',
-        name: 'forgot-password',
-        component: ForgotPassword,
-        meta: {
-            title: 'Forget Password',
-            guard: 'guest',
-        },
-    },
-    {
-        path: '/password-reset/:token',
-        name: 'password-reset',
-        component: ResetPassword,
-        // query: {
-        //     email: 'email',
-        // },
-        meta: {
-            title: 'Reset Password',
-            guard: 'guest',
-        },
-    },
-    {
-        path: '/verify-email',
-        name: 'verify-email',
-        component: VerifyEmail,
-        // query: {
-        //     resend: 'resend',
-        // },
-        meta: {
-            title: 'Email Verification',
-            guard: 'auth',
-        },
-    },
+    // {
+    //     path: '/register',
+    //     name: 'register',
+    //     component: Register,
+    //     meta: {
+    //         title: 'Register',
+    //         guard: 'guest',
+    //     },
+    // },
+    // {
+    //     path: '/forgot-password',
+    //     name: 'forgot-password',
+    //     component: ForgotPassword,
+    //     meta: {
+    //         title: 'Forget Password',
+    //         guard: 'guest',
+    //     },
+    // },
+    // {
+    //     path: '/password-reset/:token',
+    //     name: 'password-reset',
+    //     component: ResetPassword,
+    //     // query: {
+    //     //     email: 'email',
+    //     // },
+    //     meta: {
+    //         title: 'Reset Password',
+    //         guard: 'guest',
+    //     },
+    // },
+    // {
+    //     path: '/verify-email',
+    //     name: 'verify-email',
+    //     component: VerifyEmail,
+    //     // query: {
+    //     //     resend: 'resend',
+    //     // },
+    //     meta: {
+    //         title: 'Email Verification',
+    //         guard: 'auth',
+    //     },
+    // },
     {
         path: '/page-not-found',
         name: 'page-not-found',

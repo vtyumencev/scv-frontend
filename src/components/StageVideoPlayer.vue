@@ -22,7 +22,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-    console.log('Player has been destroyed');
+    console.debug('Player has been destroyed');
     videoPlayer.value.destroy();
 });
 
@@ -42,7 +42,7 @@ const youtubeAPIPrepare = () => {
         }
 
         window.onYouTubeIframeAPIReady = () => {
-            console.log('API is ready');
+            console.debug('Youtube API is ready');
             youtubeAPIisReady.value = true;
             resolve(true);
         }
@@ -66,7 +66,7 @@ const youtubePlayerInit = async () => {
         },
         events: {
             'onReady': () => {
-                videoPlayer.value.playVideo();
+                //videoPlayer.value.playVideo();
             },
             'onStateChange': (data: { data: number, target: HTMLElement }) => {
                 if (data.data === window.YT.PlayerState.PLAYING || data.data === window.YT.PlayerState.BUFFERING) {

@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import {onMounted, ref} from 'vue'
 
-defineProps(['modelValue'])
+defineProps({
+    modelValue: {
+        type: String,
+        default: ''
+    }
+});
 
 const emits = defineEmits(['update:modelValue'])
 
@@ -13,15 +18,17 @@ const onUpdated = (event : Event) => {
 
 onMounted(() => {
     if (input.value?.hasAttribute('autofocus')) {
-        input.value.focus()
+        input.value.focus();
     }
-})
+});
+
 </script>
 
 <template>
     <input
+        ref="input"
         class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
         :value="modelValue"
         @input="onUpdated"
-        ref="input" />
+    />
 </template>

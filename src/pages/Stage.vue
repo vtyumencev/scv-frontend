@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import { useLibrary } from '@/stores/library'
-import { onMounted, onUnmounted, ref, reactive, watch, computed } from 'vue';
-import { onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router';
-import Select from '../components/Select.vue';
+import { type Presets, useLibrary } from '@/stores/library'
+import {
+    ref,
+    reactive,
+    computed,
+    type PropType
+} from 'vue';
+import { useRouter } from 'vue-router';
 import type { Video } from '@/types/Video';
-import type { Choir } from "@/types/Choir";
 import StageVideoPlayer from "@/components/StageVideoPlayer.vue";
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
 import StageDecorationElement from "@/components/StageDecorationElement.vue";
+import StageNavigation from "@/components/StageNavigation.vue";
 
 const libraryStore = useLibrary();
 
 const router = useRouter();
-const route = useRoute();
 
 const props = defineProps({
+    presetName: {
+        type: String as PropType<Presets>,
+        default: null
+    },
     videoID: {
         type: String,
         default: ''
@@ -30,7 +37,7 @@ const videoID = parseInt(props.videoID);
 
 const videoController = reactive({
     isPlaying: false,
-    videoToggle: () => { },
+    videoToggle: () => undefined,
 });
 
 // const filters = reactive<Record<string, string>>({
@@ -59,28 +66,51 @@ const videoController = reactive({
 //     })
 // });
 
-const onDataIsReady = () => {
+const onDataIsReady = async () => {
     if (!currentVideo.value) {
-        router.push({ name: 'page-not-found' });
+        await router.push({ name: 'page-not-found' });
         return;
     }
     dataIsReady.value = true;
+
+    /**
+     * Preloading the assets
+     */
+    if (currentPlaceSlug.value) {
+        let imagesToBeLoaded = [] as Array<string>;
+        libraryStore.places[currentPlaceSlug.value].stageElements.forEach((element) => {
+            if (element.assets.dark) {
+                imagesToBeLoaded.push(element.assets.dark);
+            }
+            if (element.assets.light) {
+                imagesToBeLoaded.push(element.assets.light);
+            }
+        });
+        const images = imagesToBeLoaded.map(imageSrc => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = imageSrc;
+                img.onload = resolve;
+                img.onerror = reject;
+            });
+        });
+        await Promise
+            .all(images)
+            .then(() => undefined)
+            .catch(error => {
+            console.error("Some image(s) failed loading!");
+            console.error(error.message)
+        });
+
+        document.getElementById('concert-view')?.classList.add('entered');
+    }
 };
-
-onMounted( () => {
-
-});
-
-onUnmounted(() => {
-
-});
 
 const currentPreset = computed(() => {
     if (currentVideo.value) {
-        libraryStore.getChoirByID(currentVideo.value.choir_id);
-
+        //libraryStore.getChoirByID(currentVideo.value.choir_id);
     }
-    return libraryStore.presets['leipzig'];
+    return libraryStore.presets[props.presetName];
 });
 
 
@@ -88,16 +118,16 @@ const currentVideo = computed(() : Video | false => {
     return libraryStore.videos.find((video) => video.id === videoID) || false;
 });
 
-const currentChoir = computed(() : Choir | false => {
-    return libraryStore.getChoirByID(videoID);
-});
+// const currentChoir = computed(() : Choir | false => {
+//     return libraryStore.getChoirByID(videoID);
+// });
 
-const currentPlaceSlug = computed(() : string | false => {
+const currentPlaceSlug = computed(() : string | undefined => {
     if (! dataIsReady.value) {
-        return false;
+        return undefined;
     }
     const value = libraryStore.attributes.places.find(place => place.id === (currentVideo.value ? currentVideo.value.place_id : 0 ));
-    return value?.slug || false;
+    return value?.slug || undefined;
 });
 
 const playlist = computed(() : Video[] => {
@@ -150,8 +180,8 @@ const playlist = computed(() : Video[] => {
 
 </script>
 <template>
-    <ConcertLayout :background-image="currentPreset.backgroundImage" @on-data-is-ready="onDataIsReady">
-        <div class="relative flex flex-col h-full">
+    <ConcertLayout :background-image="currentPreset.backgroundImage" :background-image-dark="currentPreset.backgroundImageDark" :is-dark="videoController.isPlaying" @on-data-is-ready="onDataIsReady">
+        <div id="concert-view" class="relative flex flex-col h-full">
             <div class="absolute w-full grow-1 h-full flex justify-center items-center">
                 <div class="aspect-video bg-black -mt-[10%] -ml-[4px] w-[42%] text">
                     <div class="h-full overflow-auto">
@@ -186,6 +216,9 @@ const playlist = computed(() : Video[] => {
                     </div>
                 </Transition>
             </div>
+            <!-- Stage Navigation -->
+            <StageNavigation :video-controller="videoController" :back-action="{ name: 'presets-show', params: { presetName: presetName } }" />
+            <!-- Stage Navigation -->
             <div class="w-full absolute flex justify-between items-center py-5 px-8">
                 <div class=""></div>
                 <div class="flex space-x-2">
@@ -199,8 +232,9 @@ const playlist = computed(() : Video[] => {
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                 <li
                                     v-for="item in playlist"
+                                    :key="item"
                                     class="px-5 py-1 flex space-x-2 hover:bg-gray-100 cursor-pointer">
-                                    <img :src="item.source_thumbnail_url" class="h-[40px] rounded-md">
+                                    <img :src="item.source_thumbnail_url" class="h-[40px] rounded-md" alt="">
                                     <div class="">
                                         {{ item.title }}
                                     </div>
@@ -208,11 +242,11 @@ const playlist = computed(() : Video[] => {
                             </ul>
                         </div>
                     </div>
-                    <button
-                        class="rounded-md border border-gray-300 bg-white bg-opacity-60 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                        @click="videoController.videoToggle">
-                        Pause / Play
-                    </button>
+<!--                    <button-->
+<!--                        class="rounded-md border border-gray-300 bg-white bg-opacity-60 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"-->
+<!--                        @click="videoController.videoToggle">-->
+<!--                        Pause / Play-->
+<!--                    </button>-->
                 </div>
 <!--                            <div class="grid grid-flow-col gap-4">-->
 <!--                                <Select v-model="filters.style" name="Stil" :items="libraryStore.attributes.styles"></Select>-->
@@ -221,11 +255,25 @@ const playlist = computed(() : Video[] => {
 <!--                                <Select v-model="filters.season" name="Saison" :items="libraryStore.attributes.seasons"></Select>-->
 <!--                            </div>-->
             </div>
+            <div class="transition-bg pointer-events-none absolute top-0 left-0 w-full h-full opacity-100 bg-white"></div>
         </div>
     </ConcertLayout>
 </template>
 
 <style scoped lang="scss">
+
+    #concert-view {
+        .transition-bg {
+            transition: 1s linear;
+        }
+
+        &.entered {
+            .transition-bg {
+                opacity: 0;
+            }
+        }
+    }
+
     .stage-elements-light-enter-active {
         transition: all 0.2s 0s cubic-bezier(1, 0.5, 0.8, 1);
     }

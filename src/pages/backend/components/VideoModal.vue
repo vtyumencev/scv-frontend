@@ -11,7 +11,7 @@ import { useLibrary } from '@/stores/library';
 import Editor from '@tinymce/tinymce-vue';
 import Skeleton from './Skeleton.vue'
 import Checkbox from '@/components/Checkbox.vue';
-import { useFetch } from "@/composables/fetch";
+import { useAPI } from "@/composables/fetch";
 
 const emits = defineEmits(['updateVideos']);
 const props = defineProps({
@@ -21,7 +21,7 @@ const props = defineProps({
     }
 });
 
-const fetch = useFetch();
+const fetch = useAPI();
 
 const stageStore = useLibrary();
 

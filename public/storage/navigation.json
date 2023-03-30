@@ -1,0 +1,12 @@
+{
+    "footer": [
+        {
+            "name": "Impressum",
+            "routeName": "index"
+        },
+        {
+            "name": "Datenschutz",
+            "routeName": "index"
+        }
+    ]
+}

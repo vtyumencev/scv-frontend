@@ -2,12 +2,15 @@ import { defineStore } from 'pinia'
 import type { Attributes } from '@/types/Attributes'
 import type { Video } from "@/types/Video";
 import type { Choir } from "@/types/Choir";
-import {useFetch} from "@/composables/fetch";
+import {useAPI} from "@/composables/fetch";
 import type {Preset} from "@/types/Preset";
+import type {Place} from "@/types/Place";
 
-const fetch = useFetch();
+const fetch = useAPI();
 
 export declare type Presets = 'dresden' | 'leipzig' | 'chemnitz';
+
+export declare type Places = 'open_air' | 'concert';
 
 export const useLibrary = defineStore('library', {
 
@@ -26,6 +29,7 @@ export const useLibrary = defineStore('library', {
                 'leipzig': {
                     'name': 'Leipzig',
                     'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
+                    'backgroundImageDark': '/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
                     'source': {
                         'type': 'region',
                         'id': 1,
@@ -34,6 +38,7 @@ export const useLibrary = defineStore('library', {
                 'dresden': {
                     'name': 'Dresden',
                     'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
+                    'backgroundImageDark': '/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
                     'source': {
                         'type': 'region',
                         'id': 2,
@@ -297,7 +302,7 @@ export const useLibrary = defineStore('library', {
                         },
                     ]
                 }
-            },
+            } as Record<string, Place>,
             attributes: { } as Attributes,
             videos: [ ] as Video [ ],
             choirs: [ ] as Choir [ ],

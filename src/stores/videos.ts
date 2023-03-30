@@ -1,8 +1,8 @@
 import type { Video } from '@/types/Video';
 import { defineStore } from 'pinia';
-import { useFetch } from "@/composables/fetch";
+import { useAPI } from "@/composables/fetch";
 
-const fetch = useFetch();
+const fetch = useAPI();
 
 export const useVideos = defineStore('videos', {
 

@@ -9,9 +9,9 @@ import {useLibrary} from '@/stores/library';
 import Editor from '@tinymce/tinymce-vue';
 import VideoExplorer from './VideoExplorer.vue';
 import {useRouter} from 'vue-router';
-import {useFetch} from "@/composables/fetch";
+import {useAPI} from "@/composables/fetch";
 
-const fetch = useFetch();
+const fetch = useAPI();
 
 const router = useRouter();
 const stageStore = useLibrary();
@@ -33,7 +33,7 @@ const props = defineProps({
 const data = ref<Choir>(props.data);
 
 onMounted(async () => {
-    stageStore.getAttributes()
+    await stageStore.getAttributes()
 });
 
 const save = async () => {

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue'
-import { useChoirs } from '@/stores/choirs'
 import { onMounted, ref } from 'vue'
 import ChoirForm from "./components/ChoirForm.vue"
 import type { Choir } from '@/types/Choir'
 import VideoForm from './components/VideoModal.vue'
 import Skeleton from './components/Skeleton.vue'
 import type {Video} from "@/types/Video";
-import { useFetch } from "@/composables/fetch";
+import { useAPI } from "@/composables/fetch";
 
-const fetch = useFetch();
+const fetch = useAPI();
 
 const props = defineProps({
     id: {
@@ -23,13 +22,13 @@ const props = defineProps({
 })
 
 const choirID = parseInt(props.id)
-const choirsStorage = useChoirs()
 
 const choir = ref<Choir>()
 const isVideosProcessing = ref(false)
 
 onMounted(async () => {
-    choir.value = await choirsStorage.getChoir(choirID)
+    const { data } = await fetch.show<Choir>('choirs', choirID);
+    choir.value = data;
 })
 
 const updateVideos = async () => {
@@ -58,7 +57,7 @@ const updateVideos = async () => {
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 pt-10 bg-white sm:rounded-lg border-b border-gray-200">
                         <div class="max-w-3xl mx-auto">
-                            <ChoirForm v-if="choir" :data="choir" :isVideosProcessing="isVideosProcessing" @update-videos="updateVideos" />
+                            <ChoirForm v-if="choir" :data="choir" :is-videos-processing="isVideosProcessing" @update-videos="updateVideos" />
                             <Skeleton v-else/>
                         </div>
                     </div>
@@ -66,7 +65,7 @@ const updateVideos = async () => {
             </div>
         </div>
         <template #modals>
-            <VideoForm v-if="videoID" :videoID="videoID" @update-videos="updateVideos" />
+            <VideoForm v-if="videoID" :video-i-d="videoID" @update-videos="updateVideos" />
         </template>
     </AuthenticatedLayout>
 </template>

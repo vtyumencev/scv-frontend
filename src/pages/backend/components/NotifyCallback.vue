@@ -13,7 +13,7 @@ const processing = ref(false);
 const props = defineProps({
     closeToast: {
         type: Function as PropType<(e?: MouseEvent) => void>,
-        default: () => {}
+        default: () => undefined
     },
     toastProps: {
         type: Object as PropType<ToastOptions<NotifyCallbackOptions>>,

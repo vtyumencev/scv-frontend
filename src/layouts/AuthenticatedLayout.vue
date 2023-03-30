@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
-import { useUsers } from '@/stores/user'
-import Dropdown from '@/components/Dropdown.vue'
-import DropdownLink from '@/components/DropdownLink.vue'
-import NavLink from '@/components/NavLink.vue'
-import ResponsiveNavLink from '@/components/ResponsiveNavLink.vue'
+import { ref, onBeforeMount } from 'vue';
+import { useUsers } from '@/stores/user';
+import Dropdown from '@/components/Dropdown.vue';
+import DropdownLink from '@/components/DropdownLink.vue';
+import NavLink from '@/components/NavLink.vue';
+import ResponsiveNavLink from '@/components/ResponsiveNavLink.vue';
 
-import 'vue3-toastify/dist/index.css'
+import 'vue3-toastify/dist/index.css';
 
-const showingNavigationDropdown = ref(false)
+const showingNavigationDropdown = ref(false);
 
-const store = useUsers()
+const store = useUsers();
 
-const auth = store.authUser
+const auth = store.authUser;
 
 onBeforeMount(() => {
     if (!store.hasUserData) {
@@ -21,7 +21,7 @@ onBeforeMount(() => {
 })
 
 const submitLogout = () => {
-    store.logout()
+    store.logout();
 }
 </script>
 
@@ -38,9 +38,9 @@ const submitLogout = () => {
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:flex">
                                 <router-link
+                                    v-slot="{ href, isActive, navigate }"
                                     to="/choirs"
-                                    custom
-                                    v-slot="{ href, isActive, navigate }">
+                                    custom>
                                     <NavLink
                                         :href="href"
                                         :active="isActive"
@@ -49,9 +49,9 @@ const submitLogout = () => {
                                     </NavLink>
                                 </router-link>
                                 <router-link
+                                    v-slot="{ href, isActive, navigate }"
                                     to="/attributes"
-                                    custom
-                                    v-slot="{ href, isActive, navigate }">
+                                    custom>
                                     <NavLink
                                         :href="href"
                                         :active="isActive"
@@ -100,11 +100,11 @@ const submitLogout = () => {
                         <!-- Hamburger -->
                         <div class="-mr-2 flex items-center sm:hidden">
                             <button
+                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
                                 @click="
                                     showingNavigationDropdown =
                                         !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                                ">
                                 <svg
                                     class="h-6 w-6"
                                     stroke="currentColor"
@@ -145,9 +145,9 @@ const submitLogout = () => {
                     class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
                         <router-link
+                            v-slot="{ href, isActive, navigate }"
                             to="/dashboard"
-                            custom
-                            v-slot="{ href, isActive, navigate }">
+                            custom>
                             <ResponsiveNavLink
                                 :href="href"
                                 :active="isActive"
@@ -170,9 +170,9 @@ const submitLogout = () => {
 
                         <div class="mt-3 space-y-1">
                             <router-link
+                                v-slot="{ href, navigate }"
                                 to="/"
-                                custom
-                                v-slot="{ href, navigate }">
+                                custom>
                                 <ResponsiveNavLink
                                     :href="href"
                                     @click="navigate">
@@ -185,7 +185,7 @@ const submitLogout = () => {
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
+            <header v-if="$slots.header" class="bg-white shadow">
                 <div class="max-w-7xl mx-auto h-16 px-4 sm:px-6 lg:px-8 flex">
                     <slot name="header" />
                 </div>
