@@ -19,6 +19,7 @@
         "date-fns": "^2.29.3",
         "flowbite": "^1.6.3",
         "pinia": "^2.0.28",
+        "swiper": "^9.2.0",
         "tinymce": "^6.3.2",
         "vite-plugin-require": "^1.1.10",
         "vue": "^3.2.47",

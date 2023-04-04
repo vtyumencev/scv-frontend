@@ -82,16 +82,16 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel value="Region" />
-            <Select v-model="data.region_id" class="mt-1 block w-full" name="Region is not selected" :items="stageStore.attributes.regions"></Select>
+            <Select v-model="data.region_id" class="mt-1 block w-full" name="Region is not selected" :items="stageStore.attributes?.regions"></Select>
         </div>
         <div class="mb-5">
             <InputLabel value="Chortyp" />
-            <Select v-model="data.type_id" class="mt-1 block w-full" name="Type is not selected" :items="stageStore.attributes.choir_types"></Select>
+            <Select v-model="data.type_id" class="mt-1 block w-full" name="Type is not selected" :items="stageStore.attributes?.choir_types"></Select>
         </div>
         <div class="mb-5">
             <InputLabel value="Videos" />
             <div class="mt-1 p-4 border rounded-md relative">
-                <VideoExplorer :items="data.videos" :choir-i-d="data.id" v-bind="$attrs"></VideoExplorer>
+                <VideoExplorer :items="data.videos" :choir-i-d="data.id"></VideoExplorer>
                 <template v-if="isVideosProcessing">
                     <div class="absolute top-0 left-0 h-full w-full rounded-md bg-white bg-opacity-80"></div>
                     <div role="status" class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">

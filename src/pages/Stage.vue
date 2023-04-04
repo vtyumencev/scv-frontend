@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Presets, useLibrary } from '@/stores/library'
+import { type PresetNames, useLibrary } from '@/stores/library'
 import {
     ref,
     reactive,
@@ -8,10 +8,10 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Video } from '@/types/Video';
-import StageVideoPlayer from "@/components/StageVideoPlayer.vue";
+import StageVideoPlayer from "@/components/frontend/StageVideoPlayer.vue";
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
-import StageDecorationElement from "@/components/StageDecorationElement.vue";
-import StageNavigation from "@/components/StageNavigation.vue";
+import StageDecorationElement from "@/components/frontend/StageDecorationElement.vue";
+import StageNavigation from "@/components/frontend/StageNavigation.vue";
 
 const libraryStore = useLibrary();
 
@@ -19,7 +19,7 @@ const router = useRouter();
 
 const props = defineProps({
     presetName: {
-        type: String as PropType<Presets>,
+        type: String as PropType<PresetNames>,
         default: null
     },
     videoID: {

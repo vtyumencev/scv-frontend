@@ -36,7 +36,7 @@ onMounted( () => {
 
 onUnmounted(() => {
     if (dataIsReady.value) {
-        window.removeEventListener('resize', () => concertSize());
+        window.removeEventListener('resize', concertSize);
         document.removeEventListener('mousemove', concertParallax);
         dataIsReady.value = false;
     }

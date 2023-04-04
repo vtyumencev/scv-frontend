@@ -5,7 +5,8 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Nunito', ...defaultTheme.fontFamily.sans],
+                sans: ['Lato', ...defaultTheme.fontFamily.sans],
+                serif: ['Noto Serif', ...defaultTheme.fontFamily.serif],
             },
             maxWidth: {
                 'site-container': '110rem',
@@ -14,6 +15,10 @@ module.exports = {
                 'container-inline': '20px',
                 'library-left-full': '100px',
                 'library-left': '80px',
+            },
+            colors: {
+                'theme-alpha': '#F8C300',
+                'theme-alpha-dim': '#FFF9E3',
             }
         },
     },

@@ -1,11 +1,28 @@
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref} from "vue";
 import { useIntersectionObserver } from '@vueuse/core'
-import ChemnitzMask from '../../public/homepage/Masks/ChemnitzMask.svg';
-import ChemnitzMapMask from '../../public/homepage/Masks/ChemnitzMapMask.svg';
 import {useRouter} from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
-import type {RouteLocationRaw} from "vue-router";
+import type {BookObject} from "@/types/BookObject";
+import VideoModal from "@/components/frontend/VideoModal.vue";
+
+import LeipzigMask from '../../public/images/homepage/masks/desk/leipzig.svg';
+import LeipzigMapMask from '../../public/images/homepage/masks/map/leipzig.svg';
+import DresdenMask from '../../public/images/homepage/masks/desk/dresden.svg';
+import DresdenMapMask from '../../public/images/homepage/masks/map/dresden.svg';
+import ChemnitzMask from '../../public/images/homepage/masks/desk/chemnitz.svg';
+import ChemnitzMapMask from '../../public/images/homepage/masks/map/chemnitz.svg';
+import OstMask from '../../public/images/homepage/masks/desk/ost.svg';
+import OstMapMask from '../../public/images/homepage/masks/map/ost.svg';
+import WestMask from '../../public/images/homepage/masks/desk/west.svg';
+import WestMapMask from '../../public/images/homepage/masks/map/west.svg';
+import NorthMask from '../../public/images/homepage/masks/desk/nord.svg';
+import NorthMapMask from '../../public/images/homepage/masks/map/nord.svg';
+
+import KinderYouthMask from '../../public/images/homepage/masks/desk/kinder-jugend.svg';
+import RehearsalMask from '../../public/images/homepage/masks/desk/proberaum.svg';
+import LibraryMask from '../../public/images/homepage/masks/desk/mediathek.svg';
+import NeutralMask from '../../public/images/homepage/masks/desk/neutral.svg';
 
 const router = useRouter();
 
@@ -13,25 +30,8 @@ const introSlide = ref<HTMLElement>();
 const deskSlide = ref<HTMLElement>();
 
 const dataIsReady = ref(false);
+const isIntroVideoShown = ref(false);
 const deskSlideView = ref(false);
-
-interface Link {
-    name: string | null,
-    is_in_book: boolean,
-    route: RouteLocationRaw | null,
-    front_object: {
-        left: number,
-        bottom: number,
-        width: number,
-        asset_url: string,
-    },
-    map_mask: {
-        left: number,
-        bottom: number,
-        width: number,
-        asset_component: string,
-    } | null
-}
 
 const links = [
     {
@@ -42,7 +42,8 @@ const links = [
             left: 1,
             bottom: 1,
             width: 90,
-            asset_url: '/homepage/Book.png',
+            asset_url: '/images/homepage/Book.png',
+            asset_mask_component: null
         },
         map_mask: null
     },
@@ -54,9 +55,15 @@ const links = [
             left: 34,
             bottom: 42,
             width: 25,
-            asset_url: '/homepage/Leipzig.png',
+            asset_url: '/images/homepage/Leipzig.png',
+            asset_mask_component: LeipzigMask
         },
-        map_mask: null
+        map_mask: {
+            left: 18.5,
+            bottom: 19.65,
+            width: 1.7,
+            asset_component: LeipzigMapMask,
+        }
     },
     {
         name: 'Dresden',
@@ -66,21 +73,33 @@ const links = [
             left: 48,
             bottom: 40,
             width: 21.5,
-            asset_url: '/homepage/Dresden.png',
+            asset_url: '/images/homepage/Dresden.png',
+            asset_mask_component: DresdenMask
         },
-        map_mask: null
+        map_mask: {
+            left: 24.8,
+            bottom: 15.9,
+            width: 2.3,
+            asset_component: DresdenMapMask,
+        }
     },
     {
         name: 'Sachsen Ost',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'sachsen-ost' } },
+        route: { name: 'presets-show', params: { presetName: 'east' } },
         front_object: {
             left: 57.5,
             bottom: 38.3,
             width: 12,
-            asset_url: '/homepage/SachsenOst.png',
+            asset_url: '/images/homepage/SachsenOst.png',
+            asset_mask_component: OstMask
         },
-        map_mask: null
+        map_mask: {
+            left: 22.8,
+            bottom: 12.95,
+            width: 11.3,
+            asset_component: OstMapMask,
+        }
     },
     {
         name: 'Seasonal',
@@ -90,90 +109,105 @@ const links = [
             left: 68,
             bottom: 34,
             width: 14,
-            asset_url: '/homepage/Seasonal1.png',
+            asset_url: '/images/homepage/Seasonal1.png',
+            asset_mask_component: NeutralMask
         },
         map_mask: null
     },
     {
         name: 'Kinder Jugend',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'kinder-jugend' } },
+        route: { name: 'presets-show', params: { presetName: 'kinder-youth' } },
         front_object: {
             left: 23.5,
             bottom: 39.8,
             width: 16,
-            asset_url: '/homepage/KinderJugend.png',
+            asset_url: '/images/homepage/KinderJugend.png',
+            asset_mask_component: KinderYouthMask
         },
         map_mask: null
-    },
-    {
-        name: 'Chemnitz',
-        is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'leipzig' } },
-        front_object: {
-            left: 31,
-            bottom: 38.7,
-            width: 9,
-            asset_url: '/homepage/Chemnitz.png',
-            asset_mask: '/homepage/Masks/ChemnitzMask.svg',
-            mask_component: ChemnitzMask
-        },
-        map_mask: {
-            left: 18.5,
-            bottom: 19.5,
-            width: 1.7,
-            asset_component: ChemnitzMapMask,
-        }
     },
     {
         name: 'Sachsen Nord',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'sachsen-nord' } },
+        route: { name: 'presets-show', params: { presetName: 'north' } },
         front_object: {
             left: 19.3,
             bottom: 35.5,
             width: 13,
-            asset_url: '/homepage/SachsenNord.png',
+            asset_url: '/images/homepage/SachsenNord.png',
+            asset_mask_component: NorthMask
         },
-        map_mask: null
+        map_mask: {
+            left: 17.75,
+            bottom: 11.85,
+            width: 6.6,
+            asset_component: NorthMapMask,
+        }
+    },
+    {
+        name: 'Chemnitz',
+        is_in_book: true,
+        route: { name: 'presets-show', params: { presetName: 'chemnitz' } },
+        front_object: {
+            left: 31,
+            bottom: 38.7,
+            width: 9,
+            asset_url: '/images/homepage/Chemnitz.png',
+            asset_mask_component: ChemnitzMask
+        },
+        map_mask: {
+            left: 19.5,
+            bottom: 13.91,
+            width: 1.75,
+            asset_component: ChemnitzMapMask,
+        }
     },
     {
         name: 'Sachsen West',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'sachsen-west' } },
+        route: { name: 'presets-show', params: { presetName: 'west' } },
         front_object: {
             left: 34.6,
             bottom: 34,
             width: 21,
-            asset_url: '/homepage/SachsenWest.png',
+            asset_url: '/images/homepage/SachsenWest.png',
+            asset_mask_component: WestMask
         },
-        map_mask: null
+        map_mask: {
+            left: 13.8,
+            bottom: 7.6,
+            width: 9.45,
+            asset_component: WestMapMask,
+        }
     },
     {
         name: 'Mediathek',
         is_in_book: false,
-        route: null,
+        route: { name: 'library' },
         front_object: {
             left: -1,
             bottom: 17,
             width: 14,
-            asset_url: '/homepage/Mediathek.png',
+            asset_url: '/images/homepage/Mediathek.png',
+            asset_mask_component: LibraryMask
         },
         map_mask: null
     },
     {
         name: 'Proberaum',
         is_in_book: false,
-        route: null,
+        route: { name: 'library' },
         front_object: {
             left: 79,
             bottom: 8,
             width: 21,
-            asset_url: '/homepage/Proberaum.png',
+            asset_url: '/images/homepage/Proberaum.png',
+            asset_mask_component: RehearsalMask
         },
         map_mask: null
     },
-] as Array<Link>;
+] as Array<BookObject>;
 
 useIntersectionObserver(
     deskSlide,
@@ -263,7 +297,7 @@ const scrollToDesk = () => {
 
 const deskHelpHint = () => {
     const maskElms = document.querySelectorAll('.object-interact');
-    maskElms.forEach( (maskEl, index) => {
+    maskElms.forEach( (maskEl) => {
         setTimeout(() => {
             maskEl.classList.add('object-interact--active');
         }, Math.random() * 400)
@@ -276,11 +310,11 @@ const deskHelpHint = () => {
     <LibraryLayout @on-data-is-ready="onDataIsReady" @on-click-help-button="deskHelpHint">
         <div class="relative snap-mandatory">
             <div ref="introSlide" class="h-screen flex justify-center items-center snap-center min-h-[900px]">
-                <div class="absolute h-screen flex items-end overflow-hidden">
+                <div class="absolute h-screen flex items-end overflow-hidden top-0">
                     <img
                         class="w-screen transition duration-[2500ms] delay-200 opacity-0"
                         :class="{ 'scale-125': !dataIsReady, 'scale-100 opacity-100': dataIsReady }"
-                        src="/landing/Clouds.jpg"
+                        src="/images/landing/Clouds.jpg"
                         alt="">
                 </div>
                 <div
@@ -290,8 +324,8 @@ const deskHelpHint = () => {
                         class="grid grid-cols-[2fr_1fr]">
                         <div class="">
                             <div class="p-10 bg-white bg-opacity-60">
-                                <h1 class="text-5xl">Deine Reise Beginnt hier!</h1>
-                                <div class="space-y-10 mt-12">
+                                <h1 class="text-[3.4rem] font-serif">Deine Reise Beginnt hier!</h1>
+                                <div class="space-y-10 mt-12 font-light text-lg">
                                     <p>
                                         <b>Wilkommen in unserer digitalen Chorlandschaft!</b> sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis?  Magnum Opus Maurenta!
                                     </p>
@@ -303,11 +337,21 @@ const deskHelpHint = () => {
                         </div>
                         <div class="">
                             <div id="balloonWrapper" class="flex justify-end">
-                                <img id="balloon" class="max-w-[300px]" src="/landing/Balloon_Play.png" alt="">
+                                <div id="balloon" class="">
+                                    <img class="max-w-[300px] relative" src="/images/landing/Balloon_Play.png" alt="">
+                                    <button
+                                        class="absolute w-[37%] h-[30%] top-[25%] left-[27%] rounded-full"
+                                        @click="isIntroVideoShown = true"></button>
+                                </div>
+                                <Teleport to="body">
+                                    <Transition>
+                                        <VideoModal v-if="isIntroVideoShown" video-id="pkWrunMCQ-0" @close-modal="isIntroVideoShown = false" />
+                                    </Transition>
+                                </Teleport>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-[100px] flex justify-center mr-10">
+                    <div class="mt-[60px] flex justify-center mr-10">
                         <div class="relative">
                             <button
                                 class="bg-gradient-to-b to-[#F8C300] from-[#FFF9E3] p-[2px] shadow-[8px_7px_7px_rgba(0,18,52,0.45)] group"
@@ -329,10 +373,10 @@ const deskHelpHint = () => {
             <div class="h-[200px]"></div>
             <div ref="deskSlide" class="snap-center flex justify-center relative">
                 <div class="flex items-end pointer-events-none">
-                    <img class="w-screen " src="/homepage/Sky.jpg" alt="">
-                    <img class=" absolute bottom-0" src="/homepage/Desk.png" alt="">
+                    <img class="w-screen " src="/images/homepage/Sky.jpg" alt="">
+                    <img class=" absolute bottom-0" src="/images/homepage/Desk.png" alt="">
                 </div>
-                <div id="book-objects" class="absolute w-full h-full" :class="{ 'book-objects--shown': deskSlideView }">
+                <div id="desk-objects" class="absolute w-full h-full" :class="{ 'book-objects--shown': deskSlideView }">
                     <div
                         v-for="(object, key) in links"
                         :key="object"
@@ -358,8 +402,8 @@ const deskHelpHint = () => {
                             </div>
                         </div>
                         <component
-                            :is="object.front_object.mask_component"
-                            v-if="object.front_object.mask_component"
+                            :is="object.front_object.asset_mask_component"
+                            v-if="object.front_object.asset_mask_component"
                             :data-object-mask="key"
                             class="object-mask absolute top-0 opacity-0 pointer-events-auto"
                         />
@@ -428,6 +472,7 @@ const deskHelpHint = () => {
 }
 
 .object-interact {
+    z-index: 5;
     .book-inner-object {
         transform: perspective(1000px) rotateX(90deg);
         opacity: 0;
@@ -438,15 +483,21 @@ const deskHelpHint = () => {
             transition: #{$i * 0.05 + 0.6}s #{$i * 0.02}s cubic-bezier(0, 0, 0.28, 1.34);
         }
     }
-    transform-origin: bottom;
+
     .book-objects--shown & .book-inner-object {
         opacity: 1;
         transform: perspective(1000px) rotateX(0);
     }
 }
 
-svg path {
-    cursor: pointer;
+#desk-objects {
+    svg {
+        pointer-events: none;
+    }
+    svg path {
+        cursor: pointer;
+        pointer-events: auto;
+    }
 }
 
 </style>

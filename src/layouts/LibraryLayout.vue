@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FrontendLayout from "@/layouts/FrontendLayout.vue";
-import FooterNav from "@/components/FooterNav.vue";
+import FooterNav from "@/components/frontend/FooterNav.vue";
 
 const emits = defineEmits(['onClickHelpButton']);
 

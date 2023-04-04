@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
 import {onBeforeMount, ref, type PropType, computed, onMounted} from "vue";
-import { useLibrary, type Presets } from "@/stores/library";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
+import { useLibrary, type PresetNames } from "@/stores/library";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import type { Preset } from "@/types/Preset";
 import type { Video } from "@/types/Video";
 import type { Choir } from "@/types/Choir";
@@ -10,10 +10,11 @@ import type { Attribute } from "@/types/Attribute";
 
 const libraryStore = useLibrary();
 const router = useRouter();
+const route = useRoute();
 
 const props = defineProps({
     presetName: {
-        type: String as PropType<Presets>,
+        type: String as PropType<PresetNames>,
         required: true
     }
 });
@@ -22,7 +23,13 @@ const preset = ref<Preset>();
 
 onBeforeMount(() => {
     if (!(props.presetName in libraryStore.presets)) {
-        router.push({ name: 'page-not-found' });
+        router.replace({
+            name: 'page-not-found',
+            params: { pathMatch: route.path.substring(1).split('/')},
+            query: route.query,
+            hash: route.hash,
+        });
+        return;
     }
 
     preset.value = libraryStore.presets[props.presetName];
@@ -33,16 +40,23 @@ onMounted(() => {
 });
 
 const relatedVideos = computed(() : Video[] => {
+    if (! libraryStore.videos) {
+        return [];
+    }
     return libraryStore.videos
         .filter(video => video.choir_id !== null)
         .filter(video => getChoirByVideo(video)?.region_id === currentRegion.value?.id);
 });
 
 const currentRegion = computed( () : Attribute | undefined => {
-    if (! libraryStore.attributes.regions) {
+    const currentPreset = preset.value;
+    if (! libraryStore.attributes?.regions) {
         return undefined;
     }
-    return libraryStore.attributes.regions.find(region => region.id === libraryStore.presets[props.presetName].source.id);
+    if (currentPreset === undefined) {
+        return undefined;
+    }
+    return libraryStore.attributes?.regions.find(region => region.id === currentPreset.source.id);
 });
 
 const getChoirByVideo = (video: Video) : Choir | undefined => {
@@ -61,14 +75,10 @@ onBeforeRouteLeave(async () => {
     // });
 });
 
-const onDataIsReady = () => {
-
-}
-
 </script>
 
 <template>
-    <ConcertLayout :background-image="preset?.backgroundImage" @on-data-is-ready="onDataIsReady">
+    <ConcertLayout :background-image="preset?.backgroundImage">
         <div id="preset-view">
             <div class="pointer-events-none">
                 <div id="decoration-wegweiser-image">

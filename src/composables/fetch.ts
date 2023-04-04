@@ -2,8 +2,8 @@ import axios from '@/lib/axios';
 import type { Method } from 'axios';
 import { toast, type ToastOptions } from "vue3-toastify";
 import { h, type Ref, type RendererElement } from "vue";
-import NotifyCallback from "@/pages/backend/components/NotifyCallback.vue";
-import type NotifyCallbackOptions from "@/pages/backend/components/NotifyCallback.vue";
+import NotifyCallback from "@/components/backend/NotifyCallback.vue";
+import type NotifyCallbackOptions from "@/components/backend/NotifyCallback.vue";
 import type { AxiosResponse } from "axios";
 import { useUsers } from "@/stores/user";
 

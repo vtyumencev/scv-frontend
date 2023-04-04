@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["es2017"],
+    "lib": ["es2017", "dom.iterable"],
     //"typeRoots": ["./src/types.d.ts"]
   },
   "references": [

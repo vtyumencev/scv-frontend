@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import navigation from '../../public/storage/navigation.json';
+import navigation from '../../../public/storage/navigation.json';
 import type { SiteNavigation } from "@/types/SiteNavigation";
 const links = navigation as SiteNavigation;
 

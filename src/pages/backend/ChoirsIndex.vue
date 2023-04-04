@@ -3,7 +3,7 @@ import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
 import { useChoirs } from '@/stores/choirs';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import {computed, onMounted} from 'vue';
-import Skeleton from './components/Skeleton.vue';
+import Skeleton from '../../components/backend/Skeleton.vue';
 import TextInput from "@/components/TextInput.vue";
 import Select from "@/components/Select.vue";
 import type { Choir } from "@/types/Choir";

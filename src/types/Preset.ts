@@ -4,5 +4,6 @@ export interface Preset {
     source: {
         type: string,
         id?: number
-    }
+    },
+    title_gen: string,
 }

@@ -2,7 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router';
 import { useUsers } from '@/stores/user';
 import Stage from '@/pages/Stage.vue';
 import PageNotFound from '@/pages/errors/404.vue';
-import Dashboard from '@/pages/Dashboard.vue';
+import Dashboard from '@/pages/backend/Dashboard.vue';
 import Login from '@/pages/auth/Login.vue';
 // import Register from '@/pages/auth/Register.vue';
 // import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
@@ -11,7 +11,7 @@ import Login from '@/pages/auth/Login.vue';
 import type { RouteRecordRaw } from 'vue-router';
 import Index from "@/pages/Index.vue";
 
-import PresetsShow from "@/pages/PresetsShow.vue";
+import PresetsShow from "@/pages/StagePreset.vue";
 
 import Choirs from '@/pages/backend/Choirs.vue';
 import ChoirsIndex from '@/pages/backend/ChoirsIndex.vue';
@@ -20,8 +20,9 @@ import ChoirsNew from '@/pages/backend/ChoirsNew.vue';
 
 import Attributes from '@/pages/backend/Attributes.vue';
 import Attribute from '@/pages/backend/Attribute.vue';
-import TestPage from "@/pages/TestPage.vue";
+import TestPage from "@/pages/backend/TestPage.vue";
 import Library from "@/pages/Library.vue";
+import LibraryChoir from "@/pages/LibraryChoir.vue";
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
 
@@ -40,6 +41,13 @@ const routes : Array<RouteRecordRaw> = [
         path: '/library',
         name: 'library',
         component: Library,
+        props: route => ({ query: route.query })
+    },
+    {
+        path: '/library/choirs/:choirId',
+        name: 'library-choirs-show',
+        component: LibraryChoir,
+        props: route => ({ query: route.query, choirId: route.params.choirId })
     },
     {
         path: '/presets/:presetName',
@@ -206,22 +214,27 @@ const routes : Array<RouteRecordRaw> = [
     //     },
     // },
     {
-        path: '/page-not-found',
+        path: '/:pathMatch(.*)*',
         name: 'page-not-found',
         component: PageNotFound,
         meta: {
             title: 'Page Not Found',
         },
     },
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/page-not-found',
-    },
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes: routes,
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition;
+        } else {
+            if (to.path !== from.path) {
+                return { top: 0 }
+            }
+        }
+    },
 });
 
 // Navigation guard

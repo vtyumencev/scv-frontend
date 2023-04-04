@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
-import AttributesNavbar from './components/AttributesNavbar.vue';
+import AttributesNavbar from '../../components/backend/AttributesNavbar.vue';
 import { useAttributes, type EditableAttributes } from '@/stores/attributes';
 import { type PropType, computed } from 'vue';
-import Skeleton from './components/Skeleton.vue';
-import AttributeForm from './components/AttributeForm.vue'
+import Skeleton from '../../components/backend/Skeleton.vue';
+import AttributeForm from '../../components/backend/AttributeForm.vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
@@ -37,7 +37,7 @@ const isAddNew = computed(() => {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="px-6 py-10 bg-white sm:rounded-lg border-b border-gray-200">
-                        <div class="max-w-3xl mx-auto" v-if="attributesStorage.list">
+                        <div v-if="attributesStorage.list" class="max-w-3xl mx-auto">
                             <router-link v-for="attributeItem in attributesStorage.list[attributeName]" :to="{ name: 'attribute-values', params: { attributeID: attributeItem.id } }" class="block py-3 text-indigo-500 border-b last:border-0">
                                 {{ attributeItem.name }}
                             </router-link>
@@ -48,7 +48,7 @@ const isAddNew = computed(() => {
             </div>
         </div>
         <template #modals>
-            <AttributeForm v-if="attributeID || isAddNew" :isAddNew="isAddNew" :attributeName="attributeName" :attributeID="attributeID" />
+            <AttributeForm v-if="attributeID || isAddNew" :is-add-new="isAddNew" :attributeName="attributeName" :attribute-i-d="attributeID" />
 
         </template>
     </AuthenticatedLayout>

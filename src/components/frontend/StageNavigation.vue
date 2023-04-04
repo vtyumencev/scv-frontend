@@ -62,7 +62,7 @@ const menuParallax = (e: MouseEvent) => {
                     class="w-[58%] flex justify-center absolute">
                     <img
                         class="w-full relative pointer-events-none"
-                        src="/public/stage/navigation/Menu_offen_full.png"
+                        src="/stage/navigation/Menu_offen_full.png"
                         alt="">
                     <router-link
                         :to="backAction"
@@ -74,7 +74,7 @@ const menuParallax = (e: MouseEvent) => {
                         v-if="videoController.isPlaying"
                         class="bottom-[23%] left-[43.1%] w-[11.7%] h-[26%] rounded-full absolute z-[20]"
                         @click="videoController.videoToggle()">
-                        <img src="/public/stage/navigation/Button_Pause.png" alt="">
+                        <img src="/stage/navigation/Button_Pause.png" alt="">
                     </button>
                     <button
                         v-if="!videoController.isPlaying"
@@ -95,7 +95,7 @@ const menuParallax = (e: MouseEvent) => {
                         <img
                             ref="stageMenuPreviewEl"
                             class="w-[30%] cursor-pointer"
-                            src="/public/stage/navigation/Menu_zu_border.png"
+                            src="/stage/navigation/Menu_zu_border.png"
                             alt="">
                     </div>
                 </Transition>

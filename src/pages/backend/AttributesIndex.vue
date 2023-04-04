@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue';
-import AttributesNavbar from './components/AttributesNavbar.vue';
+import AttributesNavbar from '../../components/backend/AttributesNavbar.vue';
 
 </script>
 

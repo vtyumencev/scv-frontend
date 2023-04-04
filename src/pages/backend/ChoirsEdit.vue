@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '../../layouts/AuthenticatedLayout.vue'
 import { onMounted, ref } from 'vue'
-import ChoirForm from "./components/ChoirForm.vue"
+import ChoirForm from "../../components/backend/ChoirForm.vue"
 import type { Choir } from '@/types/Choir'
-import VideoForm from './components/VideoModal.vue'
-import Skeleton from './components/Skeleton.vue'
+import VideoForm from '../../components/backend/VideoModal.vue'
+import Skeleton from '../../components/backend/Skeleton.vue'
 import type {Video} from "@/types/Video";
 import { useAPI } from "@/composables/fetch";
 

@@ -9,7 +9,6 @@ import { useRouter } from 'vue-router';
 import InputLabel from '@/components/InputLabel.vue';
 import TextInput from '@/components/TextInput.vue';
 import type { Attribute } from '@/types/Attribute';
-import { fetchStatusHandler } from '@/helpers/fetchStatusHandler';
 import {useAPI} from "@/composables/fetch";
 
 let attributesStorage = useAttributes();
