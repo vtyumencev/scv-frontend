@@ -1,9 +1,9 @@
+import type { Video } from "@/types/Video";
+
 export interface Preset {
     name: string,
     backgroundImage: string,
-    source: {
-        type: string,
-        id?: number
-    },
     title_gen: string,
+    videosFilter: () => Video[],
+    has_no_enter_room?: boolean
 }

@@ -1,22 +1,12 @@
 <script setup lang="ts">
-
-import {useStorage} from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
-import LibrarySidebar from "@/components/frontend/LibrarySidebar.vue";
-import {onBeforeMount, type PropType, ref, watch} from "vue";
-import {onBeforeRouteLeave, type RouteLocationRaw} from "vue-router";
-
-const isDarkModeEnabled = useStorage('isDarkModeEnabled', false);
-const dataIsReady = ref(false);
-const toggleShift = () => {
-    isDarkModeEnabled.value = !isDarkModeEnabled.value;
-}
+import { onBeforeMount, type PropType, ref, watch } from "vue";
+import { onBeforeRouteLeave, type RouteLocationRaw, useRoute } from "vue-router";
+import LibraryFilter from "@/components/frontend/LibraryFilter.vue";
+import { useLibrary } from "@/stores/library";
 
 defineProps({
-    query: {
-        type: Object as PropType<Record<string, string>>,
-        default: { } as object
-    },
     backgroundImg: {
         type: String,
         default: null
@@ -24,8 +14,22 @@ defineProps({
     backtrackRoute: {
         type: Object as PropType<RouteLocationRaw>,
         default: null
+    },
+    filterRouteName: {
+        type: String,
+        default: null
     }
 });
+
+const isDarkModeEnabled = useStorage('isDarkModeEnabled', false);
+const dataIsReady = ref(false);
+const route = useRoute();
+const isFilterSelectorShown = ref(!!Object.entries(route.query).length);
+const isInfoSelectorShown = ref(false);
+
+const toggleShift = () => {
+    isDarkModeEnabled.value = !isDarkModeEnabled.value;
+}
 
 onBeforeMount(() => {
     if (isDarkModeEnabled.value) {
@@ -79,14 +83,52 @@ const onDataIsReady = () => {
                 </div>
             </div>
             <div class="px-5 pt-[200px] pl-library-left-full min-h-[700px]">
-                <div class="flex dark:text-white transition">
-                    <div class="w-full max-w-[350px] mr-[50px]">
+                <div class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(0,_4fr)] gap-y-5 gap-x-16 dark:text-white transition">
+                    <div class="">
                         <div class="">
                             <slot name="sidebarContent"></slot>
                         </div>
-                        <LibrarySidebar v-if="dataIsReady" :query="query" :backtrack-route="backtrackRoute" />
+                        <div class="mt-10 space-y-5">
+                            <div>
+                                <button class="flex items-center uppercase" @click="isFilterSelectorShown = !isFilterSelectorShown">
+                                    <span class="relative">
+                                        <img class="mr-4 w-7" src="/icons/library.svg" alt="">
+                                        <img class="absolute left-0 top-0 opacity-0 dark:opacity-100 transition" src="/icons/library-white.svg" alt="">
+                                    </span>
+                                    <span>Filtern</span>
+                                </button>
+                                <Transition name="filter">
+                                    <LibraryFilter v-if="isFilterSelectorShown" class="ml-11 mt-3" :filter-route-name="filterRouteName" />
+                                </Transition>
+                            </div>
+                            <div v-if="$slots.sidebarInfo">
+                                <div class="">
+                                    <button class="flex items-center uppercase" @click="isInfoSelectorShown = !isInfoSelectorShown">
+                                        <span class="relative">
+                                            <img class="mr-4 w-7" src="/icons/info.svg" alt="">
+                                            <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/icons/info-white.svg" alt="">
+                                        </span>
+                                        <span>Info</span>
+                                    </button>
+                                    <Transition name="filter">
+                                        <div v-if="isInfoSelectorShown" class="ml-11 mt-3">
+                                            <slot name="sidebarInfo" />
+                                        </div>
+                                    </Transition>
+                                </div>
+                            </div>
+                            <div v-if="backtrackRoute">
+                                <router-link :to="backtrackRoute" class="uppercase flex text-left">
+                                    <span class="relative mt-1">
+                                        <img class="mr-4 w-7" src="/icons/prev.svg" alt="">
+                                        <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/icons/prev-white.svg" alt="">
+                                    </span>
+                                    <span>zurück zur<br>{{ backtrackRoute.title }}</span>
+                                </router-link>
+                            </div>
+                        </div>
                     </div>
-                    <div class="w-full max-w-5xl">
+                    <div class="max-w-6xl pr-10">
                         <slot />
                     </div>
                 </div>
@@ -94,3 +136,25 @@ const onDataIsReady = () => {
         </div>
     </LibraryLayout>
 </template>
+
+<style scoped>
+.filter-enter-active {
+    animation: bounce-in 0.3s;
+    transform-origin: top left;
+}
+.filter-leave-active {
+    animation: bounce-in 0.1s reverse;
+    transform-origin: top left;
+}
+@keyframes bounce-in {
+    0% {
+        transform: translateY(-5px);
+    }
+    50% {
+        transform: translateY(5px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+</style>

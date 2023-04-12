@@ -70,6 +70,7 @@ const concertSize = () : void => {
         concertEl.style.width = '';
     }
     concertEl.style.height = clh + 'px';
+    concertEl.style.setProperty('--font-size-base', clh / 100 + 'px')
 }
 
 </script>

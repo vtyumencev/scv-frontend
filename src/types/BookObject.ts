@@ -4,6 +4,7 @@ export interface BookObject {
     name: string | null,
     is_in_book: boolean,
     route: RouteLocationRaw | null,
+    order: number,
     front_object: {
         left: number,
         bottom: number,

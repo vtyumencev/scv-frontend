@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from "vue";
-import { useIntersectionObserver } from '@vueuse/core'
-import {useRouter} from "vue-router";
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import { useIdle, useIntersectionObserver } from '@vueuse/core'
+import { useRouter, useRoute } from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
-import type {BookObject} from "@/types/BookObject";
+import type { BookObject } from "@/types/BookObject";
 import VideoModal from "@/components/frontend/VideoModal.vue";
+import { LANDSCAPES } from "@/enums/landscapes";
 
 import LeipzigMask from '../../public/images/homepage/masks/desk/leipzig.svg';
 import LeipzigMapMask from '../../public/images/homepage/masks/map/leipzig.svg';
@@ -15,29 +16,35 @@ import ChemnitzMapMask from '../../public/images/homepage/masks/map/chemnitz.svg
 import OstMask from '../../public/images/homepage/masks/desk/ost.svg';
 import OstMapMask from '../../public/images/homepage/masks/map/ost.svg';
 import WestMask from '../../public/images/homepage/masks/desk/west.svg';
-import WestMapMask from '../../public/images/homepage/masks/map/west.svg';
+import WestMapMask from '../../public/images/homepage/masks/map/west-2.svg';
 import NorthMask from '../../public/images/homepage/masks/desk/nord.svg';
-import NorthMapMask from '../../public/images/homepage/masks/map/nord.svg';
+import NorthMapMask from '../../public/images/homepage/masks/map/north.svg';
 
 import KinderYouthMask from '../../public/images/homepage/masks/desk/kinder-jugend.svg';
 import RehearsalMask from '../../public/images/homepage/masks/desk/proberaum.svg';
 import LibraryMask from '../../public/images/homepage/masks/desk/mediathek.svg';
 import NeutralMask from '../../public/images/homepage/masks/desk/neutral.svg';
+import LibraryButton from "@/components/frontend/LibraryButton.vue";
 
 const router = useRouter();
+const route = useRoute();
 
 const introSlide = ref<HTMLElement>();
 const deskSlide = ref<HTMLElement>();
 
+const { idle } = useIdle(3000);
+
 const dataIsReady = ref(false);
 const isIntroVideoShown = ref(false);
 const deskSlideView = ref(false);
+const deskShakeTimeout = ref();
 
 const links = [
     {
         name: null,
         is_in_book: false,
         route: null,
+        order: 0,
         front_object: {
             left: 1,
             bottom: 1,
@@ -51,6 +58,7 @@ const links = [
         name: 'Leipzig',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'leipzig' } },
+        order: 6,
         front_object: {
             left: 34,
             bottom: 42,
@@ -69,6 +77,7 @@ const links = [
         name: 'Dresden',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'dresden' } },
+        order: 7,
         front_object: {
             left: 48,
             bottom: 40,
@@ -84,9 +93,10 @@ const links = [
         }
     },
     {
-        name: 'Sachsen Ost',
+        name: 'Ostsachsen',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'east' } },
+        order: 8,
         front_object: {
             left: 57.5,
             bottom: 38.3,
@@ -104,7 +114,8 @@ const links = [
     {
         name: 'Seasonal',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'seasonal' } },
+        route: { name: 'presets-show', params: { presetName: 'neutral' } },
+        order: 9,
         front_object: {
             left: 68,
             bottom: 34,
@@ -118,6 +129,7 @@ const links = [
         name: 'Kinder Jugend',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'kinder-youth' } },
+        order: 3,
         front_object: {
             left: 23.5,
             bottom: 39.8,
@@ -128,9 +140,10 @@ const links = [
         map_mask: null
     },
     {
-        name: 'Sachsen Nord',
+        name: 'Nordsachsen',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'north' } },
+        order: 2,
         front_object: {
             left: 19.3,
             bottom: 35.5,
@@ -139,9 +152,9 @@ const links = [
             asset_mask_component: NorthMask
         },
         map_mask: {
-            left: 17.75,
-            bottom: 11.85,
-            width: 6.6,
+            left: 17.78,
+            bottom: 16.45,
+            width: 6.3,
             asset_component: NorthMapMask,
         }
     },
@@ -149,6 +162,7 @@ const links = [
         name: 'Chemnitz',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'chemnitz' } },
+        order: 4,
         front_object: {
             left: 31,
             bottom: 38.7,
@@ -164,9 +178,10 @@ const links = [
         }
     },
     {
-        name: 'Sachsen West',
+        name: 'Westsachsen',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'west' } },
+        order: 5,
         front_object: {
             left: 34.6,
             bottom: 34,
@@ -177,14 +192,15 @@ const links = [
         map_mask: {
             left: 13.8,
             bottom: 7.6,
-            width: 9.45,
+            width: 10.6,
             asset_component: WestMapMask,
         }
     },
     {
         name: 'Mediathek',
         is_in_book: false,
-        route: { name: 'library' },
+        route: { name: 'library-index' },
+        order: 1,
         front_object: {
             left: -1,
             bottom: 17,
@@ -197,7 +213,8 @@ const links = [
     {
         name: 'Proberaum',
         is_in_book: false,
-        route: { name: 'library' },
+        route: { name: 'presets-show', params: { presetName: LANDSCAPES.REHEARSAL } },
+        order: 10,
         front_object: {
             left: 79,
             bottom: 8,
@@ -215,12 +232,12 @@ useIntersectionObserver(
         deskSlideView.value = isIntersecting;
     },
     {
-        threshold: 0.5
+        threshold: [0.5]
     }
 );
 
 onMounted(() => {
-    const maskElms = document.querySelectorAll('.object-interact');
+    const maskElms = document.querySelectorAll<HTMLElement>('.object-interact');
     maskElms.forEach((maskEl) => {
         const maskID = parseInt(maskEl.getAttribute('data-object-id') ?? '');
         const maskPathEl = maskEl?.querySelector(`svg path`);
@@ -229,9 +246,8 @@ onMounted(() => {
         maskPathEl?.addEventListener('click', routeToPreset.bind(null, maskID));
     });
 
-    const mapMaskElms = document.querySelectorAll('.map-mask');
+    const mapMaskElms = document.querySelectorAll<HTMLElement>('.map-mask');
     mapMaskElms.forEach((mapMaskEl) =>{
-
         const mapMaskID = parseInt(mapMaskEl.getAttribute('data-map-mask') ?? '');
         const mapMaskPathEl = mapMaskEl?.querySelector('path');
         mapMaskPathEl?.addEventListener('mouseenter', mapMaskMouseEnter.bind(mapMaskEl));
@@ -243,19 +259,61 @@ onMounted(() => {
 onUnmounted(() => {
     const masksElms = document.querySelectorAll<HTMLElement>('.object-mask');
     masksElms.forEach((maskEl) => {
-        maskEl.removeEventListener('mouseenter', objectMaskMouseEnter);
-        maskEl.removeEventListener('mouseleave', objectMaskMouseLeave);
+        const maskID = parseInt(maskEl.getAttribute('data-object-id') ?? '');
+        maskEl.removeEventListener('mouseenter', objectMaskMouseEnter.bind(maskEl));
+        maskEl.removeEventListener('mouseleave', objectMaskMouseLeave.bind(maskEl));
+        maskEl?.addEventListener('click', routeToPreset.bind(null, maskID));
     });
     /**
      *
      *
      */
+
+    clearTimeout(deskShakeTimeout.value);
 });
 
+watch(idle, (idleValue) => {
+    clearTimeout(deskShakeTimeout.value);
+    if (idleValue) {
+        shakeDesk();
+    } else {
+        const objectsElms = document.querySelectorAll<HTMLElement>('.object-interact');
+        objectsElms.forEach( (objectEl) => {
+            objectEl.classList.remove('object-interact--active-idle');
+        });
+    }
+});
+
+const shakeDesk = () => {
+    const objectsElms = document.querySelectorAll<HTMLElement>('.object-interact');
+    objectsElms.forEach( (objectEl) => {
+        const order = parseInt(objectEl.getAttribute('data-order') ?? '0');
+        setTimeout(() => {
+            if (idle.value) {
+                objectEl.classList.add('object-interact--active-idle');
+            }
+        }, order * 1000);
+        setTimeout(() => {
+            objectEl.classList.remove('object-interact--active-idle');
+        }, 12000 + order * 300);
+    });
+
+    deskShakeTimeout.value = setTimeout(shakeDesk, 18000)
+}
+
 const onDataIsReady = () => {
+
     setTimeout(() => {
         dataIsReady.value = true;
     }, 0);
+
+    setTimeout(() => {
+        if (route.hash === '#desk') {
+            router.replace({ hash: '' })
+            deskSlide.value?.scrollIntoView({  });
+        }
+    }, 100);
+
 }
 
 const objectMaskMouseEnter = function (this: HTMLElement) {
@@ -285,9 +343,9 @@ const mapMaskMouseLeave = function (this: HTMLElement) {
 }
 
 const routeToPreset = function (objectID: number) {
-    const route = links[objectID].route;
-    if (route !== null) {
-        router.push(route);
+    const routeObject = links[objectID].route;
+    if (routeObject !== null) {
+        router.push(routeObject);
     }
 }
 
@@ -353,13 +411,7 @@ const deskHelpHint = () => {
                     </div>
                     <div class="mt-[60px] flex justify-center mr-10">
                         <div class="relative">
-                            <button
-                                class="bg-gradient-to-b to-[#F8C300] from-[#FFF9E3] p-[2px] shadow-[8px_7px_7px_rgba(0,18,52,0.45)] group"
-                                @click="scrollToDesk">
-                                        <span class="group-hover:bg-white transition block py-2 px-8">
-                                            Reise beginnen
-                                        </span>
-                            </button>
+                            <LibraryButton @click="scrollToDesk">Reise beginnen</LibraryButton>
                             <div class="absolute w-full flex justify-center bottom-[-120px]">
                                 <div class="grid pointer-events-none double-arrow">
                                     <img src="/icons/blue-arrow.svg" alt="">
@@ -371,31 +423,56 @@ const deskHelpHint = () => {
                 </div>
             </div>
             <div class="h-[200px]"></div>
-            <div ref="deskSlide" class="snap-center flex justify-center relative">
+            <div id="desk" class="snap-center flex justify-center relative">
                 <div class="flex items-end pointer-events-none">
                     <img class="w-screen " src="/images/homepage/Sky.jpg" alt="">
                     <img class=" absolute bottom-0" src="/images/homepage/Desk.png" alt="">
                 </div>
-                <div id="desk-objects" class="absolute w-full h-full" :class="{ 'book-objects--shown': deskSlideView }">
+                <div
+                    id="desk-objects"
+                    ref="deskSlide"
+                    class="absolute w-full h-full group"
+                    :class="{
+                        'book-objects--shown': deskSlideView,
+                        'book-objects--idle': idle
+                    }">
                     <div
                         v-for="(object, key) in links"
                         :key="object"
                         :data-object-id="key"
                         class="group absolute pointer-events-none"
                         :class="{'object-interact' : object.route}"
+                        :data-order="object.order"
                         :style="{
                                 left: object.front_object.left + '%',
                                 bottom: object.front_object.bottom + '%',
                                 width: object.front_object.width + '%'
                             }">
-                        <div class="transition group-[.object-interact--active]:-translate-y-1">
+                        <div
+                            class="
+                                transition
+                                group-[.object-interact--active-idle]:-translate-y-1
+                                group-[.object-interact--active]:-translate-y-1
+                                group-[.book-objects--idle]:duration-[2000ms]">
                             <img
                                 class="w-full"
                                 :class="{ 'book-inner-object': object.is_in_book }"
                                 :src="object.front_object.asset_url"
                                 alt="">
                         </div>
-                        <div class="object-hint absolute top-[-80px] w-full flex justify-center  opacity-0 group-[.object-interact--active]:opacity-100 transition">
+                        <div
+                            class="
+                                object-hint
+                                absolute
+                                top-[-80px]
+                                w-full
+                                flex
+                                justify-center
+                                opacity-0
+                                group-[.object-interact--active-idle]:opacity-100
+                                group-[.object-interact--active]:opacity-100
+                                transition
+                                group-[.book-objects--idle]:duration-[2000ms]">
                             <div class="flex flex-col items-center">
                                 <span class="bg-white bg-opacity-80 px-3 py-1">{{ object.name }}</span>
                                 <img class="w-[30px] mt-[10px]" src="/icons/double-arrow.svg" alt="">

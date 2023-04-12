@@ -13,5 +13,7 @@ export interface Video {
     text: string,
     is_kids_and_youth: boolean,
     is_rehearsal: boolean,
-    choir_id: number | null,
+    choir_id: number,
+    choir_leader: string | null,
+    landscape_id: number | null
 }

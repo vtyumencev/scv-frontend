@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, toRefs} from "vue";
+import { onMounted, onUnmounted, ref, toRefs, watch } from "vue";
 
 const youtubeAPIisReady = ref(false);
 const videoPlayer = ref<any>(null);
@@ -14,6 +14,12 @@ const props = defineProps({
         default: null
     }
 });
+
+watch(() => props.videoId,(newValue) => {
+    videoController.isPlaying.value = false;
+    videoPlayer.value.destroy();
+    youtubePlayerInit();
+})
 
 const videoController = toRefs(props.videoController)
 
@@ -86,6 +92,14 @@ videoController.videoToggle.value = () => {
     } else {
         videoPlayer.value.playVideo();
     }
+}
+
+videoController.pause.value = () => {
+    videoPlayer.value.pauseVideo();
+}
+
+videoController.play.value = () => {
+    videoPlayer.value.playVideo();
 }
 
 </script>

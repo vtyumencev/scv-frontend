@@ -5,7 +5,7 @@ export interface Choir {
     name: string,
     region_id: number,
     type_id: number,
-    director: string
+    direction: string
     rehearsal_time: string,
     contact_address: string,
     contact_phone: string,

@@ -33,6 +33,10 @@ onBeforeMount(() => {
     }
 
     preset.value = libraryStore.presets[props.presetName];
+
+    if (preset.value?.has_no_enter_room) {
+
+    }
 });
 
 onMounted(() => {
@@ -43,20 +47,13 @@ const relatedVideos = computed(() : Video[] => {
     if (! libraryStore.videos) {
         return [];
     }
-    return libraryStore.videos
-        .filter(video => video.choir_id !== null)
-        .filter(video => getChoirByVideo(video)?.region_id === currentRegion.value?.id);
-});
 
-const currentRegion = computed( () : Attribute | undefined => {
     const currentPreset = preset.value;
-    if (! libraryStore.attributes?.regions) {
-        return undefined;
-    }
     if (currentPreset === undefined) {
-        return undefined;
+        return [];
     }
-    return libraryStore.attributes?.regions.find(region => region.id === currentPreset.source.id);
+
+    return currentPreset.videosFilter();
 });
 
 const getChoirByVideo = (video: Video) : Choir | undefined => {
@@ -108,13 +105,13 @@ onBeforeRouteLeave(async () => {
                     data-depth-strength-y="0"
                     class="absolute top-[28%] left-[7%] w-[9%] h-[9%]">
                     <router-link
-                        :to="{ name: 'index' }"
+                        :to="{ name: 'index', hash: '#desk' }"
                         class="block -rotate-[13deg] h-full">
                     </router-link>
                 </div>
             </div>
             <div id="video-explorer" class="absolute right-[8%] bottom-0 h-[47%] w-[64%] overflow-auto">
-                <div v-if="relatedVideos.length" class="grid grid-cols-4 gap-6 pb-[20px] px-5">
+                <div v-if="relatedVideos.length" class="grid grid-cols-3 gap-6 pb-[20px] px-5">
                     <div
                         v-for="video in relatedVideos"
                         :key="video"

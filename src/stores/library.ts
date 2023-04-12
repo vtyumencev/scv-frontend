@@ -8,6 +8,7 @@ import type {Place} from "@/types/Place";
 import type {VideosFilter} from "@/types/VideosFilter";
 import {ref} from "vue";
 import type {Attribute} from "@/types/Attribute";
+import { LANDSCAPES } from "@/enums/landscapes";
 
 const fetch = useAPI();
 
@@ -19,78 +20,107 @@ export declare type FilterNames = 'genres' | 'styles' | 'regions';
 
 export const useLibrary = defineStore('library', () => {
     const attributes = ref<Attributes>();
-    const videos = ref<Video[]>();
-    const choirs = ref<Choir[]>();
+    const videos = ref<Video[]>([]);
+    const choirs = ref<Choir[]>([]);
     const dataIsReady = ref(false);
 
-    const presets = {
-        'leipzig': {
-            'name': 'Leipzig',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
-                'backgroundImageDark': '/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 1,
-            },
-            title_gen: 'Leipziger'
+    const landscapes = {
+        [LANDSCAPES.LEIPZIG]: {
+            name: 'Leipzig',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
+            backgroundImageDark: '/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
+            title_gen: 'Leipziger',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.LEIPZIG)?.id
+                );
+            }
         },
-        'dresden': {
-            'name': 'Dresden',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
-                'backgroundImageDark': '/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 2,
-            },
-            title_gen: 'Dresdener'
+        [LANDSCAPES.DRESDEN]: {
+            name: 'Dresden',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
+            backgroundImageDark: '/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
+            title_gen: 'Dresdener',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.DRESDEN)?.id
+                );
+            }
         },
-        'chemnitz': {
-            'name': 'Chemnitz',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Chemnitz.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 3,
-            },
-            title_gen: 'Chemnitzer'
+        [LANDSCAPES.CHEMNITZ]: {
+            name: 'Chemnitz',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Chemnitz.jpg',
+            title_gen: 'Chemnitzer',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.CHEMNITZ)?.id
+                );
+            }
         },
-        'north': {
-            'name': 'Nord',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_Nord.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 4,
-            },
-            title_gen: 'Norder'
+        [LANDSCAPES.NORTH]: {
+            name: 'Nord',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Nord.jpg',
+            title_gen: 'Norder',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.NORTH)?.id
+                );
+            }
         },
-        'west': {
-            'name': 'West',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_West.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 5,
-            },
-            title_gen: 'Westen'
+        [LANDSCAPES.WEST]: {
+            name: 'West',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_West.jpg',
+            title_gen: 'Westen',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.WEST)?.id
+                );
+            }
         },
-        'east': {
-            'name': 'Ost',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_SachsenOst.jpg',
-                'source': {
-                'type': 'region',
-                    'id': 6,
-            },
-            title_gen: 'Osten'
+        [LANDSCAPES.EAST]: {
+            name: 'Ost',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_SachsenOst.jpg',
+            title_gen: 'Osten',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.EAST)?.id
+                );
+            }
         },
-        'kinder-youth': {
-            'name': 'Kinder Jugend',
-                'backgroundImage': '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
-                'source': {
-                'type': 'kinder_youth',
-            },
-            title_gen: ''
+        [LANDSCAPES.KINDER_YOUTH]: {
+            name: 'Kinder Jugend',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            title_gen: '',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.KINDER_YOUTH)?.id
+                );
+            }
+        },
+        [LANDSCAPES.SEASON_NEUTRAL]: {
+            name: 'Kinder Jugend',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            title_gen: '',
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.SEASON_NEUTRAL)?.id
+                );
+            }
+        },
+        [LANDSCAPES.REHEARSAL]: {
+            name: 'Kinder Jugend',
+            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            title_gen: '',
+            has_no_enter_room: true,
+            videosFilter: () => {
+                return videos.value.filter(video =>
+                    video.landscape_id === getLandscapeBySlug(LANDSCAPES.REHEARSAL)?.id
+                );
+            }
         },
     } as Presets;
     const places = {
-        'concert': {
+        'cultural_stage': {
             'stageElements': [
                 {
                     'assets': {
@@ -306,27 +336,192 @@ export const useLibrary = defineStore('library', () => {
                     'deathStrengthY': 0,
                 },
             ]
+        },
+        'sacred': {
+            'stageElements': [
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/BackgorundSakral.png',
+                        'dark': '/stage/places/church/dark/BackgorundSakralDark_candles.png',
+                    },
+                    'width': 100,
+                    'top': 0,
+                    'left': 0,
+                    'deathStrengthX': 0,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/path.png',
+                        'dark': '/stage/places/church/dark/path.png',
+                    },
+                    'width': 35,
+                    'top': 60,
+                    'left': 33.5,
+                    'deathStrengthX': 0,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank5l.png',
+                        'dark': '/stage/places/church/dark/bank5l.png',
+                    },
+                    'width': 23.7,
+                    'top': 61.3,
+                    'left': 24.3,
+                    'deathStrengthX': 0.02,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank5r.png',
+                        'dark': '/stage/places/church/dark/bank5r.png',
+                    },
+                    'width': 21,
+                    'top': 61.8,
+                    'left': 51.9,
+                    'deathStrengthX': 0.02,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank4l.png',
+                        'dark': '/stage/places/church/dark/bank4l.png',
+                    },
+                    'width': 26.8,
+                    'top': 66.5,
+                    'left': 20.1,
+                    'deathStrengthX': 0.04,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank4r.png',
+                        'dark': '/stage/places/church/dark/bank4r.png',
+                    },
+                    'width': 24,
+                    'top': 66.4,
+                    'left': 52.9,
+                    'deathStrengthX': 0.04,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank3l.png',
+                        'dark': '/stage/places/church/dark/bank3l.png',
+                    },
+                    'width': 30.6,
+                    'top': 70.7,
+                    'left': 15.4,
+                    'deathStrengthX': 0.06,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank3r.png',
+                        'dark': '/stage/places/church/dark/bank3r.png',
+                    },
+                    'width': 27.4,
+                    'top': 70.4,
+                    'left': 53.7,
+                    'deathStrengthX': 0.06,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank2l.png',
+                        'dark': '/stage/places/church/dark/bank2l.png',
+                    },
+                    'width': 34.1,
+                    'top': 76.7,
+                    'left': 10.7,
+                    'deathStrengthX': 0.08,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank2r.png',
+                        'dark': '/stage/places/church/dark/bank2r.png',
+                    },
+                    'width': 30.9,
+                    'top': 76.2,
+                    'left': 54.8,
+                    'deathStrengthX': 0.08,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank1l.png',
+                        'dark': '/stage/places/church/dark/bank1l.png',
+                    },
+                    'width': 50,
+                    'top': 85.8,
+                    'left': -6.3,
+                    'deathStrengthX': 0.12,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/bank1r.png',
+                        'dark': '/stage/places/church/dark/bank1r.png',
+                    },
+                    'width': 50,
+                    'top': 83.5,
+                    'left': 56,
+                    'deathStrengthX': 0.12,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/SauleV1L.png',
+                        'dark': '/stage/places/church/dark/SauleV1L.png',
+                    },
+                    'width': 30.6,
+                    'top': 0,
+                    'left': -11.5,
+                    'deathStrengthX': 0.2,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/places/church/light/SauleV1R.png',
+                        'dark': '/stage/places/church/dark/SauleV1R.png',
+                    },
+                    'width': 30.6,
+                    'top': 0,
+                    'left': 80.2,
+                    'deathStrengthX': 0.2,
+                    'deathStrengthY': 0,
+                },
+                {
+                    'assets': {
+                        'light': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'dark': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                    },
+                    'width': 100,
+                    'top': 0,
+                    'left': 0,
+                    'deathStrengthX': 0,
+                    'deathStrengthY': 0,
+                },
+            ]
         }
     } as Record<string, Place>;
 
+    const relatedVideos = ref<Video[]>([]);
+
     const filters = {
         genres: {
-            selected: [] as string[],
-                is_active: false,
-                filterCallback: (video, selectedAttributes) => selectedAttributes.includes(video.genre_id + '')
+            filterCallback: (video, selectedAttributes) => selectedAttributes.includes(video.genre_id + '')
         },
         styles: {
-            selected: [] as string[],
-                is_active: false,
-                filterCallback: (video, selectedAttributes) => selectedAttributes.includes(video.style_id + '')
+            filterCallback: (video, selectedAttributes) => selectedAttributes.includes(video.style_id + '')
         },
         regions: {
-            selected: [] as string[],
-                is_active: false,
-                filterCallback: (video, selectedAttributes) => {
-                    const regionId = choirs.value?.find(choir => choir.id === video.choir_id)?.region_id;
-                    return selectedAttributes.includes(regionId + '');
-                }
+            filterCallback: (video, selectedAttributes) => {
+                const regionId = choirs.value?.find(choir => choir.id === video.choir_id)?.region_id;
+                return selectedAttributes.includes(regionId + '');
+            }
         }
     } as Record<string, VideosFilter>;
 
@@ -359,12 +554,16 @@ export const useLibrary = defineStore('library', () => {
     };
 
     const getChoirByID = (choirID: number): Choir | null => {
-        return choirs.value?.find(choir => choir.id === choirID) || null
+        return choirs.value?.find(choir => choir.id === choirID) || null;
     };
 
     const getRegionByID = (regionID: number): Attribute | null => {
-        return attributes.value?.regions.find(attr => attr.id === regionID) || null
+        return attributes.value?.regions.find(attr => attr.id === regionID) || null;
     };
+
+    const getLandscapeBySlug = (landscapeSlug: string): Attribute | null => {
+        return attributes.value?.landscapes.find(attr => attr.slug === landscapeSlug) || null;
+    }
 
     const getPresetByRegion = (regionID: number): Preset | null => {
 
@@ -372,7 +571,7 @@ export const useLibrary = defineStore('library', () => {
         if (! regionSlug) {
             return null;
         }
-        return presets[regionSlug];
+        return landscapes[regionSlug];
     }
 
     return {
@@ -380,9 +579,10 @@ export const useLibrary = defineStore('library', () => {
         attributes,
         videos,
         choirs,
-        presets,
+        presets: landscapes,
         places,
         filters,
+        relatedVideos,
         getVideos,
         getChoirs,
         getAttributes,

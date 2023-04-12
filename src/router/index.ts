@@ -40,14 +40,28 @@ const routes : Array<RouteRecordRaw> = [
     {
         path: '/library',
         name: 'library',
-        component: Library,
-        props: route => ({ query: route.query })
-    },
-    {
-        path: '/library/choirs/:choirId',
-        name: 'library-choirs-show',
-        component: LibraryChoir,
-        props: route => ({ query: route.query, choirId: route.params.choirId })
+        children: [
+            {
+                path: '',
+                name: 'library-index',
+                component: Library,
+                props: route => ({ query: route.query }),
+            },
+            {
+                path: 'choirs/:choirId',
+                name: 'library-choirs-show',
+                component: LibraryChoir,
+                props: route => ({ query: route.query, choirId: route.params.choirId, videoId: route.params.videoId }),
+                children: [
+                    {
+                        path: 'video/:videoId',
+                        name: 'library-choirs-show-video',
+                        component: LibraryChoir,
+                        props: route => ({ videoId: route.params.videoId }),
+                    }
+                ]
+            }
+        ]
     },
     {
         path: '/presets/:presetName',

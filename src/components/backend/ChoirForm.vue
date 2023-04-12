@@ -10,6 +10,7 @@ import Editor from '@tinymce/tinymce-vue';
 import VideoExplorer from './VideoExplorer.vue';
 import {useRouter} from 'vue-router';
 import {useAPI} from "@/composables/fetch";
+import TextareaInput from "@/components/TextareaInput.vue";
 
 const fetch = useAPI();
 
@@ -82,11 +83,19 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel value="Region" />
-            <Select v-model="data.region_id" class="mt-1 block w-full" name="Region is not selected" :items="stageStore.attributes?.regions"></Select>
+            <Select
+                v-model="data.region_id"
+                class="mt-1 block w-full"
+                null-option="Region ist nicht ausgewählt"
+                :items="stageStore.attributes?.regions ?? []" />
         </div>
         <div class="mb-5">
             <InputLabel value="Chortyp" />
-            <Select v-model="data.type_id" class="mt-1 block w-full" name="Type is not selected" :items="stageStore.attributes?.choir_types"></Select>
+            <Select
+                v-model="data.type_id"
+                class="mt-1 block w-full"
+                null-option="Chortyp ist nicht ausgewählt"
+                :items="stageStore.attributes?.choir_types ?? []" />
         </div>
         <div class="mb-5">
             <InputLabel value="Videos" />
@@ -103,11 +112,11 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Chorleitung" />
-            <TextInput v-model="data.director" type="text" class="mt-1 block w-full" />
+            <TextInput v-model="data.direction" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Adresse" />
-            <TextInput v-model="data.contact_address" type="text" class="mt-1 block w-full" />
+            <TextareaInput v-model="data.contact_address" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Probenzeit" />
