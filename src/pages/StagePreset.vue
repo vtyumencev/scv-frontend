@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
-import {onBeforeMount, ref, type PropType, computed, onMounted} from "vue";
+import { onBeforeMount, ref, type PropType, computed, onMounted } from "vue";
 import { useLibrary, type PresetNames } from "@/stores/library";
-import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import type { Preset } from "@/types/Preset";
 import type { Video } from "@/types/Video";
 import type { Choir } from "@/types/Choir";
-import type { Attribute } from "@/types/Attribute";
 
 const libraryStore = useLibrary();
 const router = useRouter();
@@ -83,18 +82,18 @@ onBeforeRouteLeave(async () => {
                         data-depth
                         data-depth-strength-x="0.1"
                         data-depth-strength-y="0"
-                        src="/public/presets/misc/Wegweiser.png"
+                        src="/images/presets/misc/Wegweiser.png"
                         class="absolute top-[2%] left-[5%] w-[30%]"
                         alt="">
                 </div>
                 <img
                     id="decoration-wall-image"
-                    src="/public/presets/misc/Mauer.png"
+                    src="/images/presets/misc/Mauer.png"
                     class="absolute bottom-0"
                     alt="">
                 <img
                     id="decoration-automat-image"
-                    src="/public/presets/misc/Automat.png"
+                    src="/images/presets/misc/Automat.png"
                     class="absolute bottom-0 right-0 w-[75%]"
                     alt="">
             </div>

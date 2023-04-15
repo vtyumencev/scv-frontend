@@ -78,8 +78,8 @@ type HandlerOption = {
     notifyOptions?: NotifyCallbackOptions,
     processing?: Ref,
     disableNotify?: boolean
-    // eslint-disable-next-line no-unused-vars
-    onSuccess?(response: AxiosResponse): void
+    onSuccess?(response: AxiosResponse): void,
+    successMsg?: string
 }
 type HandlerOptionFull = HandlerOption & {
     action: Action,
@@ -122,7 +122,7 @@ export function useAPI() {
             );
         }
         else if (actionComment.success) {
-            toast(actionComment.success, success);
+            toast(options.successMsg ??  actionComment.success, success);
         }
 
     }
@@ -175,8 +175,8 @@ export function useAPI() {
         async show<T>(resource: string, id: number) {
             return await execute<T>('get', `/api/${resource}/${id}`, {}, {}, { action: 'show' });
         },
-        async store(resource: string, data: object = { }, options?: HandlerOption) {
-            return await execute('post', `/api/${resource}`, {}, data, { action: 'store', ...options });
+        async store<T>(resource: string, data: object = { }, options?: HandlerOption) {
+            return await execute<T>('post', `/api/${resource}`, {}, data, { action: 'store', ...options });
         },
         async update(resource: string, id: number, data: object, options?: HandlerOption) {
             return await execute('put', `/api/${resource}/${id}`, {}, data, { action: 'update', ...options });

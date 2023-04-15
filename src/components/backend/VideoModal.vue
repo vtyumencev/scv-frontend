@@ -8,9 +8,7 @@ import TextInput from '@/components/TextInput.vue'
 import PrimaryButton from '@/components/PrimaryButton.vue'
 import Select from '@/components/Select.vue'
 import { useLibrary } from '@/stores/library';
-import Editor from '@tinymce/tinymce-vue';
 import Skeleton from './Skeleton.vue'
-import Checkbox from '@/components/Checkbox.vue';
 import { useAPI } from "@/composables/fetch";
 import type { Attribute } from "@/types/Attribute";
 

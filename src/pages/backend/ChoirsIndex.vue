@@ -84,7 +84,7 @@ const filteredList = computed(() : Choir[] => {
                                     @click="choirsStorage.filterOrder !== 'date_desc' ? choirsStorage.changeOrder('date_desc') : choirsStorage.changeOrder('date_asc')">Created At</div>
                             </div>
                             <template v-if="choirsStorage.choirs.length">
-                                <TransitionGroup v-if="filteredList.length" name="list" tag="ul">
+                                <div v-if="filteredList.length" >
                                     <li v-for="item in filteredList" :key="item" class="py-3 border-b last:border-0 grid grid-cols-[3fr_1fr]">
                                         <router-link
                                             :to="{ name: 'choirs-edit', params: { id: item.id }}"
@@ -95,7 +95,7 @@ const filteredList = computed(() : Choir[] => {
                                             {{ dateCalc(item.created_at) }}
                                         </span>
                                     </li>
-                                </TransitionGroup>
+                                </div>
                                 <template v-else>
                                     No results.
                                 </template>
@@ -121,7 +121,6 @@ const filteredList = computed(() : Choir[] => {
 .list-enter-from,
 .list-leave-to {
     opacity: 0;
-    //transform: translateX(30px);
 }
 
 /* ensure leaving items are taken out of layout flow so that moving

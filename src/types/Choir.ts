@@ -4,8 +4,9 @@ export interface Choir {
     id: number,
     name: string,
     region_id: number,
+    place: string,
     type_id: number,
-    direction: string
+    leader: string
     rehearsal_time: string,
     contact_address: string,
     contact_phone: string,

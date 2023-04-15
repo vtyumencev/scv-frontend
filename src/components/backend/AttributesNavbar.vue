@@ -19,6 +19,7 @@ const attributesStorage = useAttributes();
                 <router-link
                     v-for="attribute in attributesStorage?.navigation"
                     v-slot="{ href, isActive, navigate }"
+                    :key="attribute"
                     :to="{ name: 'attribute', params: { attributeName: attribute.slug } }"
                     custom>
                     <NavLink

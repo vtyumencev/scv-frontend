@@ -21,7 +21,20 @@ defineProps<{
                 :name="attributeName"
                 :value="attr.id"
                 :checked="selected.includes('' + attr.id)"
-                class="w-4 h-4 text-theme-alpha bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 transition">
+                class="
+                w-4
+                h-4
+                text-theme-alpha
+                border-black
+                border-opacity-20
+                rounded
+                focus:ring-1
+                focus:ring-theme-beta
+                dark:ring-offset-theme-omega
+                dark:bg-theme-omega
+                dark:border-white
+                dark:border-opacity-20
+                transition">
             <label :for="'filter-checkbox-' + attributeName + '-' + attr.id" class="ml-2 text-sm uppercase text-gray-900 dark:text-gray-300 transition">{{ attr.name }}</label>
         </div>
     </div>

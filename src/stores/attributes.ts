@@ -24,10 +24,6 @@ export const useAttributes = defineStore('attributes', {
                     'name': 'Chortyp',
                     'slug': 'choir_types',
                 },
-                {
-                    'name': 'Veranstaltungsort',
-                    'slug': 'places',
-                },
             ],
             list: { } as Attributes
         }

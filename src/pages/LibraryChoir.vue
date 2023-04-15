@@ -120,9 +120,9 @@ const applyFilters = (value: Query) => {
                     <h5 class="text-lg">Über den Chor</h5>
                     <div v-html="choir?.description"></div>
                 </div>
-                <div v-if="choir?.direction">
+                <div v-if="choir?.leader">
                     <h5 class="text-lg">Chorleitung</h5>
-                    <div>{{ choir?.direction }}</div>
+                    <div>{{ choir?.leader }}</div>
                 </div>
                 <div v-if="choir?.contact_address">
                     <h5 class="text-lg">Adresse</h5>

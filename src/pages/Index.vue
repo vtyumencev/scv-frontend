@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { defineAsyncComponent, h, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from "vue";
 import { useIdle, useIntersectionObserver } from '@vueuse/core'
 import { useRouter, useRoute } from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
 import type { BookObject } from "@/types/BookObject";
 import VideoModal from "@/components/frontend/VideoModal.vue";
-import { LANDSCAPES } from "@/enums/landscapes";
+import LibraryButton from "@/components/frontend/LibraryButton.vue";
 
 import LeipzigMask from '../../public/images/homepage/masks/desk/leipzig.svg';
 import LeipzigMapMask from '../../public/images/homepage/masks/map/leipzig.svg';
@@ -24,7 +24,6 @@ import KinderYouthMask from '../../public/images/homepage/masks/desk/kinder-juge
 import RehearsalMask from '../../public/images/homepage/masks/desk/proberaum.svg';
 import LibraryMask from '../../public/images/homepage/masks/desk/mediathek.svg';
 import NeutralMask from '../../public/images/homepage/masks/desk/neutral.svg';
-import LibraryButton from "@/components/frontend/LibraryButton.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -38,6 +37,7 @@ const dataIsReady = ref(false);
 const isIntroVideoShown = ref(false);
 const deskSlideView = ref(false);
 const deskShakeTimeout = ref();
+const hintsEnabled = ref(false);
 
 const links = [
     {
@@ -114,7 +114,7 @@ const links = [
     {
         name: 'Seasonal',
         is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'neutral' } },
+        route: null,
         order: 9,
         front_object: {
             left: 68,
@@ -213,7 +213,7 @@ const links = [
     {
         name: 'Proberaum',
         is_in_book: false,
-        route: { name: 'presets-show', params: { presetName: LANDSCAPES.REHEARSAL } },
+        route: null,
         order: 10,
         front_object: {
             left: 79,
@@ -236,7 +236,33 @@ useIntersectionObserver(
     }
 );
 
-onMounted(() => {
+onMounted( async () => {
+
+    // document.querySelector('#desk')?.addEventListener('mouseover', (e) => {
+    //
+    //     console.log(1)
+    //
+    //     const objectInteract = (e.target as HTMLElement).closest('.object-interact') as HTMLElement;
+    //     if (objectInteract) {
+    //         objectMaskMouseEnter.call(objectInteract);
+    //         return;
+    //     }
+    //
+    //     const mapInteract = (e.target as HTMLElement).closest('.map-mask') as HTMLElement;
+    //     if ((e.target as HTMLElement).closest('.map-mask')) {
+    //         mapMaskMouseEnter.call(mapInteract);
+    //         return;
+    //     }
+    //
+    //
+    // });
+    //
+    // document.querySelector('#desk')?.addEventListener('mouseout', (e) => {
+    //     const objectInteract = (e.target as HTMLElement).closest('.object-interact') as HTMLElement;
+    //     if (objectInteract) objectMaskMouseLeave.call(objectInteract);
+    //     console.log(2)
+    // });
+
     const maskElms = document.querySelectorAll<HTMLElement>('.object-interact');
     maskElms.forEach((maskEl) => {
         const maskID = parseInt(maskEl.getAttribute('data-object-id') ?? '');
@@ -249,7 +275,7 @@ onMounted(() => {
     const mapMaskElms = document.querySelectorAll<HTMLElement>('.map-mask');
     mapMaskElms.forEach((mapMaskEl) =>{
         const mapMaskID = parseInt(mapMaskEl.getAttribute('data-map-mask') ?? '');
-        const mapMaskPathEl = mapMaskEl?.querySelector('path');
+        const mapMaskPathEl = mapMaskEl?.querySelector(`path`);
         mapMaskPathEl?.addEventListener('mouseenter', mapMaskMouseEnter.bind(mapMaskEl));
         mapMaskPathEl?.addEventListener('mouseleave', mapMaskMouseLeave.bind(mapMaskEl));
         mapMaskPathEl?.addEventListener('click', routeToPreset.bind(null, mapMaskID));
@@ -317,12 +343,18 @@ const onDataIsReady = () => {
 }
 
 const objectMaskMouseEnter = function (this: HTMLElement) {
+    if (hintsEnabled.value) {
+        return;
+    }
     this.classList.add('object-interact--active');
     const objectID = this.getAttribute('data-object-id');
     const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${ objectID }"]`);
     mapMaskEl?.classList.add('opacity-100');
 }
 const objectMaskMouseLeave = function (this: HTMLElement) {
+    if (hintsEnabled.value) {
+        return;
+    }
     this.classList.remove('object-interact--active');
     const objectID = this.getAttribute('data-object-id');
     const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${ objectID }"]`);
@@ -330,12 +362,18 @@ const objectMaskMouseLeave = function (this: HTMLElement) {
 }
 
 const mapMaskMouseEnter = function (this: HTMLElement) {
+    if (hintsEnabled.value) {
+        return;
+    }
     const objectID = this.getAttribute('data-map-mask');
     const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${ objectID }"]`);
     objectMaskEl?.classList.add('object-interact--active');
     this.classList.add('opacity-100');
 }
 const mapMaskMouseLeave = function (this: HTMLElement) {
+    if (hintsEnabled.value) {
+        return;
+    }
     const objectID = this.getAttribute('data-map-mask');
     const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${ objectID }"]`);
     objectMaskEl?.classList.remove('object-interact--active');
@@ -355,20 +393,31 @@ const scrollToDesk = () => {
 
 const deskHelpHint = () => {
     const maskElms = document.querySelectorAll('.object-interact');
-    maskElms.forEach( (maskEl) => {
-        setTimeout(() => {
-            maskEl.classList.add('object-interact--active');
-        }, Math.random() * 400)
-    });
+    if (hintsEnabled.value) {
+        maskElms.forEach( (maskEl) => {
+            setTimeout(() => {
+                maskEl.classList.remove('object-interact--active');
+            }, Math.random() * 400);
+        });
+        hintsEnabled.value = false;
+    } else {
+        maskElms.forEach( (maskEl) => {
+            setTimeout(() => {
+                maskEl.classList.add('object-interact--active');
+            }, Math.random() * 400);
+        });
+        hintsEnabled.value = true;
+    }
 }
 
 </script>
 
 <template>
-    <LibraryLayout @on-data-is-ready="onDataIsReady" @on-click-help-button="deskHelpHint">
-        <div class="relative snap-mandatory">
-            <div ref="introSlide" class="h-screen flex justify-center items-center snap-center min-h-[900px]">
-                <div class="absolute h-screen flex items-end overflow-hidden top-0">
+
+    <LibraryLayout @on-data-is-ready="onDataIsReady">
+        <div class="relative">
+            <div ref="introSlide" class="lg:h-screen flex justify-center pt-20 lg:pt-0 lg:items-center lg:min-h-[900px] relative">
+                <div class="absolute bottom-[0] flex items-end overflow-hidden lg:top-0 lg:bottom-auto lg:h-screen">
                     <img
                         class="w-screen transition duration-[2500ms] delay-200 opacity-0"
                         :class="{ 'scale-125': !dataIsReady, 'scale-100 opacity-100': dataIsReady }"
@@ -379,43 +428,50 @@ const deskHelpHint = () => {
                     class="relative max-w-6xl mx-auto duration-[1000ms] delay-300 opacity-0"
                     :class="{ 'scale-110': !dataIsReady, 'scale-100 opacity-100': dataIsReady }">
                     <div
-                        class="grid grid-cols-[2fr_1fr]">
+                        class="grid lg:grid-cols-[2fr_1fr]">
                         <div class="">
-                            <div class="p-10 bg-white bg-opacity-60">
-                                <h1 class="text-[3.4rem] font-serif">Deine Reise Beginnt hier!</h1>
-                                <div class="space-y-10 mt-12 font-light text-lg">
-                                    <p>
-                                        <b>Wilkommen in unserer digitalen Chorlandschaft!</b> sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis?  Magnum Opus Maurenta!
-                                    </p>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Wilkommensvideo klicken viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel fasan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo Mediathek oder den <b>Proberaum</b> lacus vel facilisis.
-                                    </p>
+                            <div class="p-5 lg:p-10 bg-white bg-opacity-60">
+                                <div class="relative">
+                                    <h1 class="text-[1.5rem] sm:text-[2rem] lg:text-[3.4rem] font-serif mr-[140px] lg:mr-0">Deine Reise Beginnt hier!</h1>
+                                    <div class="absolute top-0 right-0 flex justify-end lg:hidden balloonWrapper">
+                                        <div class="balloon">
+                                            <img class="w-[100px] relative" src="/images/landing/Balloon_Play.png" alt="">
+                                            <button
+                                                class="absolute w-[37%] h-[30%] top-[25%] left-[27%] rounded-full"
+                                                @click="isIntroVideoShown = true"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-10 mt-8 font-light lg:text-lg">
+                                    <p>Willkommen in der Chorwelt Sachsens!</p>
+                                    <p>Wir möchten Sie auf eine kleine Reise durch die Vielfalt der Sächsischen Chorlandschaft einladen. Erleben Sie unsere Chöre und lassen Sie sich einen kurzen Moment aus dem Alltag entführen. Reisen Sie in die eher ländlich geprägten Regionen Sachsens - Nordsachsen, Ostsachsen oder Westsachsen - oder in eine der drei größten Städte Sachsens nach Chemnitz, Dresden oder Leipzig. Lassen Sie sich von der Freude am Chorsingen von den dort ansässigen Chören anstecken. Als Besonderheit können Sie den Chören beim Proben im Probenraum zusehen. Alle Videos, die nicht an einem der Auftrittsorte präsentiert werden, finden Sie in unserer Mediathek.</p>
+                                    <p>Herzlich begrüßen möchte Sie die Präsidentin des Sächsischen Chorverbands, Luise Neuhaus-Wartenberg.</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="">
-                            <div id="balloonWrapper" class="flex justify-end">
-                                <div id="balloon" class="">
+                        <div class="hidden lg:block">
+                            <div class="flex justify-end balloonWrapper">
+                                <div class="balloon">
                                     <img class="max-w-[300px] relative" src="/images/landing/Balloon_Play.png" alt="">
                                     <button
                                         class="absolute w-[37%] h-[30%] top-[25%] left-[27%] rounded-full"
                                         @click="isIntroVideoShown = true"></button>
                                 </div>
-                                <Teleport to="body">
-                                    <Transition>
-                                        <VideoModal v-if="isIntroVideoShown" video-id="pkWrunMCQ-0" @close-modal="isIntroVideoShown = false" />
-                                    </Transition>
-                                </Teleport>
                             </div>
                         </div>
+                        <Teleport to="body">
+                            <Transition>
+                                <VideoModal v-if="isIntroVideoShown" video-id="KsdAb06ZBTI" @close-modal="isIntroVideoShown = false" />
+                            </Transition>
+                        </Teleport>
                     </div>
-                    <div class="mt-[60px] flex justify-center mr-10">
+                    <div class="mt-[60px] flex justify-center">
                         <div class="relative">
                             <LibraryButton @click="scrollToDesk">Reise beginnen</LibraryButton>
                             <div class="absolute w-full flex justify-center bottom-[-120px]">
                                 <div class="grid pointer-events-none double-arrow">
-                                    <img src="/icons/blue-arrow.svg" alt="">
-                                    <img class="mt-[-20px]" src="/icons/blue-arrow.svg" alt="">
+                                    <img src="/images/icons/blue-arrow.svg" alt="">
+                                    <img class="mt-[-20px]" src="/images/icons/blue-arrow.svg" alt="">
                                 </div>
                             </div>
                         </div>
@@ -464,7 +520,8 @@ const deskHelpHint = () => {
                             class="
                                 object-hint
                                 absolute
-                                top-[-80px]
+                                top-[-70px]
+                                lg:top-[-80px]
                                 w-full
                                 flex
                                 justify-center
@@ -474,8 +531,8 @@ const deskHelpHint = () => {
                                 transition
                                 group-[.book-objects--idle]:duration-[2000ms]">
                             <div class="flex flex-col items-center">
-                                <span class="bg-white bg-opacity-80 px-3 py-1">{{ object.name }}</span>
-                                <img class="w-[30px] mt-[10px]" src="/icons/double-arrow.svg" alt="">
+                                <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ object.name }}</span>
+                                <img class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg" alt="">
                             </div>
                         </div>
                         <component
@@ -504,15 +561,21 @@ const deskHelpHint = () => {
                 </div>
             </div>
         </div>
+        <template #footer-left>
+            <button class="grid grid-flow-col gap-3 items-center uppercase" @click="deskHelpHint">
+                <img class="w-3.5 lg:w-5" src="/images/icons/question-mark-box.svg" alt="">
+                <span class="">Hilfe</span>
+            </button>
+        </template>
     </LibraryLayout>
 </template>
 <style lang="scss">
 
-#balloon {
+.balloon {
     animation: linear balloon 3s infinite;
 }
 
-#balloonWrapper {
+.balloonWrapper {
     animation: linear balloonWrapper 8s infinite both;
 }
 

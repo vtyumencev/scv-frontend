@@ -1,10 +1,28 @@
 <script setup lang="ts">
-import {onMounted} from "vue";
-import {useLibrary} from "@/stores/library";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useLibrary } from "@/stores/library";
+import { useScrollLock, useStorage } from "@vueuse/core";
+import LibraryButton from "@/components/frontend/LibraryButton.vue";
+
+const emits = defineEmits(['onDataIsReady']);
+
+const isOrientationLandscape = ref(true);
+const mql = window.matchMedia("(orientation: portrait) and (max-width: 700px)");
+
+const cookiesAccepted = useStorage('isCookiesAccepted', false)
+const isLocked = useScrollLock(document.documentElement);
+if (cookiesAccepted.value === false) {
+    isLocked.value = true;
+}
 
 const stageStore = useLibrary();
 
-const emits = defineEmits(['onDataIsReady']);
+
+watch(cookiesAccepted, (newValue) => {
+    if (newValue === true) {
+        isLocked.value = false;
+    }
+})
 
 onMounted( async () => {
 
@@ -22,11 +40,36 @@ onMounted( async () => {
             return;
         }
 
+        await stageStore.videos.forEach((video) => {
+            video.choir_name = stageStore.getChoirByID(video.choir_id)?.name ?? '';
+        })
+
         stageStore.dataReady();
     }
 
     emits('onDataIsReady');
+
+    if(mql.matches) {
+        isOrientationLandscape.value = false;
+    } else {
+        // Landscape orientation
+    }
+
+    mql.addListener(onChangeOrientation);
+
 });
+
+onBeforeUnmount(() => {
+    mql.removeListener(onChangeOrientation);
+});
+
+const onChangeOrientation = (e) => {
+    isOrientationLandscape.value = !e.matches;
+}
+
+const acceptCookies = () => {
+    cookiesAccepted.value = true;
+}
 
 </script>
 
@@ -48,6 +91,32 @@ onMounted( async () => {
                 </div>
             </div>
         </Transition>
+        <div v-if="! cookiesAccepted">
+            <div class="fixed top-0 left-0 w-full bg-white bg-opacity-80 h-full z-[20] flex items-center">
+                <div class="max-w-4xl mx-auto overflow-auto max-h-full">
+                    <div class="bg-white p-5 sm:p-10">
+                        <div class="grid grid-cols-[150px_auto] sm:grid-cols-[200px_auto] gap-10">
+                            <div class="">
+                                <img class="" src="/images/mix/cookies.png" alt="">
+                            </div>
+                            <div class="">
+                                <p>Diese Website ist ein Videoportal des Sächsischen Chorverband e.V. Alle, auf dieser Website, verfügbaren Videos sind Eigentum der Chorvereine und basieren auf der Videoplattform Youtube. Um die Videos ansehen zu können ist eine Datenverbindung zu Youtube unerlässlich. Dadurch kommt es auch zum Datentransfer mit Dritten, u.a. Google. Um diese Website vollumfänglich nutzen zu können ist Ihr Einverständniss unerlässlich. Sollten Sie damit nicht einverstanden sein, können Sie diese Website verlassen, bevor Sie ein Video ansehen und vermeiden die Verbindung zu Youtube.</p>
+                            </div>
+                        </div>
+                        <div class="mt-10 pt-2 pb-2 flex justify-center sticky bottom-0 bg-white">
+                            <LibraryButton @click="acceptCookies">
+                                Ok
+                            </LibraryButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="! isOrientationLandscape">
+            <div class="fixed top-0 left-0 w-full h-full bg-white z-[20] flex justify-center items-center">
+                <img class="w-[150px]" src="/images/icons/rotate-smartphone.png" alt="">
+            </div>
+        </div>
     </div>
 </template>
 

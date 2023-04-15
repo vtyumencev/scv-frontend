@@ -101,13 +101,20 @@ const concertSize = () : void => {
                         </div>
                         <div class="absolute bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="grid grid-flow-col gap-2">
-                                <router-link
-                                    v-for="navLink in navigationLinks.footer"
-                                    :key="navLink"
-                                    class="bg-black px-1.5 bg-opacity-50 rounded-sm"
-                                    :to="{ name: navLink.routeName }">
-                                    {{ navLink.name }}
-                                </router-link>
+                                <span v-for="navLink in navigationLinks.footer" :key="navLink">
+                                    <a
+                                        v-if="navLink.remoteLink"
+                                        :href="navLink.remoteLink"
+                                        class="bg-black px-1.5 bg-opacity-50 rounded-sm"
+                                        target="_blank">{{ navLink.name }}
+                                    </a>
+                                    <router-link
+                                        v-else
+                                        class="bg-black px-1.5 bg-opacity-50 rounded-sm"
+                                        :to="{ name: navLink.routeName }">
+                                        {{ navLink.name }}
+                                    </router-link>
+                                </span>
                             </div>
                         </div>
                         <div class="absolute right-0 bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">

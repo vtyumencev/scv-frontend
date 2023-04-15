@@ -69,10 +69,10 @@ const onReachBeginning = () => {
         </Swiper>
         <div class="absolute bottom-[0px] z-10 w-full grid grid-flow-col gap-[100px] justify-center pointer-events-none">
             <button ref="buttonPrev" class="pointer-events-auto text-theme-alpha opacity-30" @click="controlledSwiper.slidePrev()">
-                <img class="rotate-90 h-[10px]" src="/icons/blue-arrow.svg" alt="">
+                <img class="rotate-90 h-[10px]" src="/images/icons/blue-arrow.svg" alt="">
             </button>
             <button ref="buttonNext" class="pointer-events-auto text-theme-alpha" @click="controlledSwiper.slideNext()">
-                <img class="-rotate-90 h-[10px]" src="/icons/blue-arrow.svg" alt="">
+                <img class="-rotate-90 h-[10px]" src="/images/icons/blue-arrow.svg" alt="">
             </button>
         </div>
     </div>

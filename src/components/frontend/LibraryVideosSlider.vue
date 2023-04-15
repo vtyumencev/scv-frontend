@@ -37,10 +37,10 @@ const onReachBeginning = () => {
 <template>
     <div v-if="videos.length" class="relative">
         <button ref="buttonPrev" class="absolute left-[-60px] w-[40px] flex h-full items-center swiper-button-prev opacity-0 transition" @click="controlledSwiper.slidePrev()">
-            <img class="rotate-90 w-full" src="/icons/blue-arrow.svg" alt="">
+            <img class="rotate-90 w-full" src="/images/icons/blue-arrow.svg" alt="">
         </button>
         <button ref="buttonNext" class="absolute right-[-60px] w-[40px] flex h-full items-center swiper-button-prev transition" @click="controlledSwiper.slideNext()">
-            <img class="-rotate-90 w-full" src="/icons/blue-arrow.svg" alt="">
+            <img class="-rotate-90 w-full" src="/images/icons/blue-arrow.svg" alt="">
         </button>
         <Swiper
             :slides-per-view="3"

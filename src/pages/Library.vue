@@ -6,7 +6,6 @@ import type { Video } from "@/types/Video";
 import LibraryVideosSlider from "@/components/frontend/LibraryVideosSlider.vue";
 import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
 import LibraryVideosLayout from "@/layouts/LibraryVideosLayout.vue";
-import LibraryPagination from "@/components/frontend/LibraryPagination.vue";
 import LibraryVideosSliderGrid from "@/components/frontend/LibraryVideosSliderGrid.vue";
 
 const route = useRoute();
@@ -16,9 +15,6 @@ type Query = Record<string, string>;
 
 const filteredVideos = ref<Video[]>([]);
 const dataIsReady = ref(false);
-const currentPage = computed(() => {
-    return parseInt(route.query.page + "") || 1;
-});
 
 const props = defineProps({
     query: {
@@ -76,8 +72,7 @@ const isFilteredMode = computed(() => {
         <template #sidebarContent>
             <h1 class="text-6xl mb-10 font-serif">Mediathek</h1>
             <div class="space-y-4 font-light">
-                <p>Wilkommen in unserer digitalen Mediathek! sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis?  Magnum Opus Maurenta!</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. ilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo lacus vel facilisis. </p>
+                <p>Willkommen in unserer Mediathek! Hier finden Sie eine Vielzahl der Chöre des Sächsischen Chorverbandes und ihre Videos. Wir freuen uns, damit die Vielfalt der Sächsischen Laienchorszene präsentieren zu können. Filtern Sie unterhalb des Textes nach Genre, Stil oder Region oder geben Sie oben rechts in das Suchfeld einen Begriff ein, nachdem Sie suchen. Viel Freude mit den Videos!</p>
             </div>
         </template>
         <div v-if="isFilteredMode" class="h-full">
@@ -102,7 +97,7 @@ const isFilteredMode = computed(() => {
                 <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
                     Videos
                 </h2>
-                <LibraryVideosSliderGrid :videos="[...library.relatedVideos.slice(1), ...library.relatedVideos.slice(1), ...library.relatedVideos.slice(1), ...library.relatedVideos.slice(1), ...library.relatedVideos.slice(1), ...library.relatedVideos.slice(1)]" :rows="3" />
+                <LibraryVideosSliderGrid :videos="library.relatedVideos.slice(1)" :rows="3" />
 <!--                <div v-if="library.relatedVideos.length" class="grid grid-cols-3 gap-10">-->
 <!--                    <LibraryVideoPreview v-for="video in library.relatedVideos.slice(1 + (currentPage - 1) * 9, 10 + (currentPage - 1) * 9)" :key="video" :video="video" />-->
 <!--                </div>-->
@@ -114,12 +109,12 @@ const isFilteredMode = computed(() => {
 <!--                    </LibraryPagination>-->
 <!--                </div>-->
             </div>
-            <div class="mt-10">
-                <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
-                    Saisonales
-                </h2>
-                <LibraryVideosSlider :videos="library.relatedVideos.slice(10, 20)" />
-            </div>
+<!--            <div class="mt-10">-->
+<!--                <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">-->
+<!--                    Saisonales-->
+<!--                </h2>-->
+<!--                <LibraryVideosSlider :videos="library.relatedVideos.slice(10, 20)" />-->
+<!--            </div>-->
         </div>
     </LibraryVideosLayout>
 </template>

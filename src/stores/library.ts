@@ -27,8 +27,8 @@ export const useLibrary = defineStore('library', () => {
     const landscapes = {
         [LANDSCAPES.LEIPZIG]: {
             name: 'Leipzig',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
-            backgroundImageDark: '/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
             title_gen: 'Leipziger',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -38,8 +38,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.DRESDEN]: {
             name: 'Dresden',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
-            backgroundImageDark: '/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
             title_gen: 'Dresdener',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -49,7 +49,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.CHEMNITZ]: {
             name: 'Chemnitz',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Chemnitz.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_Chemnitz.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_ChemnitzNacht.jpg',
             title_gen: 'Chemnitzer',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -59,7 +60,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.NORTH]: {
             name: 'Nord',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_Nord.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_Nord.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_NordNacht.jpg',
             title_gen: 'Norder',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -69,7 +71,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.WEST]: {
             name: 'West',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_West.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_West.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_WestNacht.jpg',
             title_gen: 'Westen',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -79,7 +82,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.EAST]: {
             name: 'Ost',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_SachsenOst.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_SachsenOst.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_SachsenOstNacht.jpg',
             title_gen: 'Osten',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -89,7 +93,8 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.KINDER_YOUTH]: {
             name: 'Kinder Jugend',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            backgroundImageDark: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugendNacht.jpg',
             title_gen: '',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -99,7 +104,7 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.SEASON_NEUTRAL]: {
             name: 'Kinder Jugend',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
             title_gen: '',
             videosFilter: () => {
                 return videos.value.filter(video =>
@@ -109,7 +114,7 @@ export const useLibrary = defineStore('library', () => {
         },
         [LANDSCAPES.REHEARSAL]: {
             name: 'Kinder Jugend',
-            backgroundImage: '/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
+            backgroundImage: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
             title_gen: '',
             has_no_enter_room: true,
             videosFilter: () => {
@@ -124,8 +129,8 @@ export const useLibrary = defineStore('library', () => {
             'stageElements': [
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-Frame.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-Frame-Dark-withLights.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-Frame.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-Frame-Dark-withLights.png',
                     },
                     'width': 100,
                     'top': 0,
@@ -135,8 +140,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-SeatsB.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-SeatsB-Dark.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-SeatsB.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-SeatsB-Dark.png',
                     },
                     'width': 80,
                     'top': 75,
@@ -146,8 +151,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-SeatsA.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-SeatsA-Dark.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-SeatsA.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-SeatsA-Dark.png',
                     },
                     'width': 100,
                     'top': 85,
@@ -157,8 +162,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-BalconyM.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-BalconyM-Dark.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-BalconyM.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-BalconyM-Dark.png',
                     },
                     'width': 80,
                     'top': 80,
@@ -168,8 +173,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-BalconyL.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-BalconyL-Dark.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-BalconyL.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-BalconyL-Dark.png',
                     },
                     'width': 30,
                     'top': -13,
@@ -179,8 +184,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-BalconyR.png',
-                        'dark': '/stage/places/theater/dark/SCV-Stage-Kultur-BalconyR-Dark.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-BalconyR.png',
+                        'dark': '/images/stage/places/theater/dark/SCV-Stage-Kultur-BalconyR-Dark.png',
                     },
                     'width': 30,
                     'top': -13,
@@ -190,8 +195,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/theater/light/SCV-Stage-Kultur-DreamVignetteWhite.png',
-                        'dark': '/stage/places/theater/light/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'light': '/images/stage/places/theater/light/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'dark': '/images/stage/places/theater/light/SCV-Stage-Kultur-DreamVignetteWhite.png',
                     },
                     'width': 100,
                     'top': 0,
@@ -205,8 +210,8 @@ export const useLibrary = defineStore('library', () => {
             'stageElements': [
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Background.png',
-                        'dark': '/stage/places/open-air/dark/BackgroundDark.png',
+                        'light': '/images/stage/places/open-air/light/Background.png',
+                        'dark': '/images/stage/places/open-air/dark/BackgroundDark.png',
                     },
                     'width': 100,
                     'top': 46.3,
@@ -216,8 +221,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Foodtruck.png',
-                        'dark': '/stage/places/open-air/dark/FoodtruckDark.png',
+                        'light': '/images/stage/places/open-air/light/Foodtruck.png',
+                        'dark': '/images/stage/places/open-air/dark/FoodtruckDark.png',
                     },
                     'width': 23,
                     'top': 50,
@@ -227,8 +232,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/KidWithDog.png',
-                        'dark': '/stage/places/open-air/dark/KidWithDogDark.png',
+                        'light': '/images/stage/places/open-air/light/KidWithDog.png',
+                        'dark': '/images/stage/places/open-air/dark/KidWithDogDark.png',
                     },
                     'width': 19,
                     'top': 56.8,
@@ -238,8 +243,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Girlande_1.png',
-                        'dark': '/stage/places/open-air/dark/Girlande_1Dark.png',
+                        'light': '/images/stage/places/open-air/light/Girlande_1.png',
+                        'dark': '/images/stage/places/open-air/dark/Girlande_1Dark.png',
                     },
                     'width': 26.1,
                     'top': 27.1,
@@ -249,8 +254,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Girlande_2.png',
-                        'dark': '/stage/places/open-air/dark/Girlande_2Dark.png',
+                        'light': '/images/stage/places/open-air/light/Girlande_2.png',
+                        'dark': '/images/stage/places/open-air/dark/Girlande_2Dark.png',
                     },
                     'width': 26.1,
                     'top': 27.1,
@@ -260,8 +265,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Stage.png',
-                        'dark': '/stage/places/open-air/dark/StageDark_Lights.png',
+                        'light': '/images/stage/places/open-air/light/Stage.png',
+                        'dark': '/images/stage/places/open-air/dark/StageDark_Lights.png',
                     },
                     'width': 83,
                     'top': 3.4,
@@ -271,8 +276,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/Humans.png',
-                        'dark': '/stage/places/open-air/dark/HumansDark.png',
+                        'light': '/images/stage/places/open-air/light/Humans.png',
+                        'dark': '/images/stage/places/open-air/dark/HumansDark.png',
                     },
                     'width': 74,
                     'top': 65,
@@ -282,8 +287,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/BushL.png',
-                        'dark': '/stage/places/open-air/dark/BushLDark.png',
+                        'light': '/images/stage/places/open-air/light/BushL.png',
+                        'dark': '/images/stage/places/open-air/dark/BushLDark.png',
                     },
                     'width': 30,
                     'top': 71,
@@ -293,8 +298,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/open-air/light/BushR.png',
-                        'dark': '/stage/places/open-air/dark/BushRDark.png',
+                        'light': '/images/stage/places/open-air/light/BushR.png',
+                        'dark': '/images/stage/places/open-air/dark/BushRDark.png',
                     },
                     'width': 30,
                     'top': 71,
@@ -305,7 +310,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     'assets': {
                         'light': null,
-                        'dark': '/stage/places/open-air/dark/FireflyL.png',
+                        'dark': '/images/stage/places/open-air/dark/FireflyL.png',
                     },
                     'width': 24,
                     'top': 60,
@@ -316,7 +321,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     'assets': {
                         'light': null,
-                        'dark': '/stage/places/open-air/dark/FireflyR.png',
+                        'dark': '/images/stage/places/open-air/dark/FireflyR.png',
                     },
                     'width': 28,
                     'top': 50,
@@ -326,8 +331,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
-                        'dark': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'light': '/images/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'dark': '/images/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
                     },
                     'width': 100,
                     'top': 0,
@@ -341,8 +346,8 @@ export const useLibrary = defineStore('library', () => {
             'stageElements': [
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/BackgorundSakral.png',
-                        'dark': '/stage/places/church/dark/BackgorundSakralDark_candles.png',
+                        'light': '/images/stage/places/church/light/BackgorundSakral.png',
+                        'dark': '/images/stage/places/church/dark/BackgorundSakralDark_candles.png',
                     },
                     'width': 100,
                     'top': 0,
@@ -352,8 +357,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/path.png',
-                        'dark': '/stage/places/church/dark/path.png',
+                        'light': '/images/stage/places/church/light/path.png',
+                        'dark': '/images/stage/places/church/dark/path.png',
                     },
                     'width': 35,
                     'top': 60,
@@ -363,8 +368,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank5l.png',
-                        'dark': '/stage/places/church/dark/bank5l.png',
+                        'light': '/images/stage/places/church/light/bank5l.png',
+                        'dark': '/images/stage/places/church/dark/bank5l.png',
                     },
                     'width': 23.7,
                     'top': 61.3,
@@ -374,8 +379,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank5r.png',
-                        'dark': '/stage/places/church/dark/bank5r.png',
+                        'light': '/images/stage/places/church/light/bank5r.png',
+                        'dark': '/images/stage/places/church/dark/bank5r.png',
                     },
                     'width': 21,
                     'top': 61.8,
@@ -385,8 +390,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank4l.png',
-                        'dark': '/stage/places/church/dark/bank4l.png',
+                        'light': '/images/stage/places/church/light/bank4l.png',
+                        'dark': '/images/stage/places/church/dark/bank4l.png',
                     },
                     'width': 26.8,
                     'top': 66.5,
@@ -396,8 +401,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank4r.png',
-                        'dark': '/stage/places/church/dark/bank4r.png',
+                        'light': '/images/stage/places/church/light/bank4r.png',
+                        'dark': '/images/stage/places/church/dark/bank4r.png',
                     },
                     'width': 24,
                     'top': 66.4,
@@ -407,8 +412,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank3l.png',
-                        'dark': '/stage/places/church/dark/bank3l.png',
+                        'light': '/images/stage/places/church/light/bank3l.png',
+                        'dark': '/images/stage/places/church/dark/bank3l.png',
                     },
                     'width': 30.6,
                     'top': 70.7,
@@ -418,8 +423,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank3r.png',
-                        'dark': '/stage/places/church/dark/bank3r.png',
+                        'light': '/images/stage/places/church/light/bank3r.png',
+                        'dark': '/images/stage/places/church/dark/bank3r.png',
                     },
                     'width': 27.4,
                     'top': 70.4,
@@ -429,8 +434,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank2l.png',
-                        'dark': '/stage/places/church/dark/bank2l.png',
+                        'light': '/images/stage/places/church/light/bank2l.png',
+                        'dark': '/images/stage/places/church/dark/bank2l.png',
                     },
                     'width': 34.1,
                     'top': 76.7,
@@ -440,8 +445,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank2r.png',
-                        'dark': '/stage/places/church/dark/bank2r.png',
+                        'light': '/images/stage/places/church/light/bank2r.png',
+                        'dark': '/images/stage/places/church/dark/bank2r.png',
                     },
                     'width': 30.9,
                     'top': 76.2,
@@ -451,8 +456,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank1l.png',
-                        'dark': '/stage/places/church/dark/bank1l.png',
+                        'light': '/images/stage/places/church/light/bank1l.png',
+                        'dark': '/images/stage/places/church/dark/bank1l.png',
                     },
                     'width': 50,
                     'top': 85.8,
@@ -462,8 +467,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/bank1r.png',
-                        'dark': '/stage/places/church/dark/bank1r.png',
+                        'light': '/images/stage/places/church/light/bank1r.png',
+                        'dark': '/images/stage/places/church/dark/bank1r.png',
                     },
                     'width': 50,
                     'top': 83.5,
@@ -473,8 +478,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/SauleV1L.png',
-                        'dark': '/stage/places/church/dark/SauleV1L.png',
+                        'light': '/images/stage/places/church/light/SauleV1L.png',
+                        'dark': '/images/stage/places/church/dark/SauleV1L.png',
                     },
                     'width': 30.6,
                     'top': 0,
@@ -484,8 +489,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/places/church/light/SauleV1R.png',
-                        'dark': '/stage/places/church/dark/SauleV1R.png',
+                        'light': '/images/stage/places/church/light/SauleV1R.png',
+                        'dark': '/images/stage/places/church/dark/SauleV1R.png',
                     },
                     'width': 30.6,
                     'top': 0,
@@ -495,8 +500,8 @@ export const useLibrary = defineStore('library', () => {
                 },
                 {
                     'assets': {
-                        'light': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
-                        'dark': '/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'light': '/images/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
+                        'dark': '/images/stage/misc/SCV-Stage-Kultur-DreamVignetteWhite.png',
                     },
                     'width': 100,
                     'top': 0,
@@ -516,6 +521,12 @@ export const useLibrary = defineStore('library', () => {
         },
         styles: {
             filterCallback: (video, selectedAttributes) => selectedAttributes.includes(video.style_id + '')
+        },
+        choir_types: {
+            filterCallback: (video, selectedAttributes) => {
+                const typeId = choirs.value?.find(choir => choir.id === video.choir_id)?.type_id;
+                return selectedAttributes.includes(typeId + '');
+            }
         },
         regions: {
             filterCallback: (video, selectedAttributes) => {

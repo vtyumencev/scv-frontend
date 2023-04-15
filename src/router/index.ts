@@ -4,6 +4,7 @@ import Stage from '@/pages/Stage.vue';
 import PageNotFound from '@/pages/errors/404.vue';
 import Dashboard from '@/pages/backend/Dashboard.vue';
 import Login from '@/pages/auth/Login.vue';
+import CollectionUpload from "@/pages/auth/CollectionUpload.vue";
 // import Register from '@/pages/auth/Register.vue';
 // import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 // import ResetPassword from '@/pages/auth/ResetPassword.vue';
@@ -20,18 +21,19 @@ import ChoirsNew from '@/pages/backend/ChoirsNew.vue';
 
 import Attributes from '@/pages/backend/Attributes.vue';
 import Attribute from '@/pages/backend/Attribute.vue';
-import TestPage from "@/pages/backend/TestPage.vue";
 import Library from "@/pages/Library.vue";
 import LibraryChoir from "@/pages/LibraryChoir.vue";
+
+
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
 
 const routes : Array<RouteRecordRaw> = [
-    {
-        path: '/test',
-        name: 'test',
-        component: TestPage,
-    },
+    // {
+    //     path: '/test',
+    //     name: 'test',
+    //     component: () => import("@/pages/backend/TestPage.vue"),
+    // },
     {
         path: '/',
         name: 'index',
@@ -97,6 +99,15 @@ const routes : Array<RouteRecordRaw> = [
         component: Dashboard,
         meta: {
             title: 'Dashboard',
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/collection-upload',
+        name: 'collection-upload',
+        component: CollectionUpload,
+        meta: {
+            title: 'Collection Upload',
             guard: 'auth',
         },
     },

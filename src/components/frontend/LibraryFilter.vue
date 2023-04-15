@@ -88,6 +88,14 @@ const filterApply = () => {
             </Transition>
         </div>
         <div class="">
+            <button class="uppercase font-light" type="button" @click="filters.choir_types.isEnabled = !filters.choir_types.isEnabled">Chortyp</button>
+            <Transition name="filter">
+                <div v-show="filters.choir_types.isEnabled" class="mt-4 mb-6">
+                    <FilterAttributeCheckbox attribute-name="choir_types" :attributes="library.attributes.choir_types" :selected="filters['choir_types'].selectedValues" />
+                </div>
+            </Transition>
+        </div>
+        <div class="">
             <button class="uppercase font-light" type="button" @click="filters.regions.isEnabled = !filters.regions.isEnabled">Region</button>
             <Transition name="filter">
                 <div v-show="filters.regions.isEnabled" class="mt-4 mb-6">

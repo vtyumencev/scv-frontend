@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref, toRefs, watch } from "vue";
 
 const youtubeAPIisReady = ref(false);
+const youtubeVideoIsReady = ref(false);
 const videoPlayer = ref<any>(null);
 
 const props = defineProps({
@@ -16,6 +17,7 @@ const props = defineProps({
 });
 
 watch(() => props.videoId,(newValue) => {
+    youtubeVideoIsReady.value = false;
     videoController.isPlaying.value = false;
     videoPlayer.value.destroy();
     youtubePlayerInit();
@@ -72,6 +74,7 @@ const youtubePlayerInit = async () => {
         },
         events: {
             'onReady': () => {
+                youtubeVideoIsReady.value = true;
                 //videoPlayer.value.playVideo();
             },
             'onStateChange': (data: { data: number, target: HTMLElement }) => {
@@ -95,11 +98,11 @@ videoController.videoToggle.value = () => {
 }
 
 videoController.pause.value = () => {
-    videoPlayer.value.pauseVideo();
+    if (youtubeVideoIsReady.value) videoPlayer.value.pauseVideo();
 }
 
 videoController.play.value = () => {
-    videoPlayer.value.playVideo();
+    if (youtubeVideoIsReady.value) videoPlayer.value.playVideo();
 }
 
 </script>

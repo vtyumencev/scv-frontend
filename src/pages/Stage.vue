@@ -34,6 +34,7 @@ const props = defineProps({
 });
 
 const dataIsReady = ref(false);
+const navigationComponent = ref();
 
 const videoID = computed(() => {
     return parseInt(props.videoID);
@@ -54,6 +55,7 @@ const onDataIsReady = async () => {
         return;
     }
     dataIsReady.value = true;
+    navigationComponent.value.onDataIsReady();
 
     /**
      * Preloading the assets
@@ -102,11 +104,9 @@ const currentPreset = computed(() => {
     return libraryStore.presets[props.presetName];
 });
 
-
 const currentVideo = computed(() : Video | undefined => {
     return libraryStore.videos?.find((video) => video.id === videoID.value) || undefined;
 });
-
 
 const navigatePrev = () => {
     const videos = currentPreset.value.videosFilter();
@@ -220,11 +220,12 @@ const playlist = computed(() : Video[] => {
             </div>
             <!-- Stage Navigation -->
             <StageNavigation
+                ref="navigationComponent"
                 :video-controller="videoController"
                 :back-action="{ name: 'presets-show', params: { presetName: presetName } }"
                 :video-data="currentVideo"
             />
-            <!-- Stage Navigation -->
+            <!-- ! Stage Navigation -->
             <div class="w-full absolute flex justify-between items-center py-5 px-8">
                 <div class=""></div>
                 <div class="flex space-x-2">

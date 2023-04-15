@@ -90,6 +90,10 @@ const deleteRecord = async () => {
                 :items="stageStore.attributes?.regions ?? []" />
         </div>
         <div class="mb-5">
+            <InputLabel for="name" value="Ort" />
+            <TextInput v-model="data.place" type="text" class="mt-1 block w-full" />
+        </div>
+        <div class="mb-5">
             <InputLabel value="Chortyp" />
             <Select
                 v-model="data.type_id"
@@ -112,7 +116,7 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Chorleitung" />
-            <TextInput v-model="data.direction" type="text" class="mt-1 block w-full" />
+            <TextInput v-model="data.leader" type="text" class="mt-1 block w-full" />
         </div>
         <div class="mb-5">
             <InputLabel for="name" value="Adresse" />

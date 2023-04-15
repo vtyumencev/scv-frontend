@@ -13,12 +13,13 @@ module.exports = {
             },
             spacing: {
                 'container-inline': '20px',
-                'library-left-full': '100px',
-                'library-left': '80px',
+                'container-library-inline': '100px',
             },
             colors: {
                 'theme-alpha': '#F8C300',
                 'theme-alpha-dim': '#FFF9E3',
+                'theme-beta': '#66C6EF',
+                'theme-omega': '#151515',
             }
         },
     },

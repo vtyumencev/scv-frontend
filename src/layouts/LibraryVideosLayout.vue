@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
-import { onBeforeMount, type PropType, ref, watch } from "vue";
+import { onBeforeMount, type PropType, ref, toRaw, watch } from "vue";
 import { onBeforeRouteLeave, type RouteLocationRaw, useRoute } from "vue-router";
 import LibraryFilter from "@/components/frontend/LibraryFilter.vue";
+import { useFuse } from "@vueuse/integrations/useFuse";
 import { useLibrary } from "@/stores/library";
+import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
+import type { Video } from "@/types/Video";
+import Fuse from "fuse.js";
 
 defineProps({
     backgroundImg: {
@@ -26,6 +30,15 @@ const dataIsReady = ref(false);
 const route = useRoute();
 const isFilterSelectorShown = ref(!!Object.entries(route.query).length);
 const isInfoSelectorShown = ref(false);
+const searchInput = ref('');
+
+const library = useLibrary();
+
+const { results, fuse } = useFuse(searchInput, [] as Video[], {
+    fuseOptions: {
+        keys: [ "title", "composer", "choir_name" ]
+    }
+});
 
 const toggleShift = () => {
     isDarkModeEnabled.value = !isDarkModeEnabled.value;
@@ -50,6 +63,7 @@ onBeforeRouteLeave(() => {
 });
 
 const onDataIsReady = () => {
+    fuse.value.setCollection([...library.videos]);
     dataIsReady.value = true;
 };
 
@@ -70,20 +84,30 @@ const onDataIsReady = () => {
         </div>
         <div class="relative max-w-site-container mx-auto pb-[120px]">
             <div class="flex justify-end sticky z-10 top-0">
-                <div class="mt-5 mr-container-inline absolute w-[250px] flex items-center">
-                    <img class="absolute ml-4 h-5" src="/icons/search-icon.svg" alt="">
-                    <input class="bg-black transition border-0 text-white rounded-full pl-12 pr-5 w-full" placeholder="Suchen" type="text" />
+                <div class="mt-5 mr-container-library-inline absolute w-[250px] flex items-center">
+                    <img class="absolute ml-4 h-5" src="/images/icons/search-icon.svg" alt="">
+                    <input v-model="searchInput" class="focus:ring-theme-alpha bg-black transition border-0 text-white rounded-full pl-12 pr-5 w-full" placeholder="Suchen" type="text" />
                 </div>
             </div>
-            <div class="flex justify-end sticky mix-blend-difference z-10 top-0 mr-[280px]">
-                <div class="mt-5 mr-container-inline absolute">
+            <div class="flex justify-end sticky mix-blend-difference z-10 top-0 mr-container-library-inline">
+                <div class="mt-5 mr-[280px] absolute">
                     <button class="text-white" @click="toggleShift">
-                        <img src="/icons/shift-icon.svg" alt="">
+                        <img src="/images/icons/shift-icon.svg" alt="">
                     </button>
                 </div>
             </div>
-            <div class="px-5 pt-[200px] pl-library-left-full min-h-[700px]">
-                <div class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(0,_4fr)] gap-y-5 gap-x-16 dark:text-white transition">
+            <div class="pt-[200px] px-container-library-inline min-h-[700px]">
+                <div v-if="searchInput">
+                    <div class="max-w-5xl mx-auto">
+                        <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
+                            Search Results <button class="ml-3 text-theme-alpha uppercase" @click="searchInput = ''">Clear</button>
+                        </h2>
+                        <div class="grid grid-cols-3 gap-10">
+                            <LibraryVideoPreview v-for="video in results" :key="video" :video="video.item" />
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(0,_4fr)] gap-y-5 gap-x-16 dark:text-white transition">
                     <div class="">
                         <div class="">
                             <slot name="sidebarContent"></slot>
@@ -92,8 +116,8 @@ const onDataIsReady = () => {
                             <div>
                                 <button class="flex items-center uppercase" @click="isFilterSelectorShown = !isFilterSelectorShown">
                                     <span class="relative">
-                                        <img class="mr-4 w-7" src="/icons/library.svg" alt="">
-                                        <img class="absolute left-0 top-0 opacity-0 dark:opacity-100 transition" src="/icons/library-white.svg" alt="">
+                                        <img class="mr-4 w-7" src="/images/icons/library.svg" alt="">
+                                        <img class="absolute left-0 top-0 opacity-0 dark:opacity-100 transition" src="/images/icons/library-white.svg" alt="">
                                     </span>
                                     <span>Filtern</span>
                                 </button>
@@ -105,8 +129,8 @@ const onDataIsReady = () => {
                                 <div class="">
                                     <button class="flex items-center uppercase" @click="isInfoSelectorShown = !isInfoSelectorShown">
                                         <span class="relative">
-                                            <img class="mr-4 w-7" src="/icons/info.svg" alt="">
-                                            <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/icons/info-white.svg" alt="">
+                                            <img class="mr-4 w-7" src="/images/icons/info.svg" alt="">
+                                            <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/images/icons/info-white.svg" alt="">
                                         </span>
                                         <span>Info</span>
                                     </button>
@@ -120,15 +144,15 @@ const onDataIsReady = () => {
                             <div v-if="backtrackRoute">
                                 <router-link :to="backtrackRoute" class="uppercase flex text-left">
                                     <span class="relative mt-1">
-                                        <img class="mr-4 w-7" src="/icons/prev.svg" alt="">
-                                        <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/icons/prev-white.svg" alt="">
+                                        <img class="mr-4 w-7" src="/images/icons/prev.svg" alt="">
+                                        <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/images/icons/prev-white.svg" alt="">
                                     </span>
                                     <span>zurück zur<br>{{ backtrackRoute.title }}</span>
                                 </router-link>
                             </div>
                         </div>
                     </div>
-                    <div class="max-w-6xl pr-10">
+                    <div class="max-w-5xl">
                         <slot />
                     </div>
                 </div>

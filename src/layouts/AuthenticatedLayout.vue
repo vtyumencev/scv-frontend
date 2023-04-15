@@ -59,6 +59,17 @@ const submitLogout = () => {
                                         Attribute
                                     </NavLink>
                                 </router-link>
+                                <router-link
+                                    v-slot="{ href, isActive, navigate }"
+                                    to="/collection-upload"
+                                    custom>
+                                    <NavLink
+                                        :href="href"
+                                        :active="isActive"
+                                        @click="navigate">
+                                        Collection Upload
+                                    </NavLink>
+                                </router-link>
                             </div>
                         </div>
 

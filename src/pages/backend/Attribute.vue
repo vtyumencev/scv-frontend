@@ -38,7 +38,11 @@ const isAddNew = computed(() => {
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="px-6 py-10 bg-white sm:rounded-lg border-b border-gray-200">
                         <div v-if="attributesStorage.list" class="max-w-3xl mx-auto">
-                            <router-link v-for="attributeItem in attributesStorage.list[attributeName]" :to="{ name: 'attribute-values', params: { attributeID: attributeItem.id } }" class="block py-3 text-indigo-500 border-b last:border-0">
+                            <router-link
+                                v-for="attributeItem in attributesStorage.list[attributeName]"
+                                :key="attributeItem"
+                                :to="{ name: 'attribute-values', params: { attributeID: attributeItem.id } }"
+                                class="block py-3 text-indigo-500 border-b last:border-0">
                                 {{ attributeItem.name }}
                             </router-link>
                         </div>
@@ -49,7 +53,6 @@ const isAddNew = computed(() => {
         </div>
         <template #modals>
             <AttributeForm v-if="attributeID || isAddNew" :is-add-new="isAddNew" :attributeName="attributeName" :attribute-i-d="attributeID" />
-
         </template>
     </AuthenticatedLayout>
 </template>
