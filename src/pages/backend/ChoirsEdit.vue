@@ -7,6 +7,7 @@ import VideoForm from '../../components/backend/VideoModal.vue'
 import Skeleton from '../../components/backend/Skeleton.vue'
 import type {Video} from "@/types/Video";
 import { useAPI } from "@/composables/fetch";
+import { useRoute, useRouter } from "vue-router";
 
 const fetch = useAPI();
 
@@ -19,12 +20,15 @@ const props = defineProps({
         type: String,
         default: null
     }
-})
+});
 
-const choirID = parseInt(props.id)
+const router = useRouter();
+const route = useRoute();
 
-const choir = ref<Choir>()
-const isVideosProcessing = ref(false)
+const choirID = parseInt(props.id);
+
+const choir = ref<Choir>();
+const isVideosProcessing = ref(false);
 
 onMounted(async () => {
     const { data } = await fetch.show<Choir>('choirs', choirID);
@@ -38,6 +42,12 @@ const updateVideos = async () => {
 
     if (choir.value) {
         choir.value.videos = response.data
+    }
+}
+
+const closeVideModal = () => {
+    if (route.name === 'choirs-edit-videos-edit') {
+        router.push({ name: 'choirs-edit' });
     }
 }
 
@@ -57,15 +67,17 @@ const updateVideos = async () => {
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 pt-10 bg-white sm:rounded-lg border-b border-gray-200">
                         <div class="max-w-3xl mx-auto">
-                            <ChoirForm v-if="choir" :data="choir" :is-videos-processing="isVideosProcessing" @update-videos="updateVideos" />
+                            <template v-if="choir">
+                                <ChoirForm :data="choir" :is-videos-processing="isVideosProcessing" @update-videos="updateVideos" />
+                                <Teleport v-if="videoID" to="#modals">
+                                    <VideoForm :video-id="videoID" @update-videos="updateVideos" @close-modal="closeVideModal" />
+                                </Teleport>
+                            </template>
                             <Skeleton v-else/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <template #modals>
-            <VideoForm v-if="videoID" :video-i-d="videoID" @update-videos="updateVideos" />
-        </template>
     </AuthenticatedLayout>
 </template>

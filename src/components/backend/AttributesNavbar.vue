@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import NavLink from '@/components/NavLink.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import { useAttributes } from '@/stores/attributes';
 
-
-const attributesStorage = useAttributes();
+const navigation = [
+    {
+        'name': 'Genres',
+        'slug': 'genres',
+    },
+    {
+        'name': 'Stile',
+        'slug': 'styles',
+    },
+    {
+        'name': 'Chortyp',
+        'slug': 'choir_types',
+    },
+];
 
 </script>
 
@@ -17,7 +28,7 @@ const attributesStorage = useAttributes();
             <div
                 class="space-x-5 ml-10 flex">
                 <router-link
-                    v-for="attribute in attributesStorage?.navigation"
+                    v-for="attribute in navigation"
                     v-slot="{ href, isActive, navigate }"
                     :key="attribute"
                     :to="{ name: 'attribute', params: { attributeName: attribute.slug } }"

@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import { type PresetNames, useLibrary } from '@/stores/library'
+import { type LandscapeNames, type PlacesNames, useLibrary } from '@/stores/library'
 import {
     ref,
     reactive,
     computed,
     type PropType
 } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { Video } from '@/types/Video';
 import StageVideoPlayer from "@/components/frontend/StageVideoPlayer.vue";
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
 import StageDecorationElement from "@/components/frontend/StageDecorationElement.vue";
 import StageNavigation from "@/components/frontend/StageNavigation.vue";
 import type { Place } from "@/types/Place";
+import type { Landscape } from "@/types/Landscape";
+import type { VideoController } from "@/types/VideoController";
 
 const libraryStore = useLibrary();
 
 const router = useRouter();
+const route = useRoute();
 
 const props = defineProps({
     presetName: {
-        type: String as PropType<PresetNames>,
+        type: String as PropType<LandscapeNames>,
         default: null
     },
     videoID: {
@@ -33,6 +36,7 @@ const props = defineProps({
     }
 });
 
+const isMobile = ref(false);
 const dataIsReady = ref(false);
 const navigationComponent = ref();
 
@@ -47,15 +51,20 @@ const videoController = reactive({
     play: () => undefined,
     navigatePrev: () => navigatePrev(),
     navigateNext: () => navigateNext()
-});
+} as VideoController);
 
 const onDataIsReady = async () => {
-    if (!currentVideo.value) {
-        await router.push({ name: 'page-not-found' });
+    if (currentPreset.value.has_no_enter_room !== true && ! currentVideo.value) {
+        await router.replace({
+            name: 'page-not-found',
+            params: { pathMatch: route.path.substring(1).split('/')},
+            query: route.query,
+            hash: route.hash,
+        });
         return;
     }
     dataIsReady.value = true;
-    navigationComponent.value.onDataIsReady();
+    navigationComponent.value?.onDataIsReady();
 
     /**
      * Preloading the assets
@@ -97,11 +106,22 @@ const preloadPlaceAssets = async (place: Place) => {
     return true;
 }
 
-const currentPreset = computed(() => {
-    if (currentVideo.value) {
-        //libraryStore.getChoirByID(currentVideo.value.choir_id);
-    }
+const currentPreset = computed(() : Landscape => {
     return libraryStore.presets[props.presetName];
+});
+
+const currentPlace = computed(() : Place | null => {
+    if (currentPreset.value.bound_place) {
+        return currentPreset.value.bound_place;
+    }
+    if (! dataIsReady.value) {
+        return null;
+    }
+    const placeSlug = libraryStore.attributes?.places.find(place => place.id === (currentVideo.value ? currentVideo.value.place_id : 0 ))?.slug;
+    if (! placeSlug) {
+        return null;
+    }
+    return libraryStore.places[placeSlug as PlacesNames] ?? null;
 });
 
 const currentVideo = computed(() : Video | undefined => {
@@ -109,7 +129,7 @@ const currentVideo = computed(() : Video | undefined => {
 });
 
 const navigatePrev = () => {
-    const videos = currentPreset.value.videosFilter();
+    const videos = currentPreset.value.videos_filter();
     const currentVideoIndex = videos.findIndex(video => video.id === videoID.value);
     if (currentVideoIndex === 0) {
         navigateToVideo(videos[videos.length - 1]);
@@ -118,7 +138,7 @@ const navigatePrev = () => {
     }
 }
 const navigateNext = () => {
-    const videos = currentPreset.value.videosFilter();
+    const videos = currentPreset.value.videos_filter();
     const currentVideoIndex = videos.findIndex(video => video.id === videoID.value);
     if (currentVideoIndex === videos.length - 1) {
         navigateToVideo(videos[0]);
@@ -129,11 +149,17 @@ const navigateNext = () => {
 
 const navigateToVideo = async (video: Video) => {
 
-    const placeSlug = libraryStore.attributes?.places.find(place => place.id === video.place_id)?.slug;
-    if (! placeSlug) {
-        return null;
+    let place: Place;
+    if (currentPreset.value.bound_place) {
+        place = currentPreset.value.bound_place
+    } else {
+        const placeSlug = libraryStore.attributes?.places.find(place => place.id === video.place_id)?.slug;
+
+        if (! placeSlug) {
+            return null;
+        }
+        place = libraryStore.places[placeSlug as PlacesNames] ?? null;
     }
-    const place = libraryStore.places[placeSlug] ?? null;
 
     document.getElementById('concert-view')?.classList.remove('entered');
 
@@ -151,18 +177,6 @@ const navigateToVideo = async (video: Video) => {
     await router.push({ params: { videoID: video.id } });
 }
 
-const currentPlace = computed(() : Place | null => {
-    if (! dataIsReady.value) {
-        return null;
-    }
-    const placeSlug = libraryStore.attributes?.places.find(place => place.id === (currentVideo.value ? currentVideo.value.place_id : 0 ))?.slug;
-    if (! placeSlug) {
-        return null;
-    }
-    return libraryStore.places[placeSlug] ?? null;
-});
-
-
 const playlist = computed(() : Video[] => {
     if (!dataIsReady.value) {
         return [];
@@ -177,22 +191,81 @@ const playlist = computed(() : Video[] => {
         .filter(item => item !== undefined);
 });
 
+const background = computed(() => {
+
+    let landscape = currentPreset.value as Landscape | null;
+
+    if (! currentPreset.value.background_image) {
+        if (! currentVideo.value) {
+            return;
+        }
+        const choir = libraryStore.getChoirByID(currentVideo.value?.choir_id);
+
+        if (!choir) {
+            return;
+        }
+
+        landscape = libraryStore.getPresetByRegion(choir.region_id);
+    }
+
+    return {
+        light: landscape?.background_image,
+        dark: landscape?.background_image_dark,
+    };
+});
+
+const toggleMobile = (value: boolean) => {
+    isMobile.value = value;
+}
+
+const backAction = () => {
+    if (currentPreset.value.has_no_enter_room) {
+        router.push({ name: 'preset-stage', params: { presetName: props.presetName } });
+    } else {
+        router.push({ name: 'presets-show', params: { presetName: props.presetName } });
+    }
+};
+
 </script>
 <template>
     <ConcertLayout
-        :background-image="currentPreset.backgroundImage"
-        :background-image-dark="currentPreset.backgroundImageDark"
-        :is-dark="videoController.isPlaying" @on-data-is-ready="onDataIsReady">
-        <div id="concert-view" class="relative flex flex-col h-full">
+        :background-image="background?.light"
+        :background-image-dark="background?.dark"
+        :is-dark="videoController.isPlaying"
+        @on-data-is-ready="onDataIsReady"
+        @toggle-mobile="toggleMobile">
+        <div id="concert-view" class="relative flex flex-col h-full overflow-hidden">
             <div class="absolute w-full grow-1 h-full flex justify-center items-center">
                 <div class="aspect-video bg-black -mt-[10%] ml-[-11px] w-[42%] text">
-                    <div class="h-full overflow-auto">
+                    <div class="h-full">
                         <StageVideoPlayer
                             v-if="currentVideo"
                             class="h-full w-full"
-                            :video-id="currentVideo.source_vid"
+                            :video-id="currentVideo?.source_vid"
                             :video-controller="videoController"
                         />
+                        <div
+                            v-else
+                            class="h-full w-full bg-white overflow-auto">
+                            <div class="grid grid-cols-2 gap-2 p-3" style="font-size: var(--font-size-base, 16px);">
+                                <div
+                                    v-for="video in currentPreset.videos_filter()"
+                                    :key="video"
+                                    class="aspect-video relative">
+                                    <img
+                                        :src="video.source_thumbnail_url"
+                                        class="absolute w-full h-full object-cover"
+                                        alt="">
+                                    <div class="absolute bottom-0 text-white font-serif bg-black px-2 py-1 bg-opacity-50 w-full">
+                                        <div class="text-[1.8em] uppercase leading-none">{{ video.choir_name }}</div>
+                                        <div class="text-[1.5em] leading-none">{{ video.title }}</div>
+                                    </div>
+                                    <router-link
+                                        :to="{ params: { videoID: video.id } }"
+                                        class="absolute top-0 left-0 w-full h-full" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,10 +293,12 @@ const playlist = computed(() : Video[] => {
             </div>
             <!-- Stage Navigation -->
             <StageNavigation
+                v-if="currentVideo"
                 ref="navigationComponent"
                 :video-controller="videoController"
-                :back-action="{ name: 'presets-show', params: { presetName: presetName } }"
                 :video-data="currentVideo"
+                :is-mobile="isMobile"
+                @back-action="backAction"
             />
             <!-- ! Stage Navigation -->
             <div class="w-full absolute flex justify-between items-center py-5 px-8">

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-
-import { type PropType, computed, ref, onMounted, onUnmounted } from 'vue';
-import { useAttributes, type EditableAttributes } from '@/stores/attributes';
+import { type PropType, ref, onMounted, onUnmounted } from 'vue';
 import { Modal } from 'flowbite';
 import Skeleton from './Skeleton.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -9,11 +7,12 @@ import { useRouter } from 'vue-router';
 import InputLabel from '@/components/InputLabel.vue';
 import TextInput from '@/components/TextInput.vue';
 import type { Attribute } from '@/types/Attribute';
-import {useAPI} from "@/composables/fetch";
+import { useAPI } from "@/composables/fetch";
+import { useLibrary } from "@/stores/library";
+import type { EditableAttributes } from "@/types/EditableAttributes";
 
-let attributesStorage = useAttributes();
 const router = useRouter();
-
+const library = useLibrary();
 const api = useAPI();
 
 const props = defineProps({
@@ -25,31 +24,33 @@ const props = defineProps({
         type: String,
         default: null
     },
+    data: {
+        type: Object as PropType<Attribute>,
+        default: null
+    },
     isAddNew: {
         type: Boolean,
         default: true
     }
 });
 
-const attributeID = parseInt(props.attributeID);
-
 const processing = ref(false);
 const deleteProcessing = ref(false);
 
-let modal : Modal
+let modal: Modal;
 
 onMounted(async () => {
     modal = new Modal(document.getElementById('attributeEditModal'), {
         onHide: () => {
-            router.push({ name: 'attribute' })
+            router.push({ name: 'attribute' });
         }
     })
-    modal.show()
+    modal.show();
 })
 
 onUnmounted(() => {
     if (modal.isVisible()) {
-        modal.hide() // It also removes all listeners https://github.com/themesberg/flowbite/blob/main/src/components/modal/index.ts
+        modal.hide(); // It also removes all listeners https://github.com/themesberg/flowbite/blob/main/src/components/modal/index.ts
     }
 })
 
@@ -57,37 +58,24 @@ const closeModal = () => {
     modal.hide();
 };
 
-const data = computed(() => {
-    if (props.isAddNew) {
-        return ref<Attribute>({
-            'id': 0,
-            'name': ''
-        }).value
-    } else {
-        const namedAttributes = attributesStorage.list[props.attributeName];
-        if (namedAttributes) {
-            return namedAttributes.find(elm => elm.id === attributeID);
-        }
-        return undefined;
-    }
+const attribute = ref(Object.assign({}, props.data) ?? {
+    'id': 0,
+    'name': ''
 });
 
 const saveRecord = async () => {
-    if (! data.value) {
-        return;
-    }
     processing.value = true;
     if (props.isAddNew) {
-        await api.store(`attributes/${props.attributeName}`, data.value,{
+        await api.store(`attributes/${props.attributeName}`, attribute.value,{
             onSuccess() {
-                attributesStorage.getAttributes();
+                library.getAttributes();
                 router.push({ name: 'attribute' });
             }
         });
     } else {
-        await api.update(`attributes/${props.attributeName}`, data.value?.id, data.value,{
-            onSuccess() {
-                attributesStorage.getAttributes();
+        await api.update(`attributes/${props.attributeName}`, attribute.value.id, attribute.value,{
+            onSuccess () {
+                library.getAttributes();
             }
         });
     }
@@ -95,14 +83,10 @@ const saveRecord = async () => {
 };
 
 const deleteRecord = async () => {
-    if (! data.value?.id) {
-        return;
-    }
-
-    await api.delete(`attributes/${props.attributeName}`, data.value?.id, {
+    await api.delete(`attributes/${props.attributeName}`, attribute.value.id, {
         processing: deleteProcessing,
         onSuccess() {
-            attributesStorage.getAttributes();
+            library.getAttributes();
             router.push({ name: 'attribute' });
         }
     });
@@ -118,11 +102,11 @@ const deleteRecord = async () => {
                 <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                     <div class="text-xl font-semibold text-gray-900 dark:text-white">
-                        <h3 v-if="data && props.isAddNew && !data.name">
+                        <h3 v-if="props.isAddNew">
                             New value
                         </h3>
-                        <h3 v-else-if="data">
-                            Edit {{ data.name }}
+                        <h3 v-else-if="attribute">
+                            Edit {{ attribute.name }}
                         </h3>
                         <div v-else role="status" class="max-w-sm animate-pulse">
                             <div class="h-2.5 bg-gray-200 rounded-full w-64 mt-3"></div>
@@ -134,11 +118,11 @@ const deleteRecord = async () => {
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div v-if="data" class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto">
+                <div v-if="attribute" class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto">
                     <div class="mb-5">
                         <InputLabel value="Name" />
                         <TextInput
-                            v-model="data.name"
+                            v-model="attribute.name"
                             type="text"
                             class="mt-1 block w-full"
                             autofocus

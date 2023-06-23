@@ -11,6 +11,7 @@ import VideoExplorer from './VideoExplorer.vue';
 import {useRouter} from 'vue-router';
 import {useAPI} from "@/composables/fetch";
 import TextareaInput from "@/components/TextareaInput.vue";
+import { formatDateTime } from "@/helpers/datetime";
 
 const fetch = useAPI();
 
@@ -151,6 +152,14 @@ const deleteRecord = async () => {
                     menubar: false
                 }"
                 />
+            </div>
+        </div>
+        <div class="mb-5 text-sm">
+            <div>
+                Choir was added {{ formatDateTime(data.created_at) }}
+            </div>
+            <div>
+                Modified {{ formatDateTime(data.updated_at) }}
             </div>
         </div>
         <div class="flex justify-between mb-5 sticky bottom-0 py-3 bg-white z-[2] border-t">

@@ -11,10 +11,13 @@ export interface Video {
     place_id: number,
     genre_id: number,
     text: string,
-    is_kids_and_youth: boolean,
-    is_rehearsal: boolean,
+    is_kids_and_youth?: boolean,
+    is_rehearsal?: boolean,
     choir_id: number,
     choir_name: string,
     choir_leader: string | null,
-    landscape_id: number | null
+    landscape_id: number | null,
+    created_at: string,
+    updated_at: string,
+    order_index?: number,
 }

@@ -14,5 +14,6 @@ export interface Choir {
     contact_website: string,
     description: string,
     videos: Video[] | undefined,
-    created_at: string
+    created_at: string,
+    updated_at: string,
 }

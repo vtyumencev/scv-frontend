@@ -28,10 +28,10 @@ const choir = computed(() => {
     <div class="relative aspect-video">
         <img :src="video.source_thumbnail_url" class="absolute top-0 w-full h-full" alt="">
         <div class="absolute bottom-0 w-full text-white bg-black bg-opacity-50 py-1 px-2">
-            <div class="uppercase text-sm leading-4">
+            <div class="uppercase text-[0.7rem] xl:text-sm leading-4">
                 {{ choir?.name }}
             </div>
-            <div class="relative text-xs text-ellipsis overflow-hidden whitespace-nowrap w-full">
+            <div class="relative text-[0.7rem] xl:text-xs text-ellipsis overflow-hidden whitespace-nowrap w-full">
                 {{ video?.title }}
             </div>
         </div>

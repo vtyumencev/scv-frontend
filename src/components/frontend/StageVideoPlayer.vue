@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, toRefs, watch } from "vue";
+import { onBeforeUnmount, onMounted, type PropType, ref, toRefs, watch } from "vue";
+import type { VideoController } from "@/types/VideoController";
 
 const youtubeAPIisReady = ref(false);
 const youtubeVideoIsReady = ref(false);
@@ -11,15 +12,15 @@ const props = defineProps({
         default: null
     },
     videoController: {
-        type: Object,
+        type: Object as PropType<VideoController>,
         default: null
     }
 });
 
-watch(() => props.videoId,(newValue) => {
+watch(() => props.videoId,() => {
     youtubeVideoIsReady.value = false;
     videoController.isPlaying.value = false;
-    videoPlayer.value.destroy();
+    videoPlayer.value?.destroy();
     youtubePlayerInit();
 })
 
@@ -27,11 +28,11 @@ const videoController = toRefs(props.videoController)
 
 onMounted(() => {
     youtubePlayerInit();
-})
+});
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
     console.debug('Player has been destroyed');
-    videoPlayer.value.destroy();
+    videoPlayer.value?.destroy();
 });
 
 const youtubeAPIPrepare = () => {
@@ -108,5 +109,7 @@ videoController.play.value = () => {
 </script>
 
 <template>
-    <div id="stage-video-player"></div>
+    <div>
+        <div class="w-full h-full" id="stage-video-player"></div>
+    </div>
 </template>

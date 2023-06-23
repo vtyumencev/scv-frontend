@@ -4,8 +4,9 @@ import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
 import { Controller, type SwiperOptions } from "swiper";
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/scss';
-import { type PropType, ref } from "vue";
+import { type PropType, ref, watch } from "vue";
 import type { Video } from "@/types/Video";
+import { useFrontend } from "@/stores/frontend";
 
 defineProps({
     videos: {
@@ -13,6 +14,8 @@ defineProps({
         required: true
     }
 });
+
+const frontend = useFrontend();
 
 const controlledSwiper = ref();
 const buttonPrev = ref<HTMLElement>();
@@ -36,16 +39,16 @@ const onReachBeginning = () => {
 
 <template>
     <div v-if="videos.length" class="relative">
-        <button ref="buttonPrev" class="absolute left-[-60px] w-[40px] flex h-full items-center swiper-button-prev opacity-0 transition" @click="controlledSwiper.slidePrev()">
+        <button ref="buttonPrev" class="absolute left-[-60px] w-[20px] xl:w-[40px] flex h-full items-center swiper-button-prev opacity-0 transition" @click="controlledSwiper.slidePrev()">
             <img class="rotate-90 w-full" src="/images/icons/blue-arrow.svg" alt="">
         </button>
-        <button ref="buttonNext" class="absolute right-[-60px] w-[40px] flex h-full items-center swiper-button-prev transition" @click="controlledSwiper.slideNext()">
+        <button ref="buttonNext" class="absolute right-[-60px] w-[20px] xl:w-[40px] flex h-full items-center swiper-button-prev transition" @click="controlledSwiper.slideNext()">
             <img class="-rotate-90 w-full" src="/images/icons/blue-arrow.svg" alt="">
         </button>
         <Swiper
             :slides-per-view="3"
             :slides-per-group="3"
-            :space-between="38"
+            :space-between="frontend.isMobile ? 14 : 38"
             :mousewheel="true"
             css-mode="css-mode"
             :modules="[Controller]"

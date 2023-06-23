@@ -1,0 +1,1 @@
+export declare type EditableAttributes = 'genres' | 'styles' | 'choir_types' | 'places';

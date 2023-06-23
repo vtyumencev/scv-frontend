@@ -4,7 +4,7 @@ import Stage from '@/pages/Stage.vue';
 import PageNotFound from '@/pages/errors/404.vue';
 import Dashboard from '@/pages/backend/Dashboard.vue';
 import Login from '@/pages/auth/Login.vue';
-import CollectionUpload from "@/pages/auth/CollectionUpload.vue";
+import CollectionUpload from "@/pages/backend/CollectionUpload.vue";
 // import Register from '@/pages/auth/Register.vue';
 // import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 // import ResetPassword from '@/pages/auth/ResetPassword.vue';
@@ -23,6 +23,13 @@ import Attributes from '@/pages/backend/Attributes.vue';
 import Attribute from '@/pages/backend/Attribute.vue';
 import Library from "@/pages/Library.vue";
 import LibraryChoir from "@/pages/LibraryChoir.vue";
+import Settings from "@/pages/backend/Settings.vue";
+import SettingsSeason from "@/pages/backend/SettingsSeason.vue";
+import SettingsTranslations from "@/pages/backend/SettingsTranslations.vue";
+import Article from "@/pages/Article.vue";
+import VideosIndex from "@/pages/backend/VideosIndex.vue";
+import Landscapes from "@/pages/backend/Landscapes.vue";
+import LandscapesIndex from "@/pages/backend/LandscapesIndex.vue";
 
 
 
@@ -38,6 +45,24 @@ const routes : Array<RouteRecordRaw> = [
         path: '/',
         name: 'index',
         component: Index,
+    },
+    {
+        path: '/datenschutz',
+        name: 'datenschutz',
+        component: Article,
+        props: { translationName: 'datenschutz' },
+        meta: {
+            title: 'Datenschutz',
+        },
+    },
+    {
+        path: '/impressum',
+        name: 'impressum',
+        component: Article,
+        props: { translationName: 'impressum' },
+        meta: {
+            title: 'Impressum',
+        },
     },
     {
         path: '/library',
@@ -72,26 +97,10 @@ const routes : Array<RouteRecordRaw> = [
         props: true,
     },
     {
-        path: '/presets/:presetName/stage/:videoID(\\d+)',
+        path: '/presets/:presetName/stage/:videoID(\\d+)?',
         name: 'preset-stage',
         component: Stage,
         props: true,
-    },
-    {
-        path: '/stage/:videoID(\\d+)',
-        name: 'stage',
-        component: Stage,
-        props: true,
-        meta: {
-            title: 'Stage',
-        },
-        children: [
-            {
-                path: 'playlist/:playListIDs',
-                name: 'stage-playlist',
-                component: Stage
-            }
-        ]
     },
     {
         path: '/dashboard',
@@ -103,11 +112,21 @@ const routes : Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/collection-upload',
-        name: 'collection-upload',
+        path: '/export-import',
+        name: 'export-import',
+        props: route => ({ filePath: route.query['file-path'] }),
         component: CollectionUpload,
         meta: {
-            title: 'Collection Upload',
+            title: 'Export & Import',
+            guard: 'auth',
+        },
+    },
+    {
+        path: '/videos',
+        name: 'videos',
+        component: VideosIndex,
+        meta: {
+            title: 'Videos',
             guard: 'auth',
         },
     },
@@ -144,6 +163,53 @@ const routes : Array<RouteRecordRaw> = [
                     },
                 ]
             }
+        ]
+    },
+    {
+        path: '/settings',
+        name: 'settings',
+        component: Settings,
+        meta: {
+            title: 'Einstellungen',
+        },
+        children: [
+            {
+                path: '',
+                name: 'settings-index',
+                redirect: { name: 'settings-season' }
+            },
+            {
+                path: 'season',
+                name: 'settings-season',
+                component: SettingsSeason
+            },
+            {
+                path: 'translations',
+                name: 'settings-translations',
+                component: SettingsTranslations
+            },
+        ]
+    },
+    {
+        path: '/landscapes',
+        name: 'landscapes',
+        component: Landscapes,
+        meta: {
+            title: 'Landscapes',
+            guard: 'auth',
+        },
+        children: [
+            {
+                path: '',
+                name: 'landscapes-index',
+                redirect: { name: 'landscapes-show', params: { landscapeName: 'leipzig' } }
+            },
+            {
+                path: ':landscapeName',
+                name: 'landscapes-show',
+                component: LandscapesIndex,
+                props: true,
+            },
         ]
     },
     {

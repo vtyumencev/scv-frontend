@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
-import { Pagination, Controller, type SwiperOptions } from "swiper";
+import { Pagination, Controller } from "swiper";
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/scss';
 import 'swiper/css/pagination';
 import { computed, type PropType, ref } from "vue";
 import type { Video } from "@/types/Video";
+import { useFrontend } from "@/stores/frontend";
 
 const props = defineProps({
     videos: {
@@ -18,52 +19,58 @@ const props = defineProps({
     }
 });
 
+const frontend = useFrontend();
 const controlledSwiper = ref();
 const buttonPrev = ref<HTMLElement>();
 const buttonNext = ref<HTMLElement>();
-const setControlledSwiper = (swiper: SwiperOptions) => {
+const setControlledSwiper = (swiper: typeof Swiper): void => {
     controlledSwiper.value = swiper;
 };
 
 const videosCountPerSlide = computed(() => {
-    return props.rows * 3;
+    return props.rows * (frontend.isMobile ? 2 : 3);
 });
 const pagesCount = computed(() => {
     return Math.ceil(props.videos.length / videosCountPerSlide.value);
 });
 
 const onChange = () => {
-    buttonPrev.value?.classList.remove('opacity-30')
-    buttonNext.value?.classList.remove('opacity-30')
+    buttonPrev.value?.classList.remove('opacity-30');
+    buttonNext.value?.classList.remove('opacity-30');
 }
 const onReachEnd = () => {
-    buttonNext.value?.classList.add('opacity-30')
+    buttonNext.value?.classList.add('opacity-30');
 }
 const onReachBeginning = () => {
-    buttonPrev.value?.classList.add('opacity-30')
+    buttonPrev.value?.classList.add('opacity-30');
 }
-
 
 </script>
 
 <template>
     <div v-if="videos.length" class="relative">
         <Swiper
-            :space-between="38"
             :pagination="{
                 dynamicBullets: true,
                 clickable: true
             }"
+            :space-between="38"
             :mousewheel="true"
             css-mode="css-mode"
             :modules="[Pagination, Controller]"
             @slide-change="onChange"
             @reach-beginning="onReachBeginning"
             @reach-end="onReachEnd"
-            @swiper="setControlledSwiper">
+            @swiper="setControlledSwiper as typeof Swiper">
             <SwiperSlide v-for="slideId in pagesCount" :key="slideId">
-                <div class="grid grid-cols-3 gap-10 text-theme-alpha">
-                    <LibraryVideoPreview v-for="video in videos.slice(videosCountPerSlide * (slideId - 1), videosCountPerSlide * slideId)" :key="video" :video="video" />
+                <div
+                        class="grid grid-cols-3 gap-[14px] xl:gap-[38px] text-theme-alpha">
+                    <LibraryVideoPreview
+                            v-for="video in videos.slice(videosCountPerSlide * (slideId - 1), videosCountPerSlide * slideId)"
+                            :key="video"
+                            :video="video"
+                            class=""
+                    />
                 </div>
             </SwiperSlide>
         </Swiper>

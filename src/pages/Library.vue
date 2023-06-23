@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { watch, ref, type PropType, computed } from "vue";
 import { useRoute } from "vue-router";
-import { useLibrary } from "@/stores/library";
+import { useLibrary, type LandscapeNames } from "@/stores/library";
 import type { Video } from "@/types/Video";
 import LibraryVideosSlider from "@/components/frontend/LibraryVideosSlider.vue";
 import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
 import LibraryVideosLayout from "@/layouts/LibraryVideosLayout.vue";
 import LibraryVideosSliderGrid from "@/components/frontend/LibraryVideosSliderGrid.vue";
+import { useSettings } from "@/stores/settings";
+import type { RouteLocationRaw } from "vue-router";
+import { useFrontend } from "@/stores/frontend";
+import LibraryVideoFilterNotFound from "@/components/frontend/LibraryVideoFilterNotFound.vue";
 
 const route = useRoute();
 const library = useLibrary();
+const settings = useSettings();
+const frontend = useFrontend();
 
 type Query = Record<string, string>;
 
@@ -25,11 +31,6 @@ const props = defineProps({
 
 const onDataIsReady = () => {
     dataIsReady.value = true;
-    if (library.relatedVideos.length === 0) {
-        library.relatedVideos = library.videos?.sort(() => {
-            return 0.5 - Math.random();
-        }) ?? [];
-    }
     applyFilters(route.query as Query);
 };
 
@@ -62,59 +63,75 @@ const isFilteredMode = computed(() => {
     return Object.keys(props.query).length !== 0;
 });
 
+const seasonalVideos = computed(() => {
+    const seasonName = settings.currentSeason as LandscapeNames;
+    if (seasonName) {
+        return library.presets[seasonName].videos_filter();
+    }
+    return [];
+});
+
 </script>
 
 <template>
     <LibraryVideosLayout
         :query="query"
-        :backtrack-route="{ title: 'Startseite', name: 'index' }"
+        :backtrack-route="{ title: 'Startseite', name: 'index' } as RouteLocationRaw"
         @on-data-is-ready="onDataIsReady">
         <template #sidebarContent>
-            <h1 class="text-6xl mb-10 font-serif">Mediathek</h1>
+            <h1 class="text-6xl mb-10 font-serif">
+                {{ settings.translations.library_title.value }}
+            </h1>
             <div class="space-y-4 font-light">
-                <p>Willkommen in unserer Mediathek! Hier finden Sie eine Vielzahl der Chöre des Sächsischen Chorverbandes und ihre Videos. Wir freuen uns, damit die Vielfalt der Sächsischen Laienchorszene präsentieren zu können. Filtern Sie unterhalb des Textes nach Genre, Stil oder Region oder geben Sie oben rechts in das Suchfeld einen Begriff ein, nachdem Sie suchen. Viel Freude mit den Videos!</p>
+                <p class="whitespace-pre-wrap">{{ settings.translations.library_description.value }}</p>
             </div>
         </template>
         <div v-if="isFilteredMode" class="h-full">
-            <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
-                Filter Ergebnisse
-            </h2>
-            <div v-if="filteredVideos.length" class="grid grid-cols-3 gap-10">
-                <LibraryVideoPreview v-for="video in filteredVideos" :key="video" :video="video" />
-            </div>
-            <div v-else class="mt-5">
-                <div class="px-10 py-5 border border-black dark:border-white text-dark dark:text-white border-opacity-20 dark:border-opacity-20 text-center transition">
-                    <div class="text-lg">Videos not found</div>
-                    <div class="">Try to <router-link class="text-theme-alpha" :to="{ query: { } }">reset filters</router-link>.</div>
+            <template v-if="filteredVideos.length">
+                <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
+                    Filter Ergebnisse
+                </h2>
+                <div
+                        class="grid grid-cols-3"
+                        :class="{ 'gap-[14px]': frontend.isMobile, 'gap-[38px]': !frontend.isMobile }">
+                    <LibraryVideoPreview v-for="video in filteredVideos" :key="video" :video="video" />
                 </div>
-            </div>
+            </template>
+            <LibraryVideoFilterNotFound v-else />
         </div>
         <div v-else>
-            <div v-if="library.relatedVideos.length" class="relative pb-[56.25%]">
-                <iframe class="absolute w-full h-full" :src="'https://www.youtube.com/embed/' + library.relatedVideos[0].source_vid + '?autoplay=1'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <div v-if="frontend.personalVideoCompilation.length" class="relative pb-[56.25%]">
+                <iframe class="absolute w-full h-full" :src="'https://www.youtube.com/embed/' + frontend.personalVideoCompilation[0].source_vid + '?autoplay=1'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
-            <div class="mt-10">
+            <div class="mt-10 relative">
                 <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
                     Videos
                 </h2>
-                <LibraryVideosSliderGrid :videos="library.relatedVideos.slice(1)" :rows="3" />
-<!--                <div v-if="library.relatedVideos.length" class="grid grid-cols-3 gap-10">-->
-<!--                    <LibraryVideoPreview v-for="video in library.relatedVideos.slice(1 + (currentPage - 1) * 9, 10 + (currentPage - 1) * 9)" :key="video" :video="video" />-->
+                <LibraryVideosSliderGrid :videos="frontend.personalVideoCompilation.slice(0, 36)" :rows="3" />
+                <button
+                        ref="buttonNext"
+                        class="absolute z-10 bottom-[-4px] left-[calc(50%_+_90px)] cursor-pointer"
+                        title="Randomize"
+                        @click="frontend.randomizePersonalVideoCompilation()">
+                    <img class="h-[16px]" src="/images/icons/shuffle.svg" alt="">
+                </button>
+<!--                <div v-if="frontend.personalVideoCompilation.length" class="grid grid-cols-3 gap-10">-->
+<!--                    <LibraryVideoPreview v-for="video in frontend.personalVideoCompilation.slice(1 + (currentPage - 1) * 9, 10 + (currentPage - 1) * 9)" :key="video" :video="video" />-->
 <!--                </div>-->
-<!--                <div v-if="library.relatedVideos.length > 0" class="mt-4 space-x-1 flex justify-center">-->
+<!--                <div v-if="frontend.personalVideoCompilation.length > 0" class="mt-4 space-x-1 flex justify-center">-->
 <!--                    <LibraryPagination-->
 <!--                        :current-page="currentPage"-->
-<!--                        :total-pages="Math.ceil(library.relatedVideos.length / 9)"-->
+<!--                        :total-pages="Math.ceil(frontend.personalVideoCompilation.length / 9)"-->
 <!--                        :max-visible-buttons="9">-->
 <!--                    </LibraryPagination>-->
 <!--                </div>-->
             </div>
-<!--            <div class="mt-10">-->
-<!--                <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">-->
-<!--                    Saisonales-->
-<!--                </h2>-->
-<!--                <LibraryVideosSlider :videos="library.relatedVideos.slice(10, 20)" />-->
-<!--            </div>-->
+            <div v-if="seasonalVideos.length" class="mt-10">
+                <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
+                    Saisonales
+                </h2>
+                <LibraryVideosSlider :videos="seasonalVideos" />
+            </div>
         </div>
     </LibraryVideosLayout>
 </template>

@@ -12,7 +12,9 @@ export default defineConfig({
     },
     plugins: [
         vue(),
-        svgLoader()
+        svgLoader({
+            //defaultImport: 'raw'
+        }),
     ],
     build: {
         rollupOptions: {
@@ -20,22 +22,22 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     'index-desk-masks': [
-                        './public/images/homepage/masks/desk/leipzig.svg',
-                        './public/images/homepage/masks/map/leipzig.svg',
-                        './public/images/homepage/masks/desk/dresden.svg',
-                        './public/images/homepage/masks/map/dresden.svg',
-                        './public/images/homepage/masks/desk/chemnitz.svg',
-                        './public/images/homepage/masks/map/chemnitz.svg',
-                        './public/images/homepage/masks/desk/ost.svg',
-                        './public/images/homepage/masks/map/ost.svg',
-                        './public/images/homepage/masks/desk/west.svg',
-                        './public/images/homepage/masks/map/west-2.svg',
-                        './public/images/homepage/masks/desk/nord.svg',
-                        './public/images/homepage/masks/map/north.svg',
-                        './public/images/homepage/masks/desk/kinder-jugend.svg',
-                        './public/images/homepage/masks/desk/proberaum.svg',
-                        './public/images/homepage/masks/desk/mediathek.svg',
-                        './public/images/homepage/masks/desk/neutral.svg',
+                        '/src/components/masks/desk/leipzig.svg',
+                        '/src/components/masks/map/leipzig.svg',
+                        '/src/components/masks/desk/dresden.svg',
+                        '/src/components/masks/map/dresden.svg',
+                        '/src/components/masks/desk/chemnitz.svg',
+                        '/src/components/masks/map/chemnitz.svg',
+                        '/src/components/masks/desk/ost.svg',
+                        '/src/components/masks/map/ost.svg',
+                        '/src/components/masks/desk/west.svg',
+                        '/src/components/masks/map/west-2.svg',
+                        '/src/components/masks/desk/nord.svg',
+                        '/src/components/masks/map/north.svg',
+                        '/src/components/masks/desk/kinder-jugend.svg',
+                        '/src/components/masks/desk/proberaum.svg',
+                        '/src/components/masks/desk/mediathek.svg',
+                        '/src/components/masks/desk/neutral.svg',
                     ]
                 },
             },

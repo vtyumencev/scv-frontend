@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import LibraryVideosLayout from "@/layouts/LibraryVideosLayout.vue";
-import {useLibrary} from "@/stores/library";
-import {computed, type PropType, ref, watch} from "vue";
-import type {Preset} from "@/types/Preset";
+import { useLibrary } from "@/stores/library";
+import { computed, type PropType, ref, watch } from "vue";
+import type { Landscape } from "@/types/Landscape";
 import { useRoute, useRouter } from "vue-router";
-import type {Choir} from "@/types/Choir";
-import type {Video} from "@/types/Video";
+import type { Choir } from "@/types/Choir";
+import type { Video } from "@/types/Video";
 import LibraryVideosSlider from "@/components/frontend/LibraryVideosSlider.vue";
 import LibraryButton from "@/components/frontend/LibraryButton.vue";
+import type { RouteLocationRaw } from "vue-router";
+import LibraryVideoFilterNotFound from "@/components/frontend/LibraryVideoFilterNotFound.vue";
 
 const library = useLibrary();
 const router = useRouter();
@@ -29,7 +31,7 @@ const props = defineProps({
     }
 });
 
-const preset = ref<Preset>();
+const preset = ref<Landscape>();
 const choir = ref<Choir>();
 const relatedVideos = ref<Video[]>([]);
 const originalLibraryQuery = ref(route.query);
@@ -97,22 +99,22 @@ const applyFilters = (value: Query) => {
 </script>
 <template>
     <LibraryVideosLayout
-        :background-img="preset?.backgroundImage"
-        :backtrack-route="{ title: 'Mediathek', name: 'library-index', query: originalLibraryQuery }"
+        :background-img="preset?.background_image ?? null"
+        :backtrack-route="{ title: 'Mediathek', name: 'library-index', query: originalLibraryQuery } as RouteLocationRaw"
         filter-route-name="library-choirs-show"
         @on-data-is-ready="onDataIsReady">
         <template #sidebarContent>
-            <h1 class="text-3xl mb-10 font-serif">{{ choir?.name }}</h1>
+            <h1 class="text-3xl font-serif">{{ choir?.name }}</h1>
             <div class="space-y-4 font-light" v-html="choir?.description">
             </div>
             <a v-if="choir?.contact_website" :href="choir?.contact_website" target="_blank">
-                <LibraryButton class="mt-5 text-black">
+                <LibraryButton class="mt-5 xl:mt-10 text-black">
                     Zur Chorseite
                 </LibraryButton>
             </a>
         </template>
         <template #sidebarInfo>
-            <div class="space-y-8 font-light">
+            <div class="space-y-5 mb-10 font-light">
                 <div class="text-lg">
                     {{ choir?.name }}
                 </div>
@@ -146,9 +148,10 @@ const applyFilters = (value: Query) => {
                 </div>
             </div>
         </template>
-        <div class="">
-            <LibraryVideosSlider :videos="relatedVideos" />
-            <div v-if="selectedVideo" class="relative pb-[56.25%] mt-10">
+        <div class="h-full">
+            <LibraryVideosSlider v-if="relatedVideos.length" :videos="relatedVideos" />
+            <LibraryVideoFilterNotFound v-else />
+            <div v-if="selectedVideo" class="relative pb-[56.25%] mt-[14px] xl:mt-10">
                 <iframe class="absolute w-full h-full" :src="'https://www.youtube.com/embed/' + selectedVideo?.source_vid + '?autoplay=1'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
         </div>

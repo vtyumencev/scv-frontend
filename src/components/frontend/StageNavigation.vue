@@ -1,29 +1,32 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, type PropType, ref } from "vue";
+import { computed, onMounted, onUnmounted, type PropType, ref } from "vue";
 import type { Video } from "@/types/Video";
 import { useSound } from '@vueuse/sound';
-import soundMenuOpen from '../../../public/sounds/menu-open.wav'
-import soundMenuClose from '../../../public/sounds/menu-close.wav'
-import soundCardIn from '../../../public/sounds/card-in.wav'
-import soundCardOut from '../../../public/sounds/card-out.wav';
+import soundMenuOpen from '@/components/sounds/menu-open.wav';
+import soundMenuClose from '@/components/sounds/menu-close.wav'
+import soundCardIn from '@/components/sounds/card-in.wav'
+import soundCardOut from '@/components/sounds/card-out.wav';
 import { useLibrary } from "@/stores/library";
 import StageChoirID from "@/components/frontend/StageChoirID.vue";
 import { useStorage } from "@vueuse/core";
+import type { VideoController } from "@/types/VideoController";
 
-defineProps({
+const props = defineProps({
     videoController: {
-        type: Object,
+        type: Object as PropType<VideoController>,
         required: true
     },
     videoData: {
         type: Object as PropType<Video>,
         default: null
     },
-    backAction: {
-        type: Object,
-        required: true
-    },
+    isMobile: {
+        type: Boolean,
+        default: false
+    }
 });
+
+const emits = defineEmits(['backAction']);
 
 const onDataIsReady = () => {
     setTimeout(() => {
@@ -39,7 +42,6 @@ const stageMenuPreviewWrapperEl = ref<HTMLElement>();
 const stageMenuPreviewEl = ref<HTMLElement>();
 const IDShown = ref(false);
 const isShaking = ref(false);
-const isMobile = ref(false);
 
 const isShakeEnabled = useStorage('isStageNavigationHintEnabled', true);
 let openMenuAfterShaking = false;
@@ -50,8 +52,6 @@ const { play: playSoundsCardIn } = useSound(soundCardIn);
 const { play: playSoundsCardOut } = useSound(soundCardOut);
 
 onMounted(() => {
-    window.addEventListener('resize', onResize);
-    onResize();
     document.addEventListener('mousemove', menuParallax);
     stageMenuPreviewEl.value?.addEventListener('click', showMenu);
     stageMenuPreviewWrapperEl.value?.addEventListener('animationend', shakingEnded);
@@ -59,18 +59,10 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    window.removeEventListener('resize', onResize);
     document.removeEventListener('mousemove', menuParallax);
     stageMenuPreviewEl.value?.removeEventListener('click', showMenu);
     stageMenuPreviewWrapperEl.value?.removeEventListener('animationend', shakingEnded);
 });
-
-
-const onResize = () => {
-    const concertEl = document.querySelector('.concert')
-    isMobile.value = !!(concertEl && concertEl.clientWidth < 1000);
-}
-
 const shakeMenu = () => {
     isShaking.value = true;
     stageMenuPreviewWrapperEl.value?.classList.add('stage-menu-preview--shake');
@@ -122,6 +114,10 @@ const toggleIDCard = () => {
     }
 }
 
+const choir = computed(() => {
+    return library.getChoirByID(props.videoData.choir_id);
+})
+
 defineExpose({
     onDataIsReady
 });
@@ -131,9 +127,9 @@ defineExpose({
     <div style="font-size: var(--font-size-base);">
         <Transition name="id-card-mobile">
             <StageChoirID
-                v-if="IDShown && isMobile"
+                v-if="choir && IDShown && isMobile"
                 class="bottom-[34%] right-[0] text-[2em] w-[40%] absolute"
-                :choir-data="library.getChoirByID(videoData.choir_id)" />
+                :choir-data="choir" />
         </Transition>
         <div class="absolute w-full bottom-0 h-[39%] overflow-hidden">
             <div ref="stageMenuEl" class="w-full h-full flex justify-center">
@@ -144,9 +140,9 @@ defineExpose({
                         class="w-[58%] flex justify-center absolute">
                         <Transition name="id-card">
                             <StageChoirID
-                                v-if="IDShown && ! isMobile"
+                                v-if="choir && IDShown && ! isMobile"
                                 class="bottom-[20%] left-[96%] w-[36%] absolute"
-                                :choir-data="library.getChoirByID(videoData.choir_id)" />
+                                :choir-data="choir" />
                         </Transition>
 
                         <template v-if="isMobile">
@@ -154,18 +150,18 @@ defineExpose({
                                 class="w-full relative pointer-events-none"
                                 src="/images/stage/navigation/Menu_empty.png"
                                 alt="">
-                            <router-link
-                                :to="backAction"
-                                class="bottom-[14%] left-[10%] w-[14%] absolute z-[20]">
+                            <button
+                                    class="bottom-[14%] left-[10%] w-[14%] absolute z-[20]"
+                                    @click="emits('backAction')">
                                 <img src="/images/stage/navigation/Button_Back.png" alt="">
-                            </router-link>
+                            </button>
                             <button
                                 class="bottom-[14%] right-[12%] w-[14%] absolute z-[20]"
                                 @click="hideMenu">
                                 <img src="/images/stage/navigation/Button_close_big.png" alt="">
                             </button>
                             <button
-                                class="bottom-[33%] right-[-25%] w-[18%] h-[26%] rounded-full absolute z-[20]"
+                                class="bottom-[20%] right-[-25%] w-[18%] rounded-full absolute z-[20]"
                                 @click="toggleIDCard">
                                 <img src="/images/stage/navigation/Button_Info.png" alt="">
                             </button>
@@ -180,23 +176,23 @@ defineExpose({
                                 src="/images/stage/navigation/Button_close.png"
                                 alt="">
                             <button
-                                class="bottom-[33%] left-[72%] w-[18%] h-[26%] rounded-full absolute z-[20]"
+                                class="bottom-[1%] left-[72%] w-[18%] absolute z-[20]"
                                 @click="toggleIDCard">
                                 <img src="/images/stage/navigation/Button_ID.png" alt="">
                             </button>
                             <button
                                 class="bottom-[58%] right-[10%] w-[18%] h-[13%] absolute z-[20] -skew-y-[16deg]"
                                 @click="hideMenu"></button>
-                            <div class="bottom-[5%] left-[33%] w-[28%] absolute z-[20]">
+                            <div class="bottom-[5%] left-[33%] w-[32%] absolute z-[20]">
                                 <div class="font-serif text-[1.4em]">
                                     {{ videoData?.title }}
                                 </div>
                             </div>
-                            <router-link
-                                :to="backAction"
-                                class="bottom-[15%] left-[12%] w-[10%] absolute z-[20]">
+                            <button
+                                class="bottom-[15%] left-[12%] w-[10%] absolute z-[20]"
+                                @click="emits('backAction')">
                                 <img src="/images/stage/navigation/Button_Back.png" alt="">
-                            </router-link>
+                            </button>
                         </template>
                         <button
                             class="bottom-[18%] left-[43.1%] w-[11.7%] absolute z-[20]"

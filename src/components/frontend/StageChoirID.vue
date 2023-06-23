@@ -19,8 +19,8 @@ defineProps({
             src="/images/stage/navigation/Ausweis.png"
             alt="">
         <div class="absolute top-[0] ml-[10%] w-[75%] font-serif">
-            <div class="text-[2.4em] text-center mt-[10%]">MITGLIEDER-AUSWEIS</div>
-            <div class="text-[1.4em] gap-[1em] mt-[5%] grid grid-cols-[1fr_4fr]">
+            <div class="text-[2.3em] text-center mt-[10%]">MITGLIEDER-AUSWEIS</div>
+            <div class="text-[1.3em] gap-[1em] mt-[5%] grid grid-cols-[1fr_4fr]">
                 <div class="">Name</div>
                 <div class="">{{ choirData.name }}</div>
                 <div class="">Ort</div>

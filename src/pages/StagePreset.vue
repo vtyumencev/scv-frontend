@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
 import { onBeforeMount, ref, type PropType, computed, onMounted } from "vue";
-import { useLibrary, type PresetNames } from "@/stores/library";
+import { useLibrary, type LandscapeNames } from "@/stores/library";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
-import type { Preset } from "@/types/Preset";
+import type { Landscape } from "@/types/Landscape";
 import type { Video } from "@/types/Video";
 import type { Choir } from "@/types/Choir";
+import Simplebar from 'simplebar-vue';
+import 'simplebar-vue/dist/simplebar.min.css';
 
 const libraryStore = useLibrary();
 const router = useRouter();
@@ -13,12 +15,13 @@ const route = useRoute();
 
 const props = defineProps({
     presetName: {
-        type: String as PropType<PresetNames>,
+        type: String as PropType<LandscapeNames>,
         required: true
     }
 });
 
-const preset = ref<Preset>();
+const preset = ref<Landscape>();
+const isMobile = ref(false);
 
 onBeforeMount(() => {
     if (!(props.presetName in libraryStore.presets)) {
@@ -52,7 +55,7 @@ const relatedVideos = computed(() : Video[] => {
         return [];
     }
 
-    return currentPreset.videosFilter();
+    return currentPreset.videos_filter();
 });
 
 const getChoirByVideo = (video: Video) : Choir | undefined => {
@@ -71,10 +74,14 @@ onBeforeRouteLeave(async () => {
     // });
 });
 
+const toggleMobile = (value: boolean) => {
+    isMobile.value = value;
+}
+
 </script>
 
 <template>
-    <ConcertLayout :background-image="preset?.backgroundImage">
+    <ConcertLayout :background-image="preset?.background_image" @toggle-mobile="toggleMobile">
         <div id="preset-view">
             <div class="pointer-events-none">
                 <div id="decoration-wegweiser-image">
@@ -82,7 +89,7 @@ onBeforeRouteLeave(async () => {
                         data-depth
                         data-depth-strength-x="0.1"
                         data-depth-strength-y="0"
-                        src="/images/presets/misc/Wegweiser.png"
+                        src="/images/presets/misc/WegweiserV2.png"
                         class="absolute top-[2%] left-[5%] w-[30%]"
                         alt="">
                 </div>
@@ -108,19 +115,41 @@ onBeforeRouteLeave(async () => {
                         class="block -rotate-[13deg] h-full">
                     </router-link>
                 </div>
+                <div
+                        data-depth
+                        data-depth-strength-x="0.1"
+                        data-depth-strength-y="0"
+                        class="absolute top-[19%] left-[18%] w-[14%] h-[8%]">
+                    <router-link
+                            :to="{ name: 'library-index' }"
+                            class="block -rotate-[9deg] h-full">
+                    </router-link>
+                </div>
             </div>
-            <div id="video-explorer" class="absolute right-[8%] bottom-0 h-[47%] w-[64%] overflow-auto">
-                <div v-if="relatedVideos.length" class="grid grid-cols-3 gap-6 pb-[20px] px-5">
+            <Simplebar id="video-explorer" class="absolute right-[8%] bottom-0 h-[47%] w-[64%]">
+                <div
+                        v-if="relatedVideos.length"
+                        class="grid gap-[2em] pb-[20px] px-[2em]"
+                        :class="{
+                            'grid-cols-2': isMobile,
+                            'grid-cols-3': !isMobile,
+                        }"
+                        style="font-size: var(--font-size-base);">
                     <div
                         v-for="video in relatedVideos"
                         :key="video"
                         class="relative">
-                        <img :src="video.source_thumbnail_url" class="aspect-video object-cover" alt="">
+                        <div class="relative pb-[56.25%]">
+                            <img
+                                :src="video.source_thumbnail_url"
+                                 class="absolute w-full h-full object-cover"
+                                alt="">
+                        </div>
                         <div class="font-serif mt-2">
-                            <div class="text-xs text-ellipsis overflow-hidden whitespace-nowrap w-full">
+                            <div class="text-[2em] text-ellipsis overflow-hidden whitespace-nowrap w-full">
                                 {{ getChoirByVideo(video)?.name }}
                             </div>
-                            <div class="uppercase text-sm">
+                            <div class="uppercase text-[2em]">
                                 {{ video.title }}
                             </div>
                         </div>
@@ -133,7 +162,7 @@ onBeforeRouteLeave(async () => {
                 <div v-else class="font-serif w-full h-full flex justify-center items-center">
                     <div class="">There's no videos yet</div>
                 </div>
-            </div>
+            </Simplebar>
             <div class="transition-bg pointer-events-none absolute top-0 left-0 w-full h-full opacity-100 bg-white"></div>
         </div>
     </ConcertLayout>

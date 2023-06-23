@@ -11,10 +11,11 @@ import { useLibrary } from '@/stores/library';
 import Skeleton from './Skeleton.vue'
 import { useAPI } from "@/composables/fetch";
 import type { Attribute } from "@/types/Attribute";
+import { formatDateTime } from "@/helpers/datetime";
 
-const emits = defineEmits(['updateVideos']);
+const emits = defineEmits(['updateVideos', 'closeModal']);
 const props = defineProps({
-    videoID: {
+    videoId: {
         type: String,
         default: null
     }
@@ -32,13 +33,14 @@ const data = ref<Video>()
 const processing = ref(false)
 const deleteProcessing = ref(false)
 
-const videoID = parseInt(props.videoID)
+const videoID = parseInt(props.videoId)
 
 onMounted(async () => {
     modal = new Modal(document.getElementById('videoEditModal'), {
         backdrop: 'static',
         onHide: () => {
-            router.push({ name: 'choirs-edit' })
+            //router.push({ name: 'choirs-edit' })
+            emits('closeModal');
         }
     })
     modal.show()
@@ -54,30 +56,30 @@ onUnmounted(() => {
 })
 
 const videoDurationText = computed(() => {
-    const duration = data.value?.duration
+    const duration = data.value?.duration;
     if (duration) {
-        const min = Math.floor(duration / 60)
-        const sec = duration - min * 60
-        return min + ':' + (sec < 10 ? '0' : '') + sec
+        const min = Math.floor(duration / 60);
+        const sec = duration - min * 60;
+        return min + ':' + (sec < 10 ? '0' : '') + sec;
     } else {
-        return '--:--'
+        return '--:--';
     }
 })
 
 const closeModal = () => {
-    modal.hide()
+    modal.hide();
 }
 
 const saveRecord = async (event : Event) => {
     if (!data.value) {
-        return
+        return;
     }
 
     await fetch.update('videos', videoID, data.value, {
         processing: processing,
         formEl: <Element>event.target,
         onSuccess() {
-            emits('updateVideos')
+            emits('updateVideos');
         }
     });
 }
@@ -122,7 +124,7 @@ const availablePlaces = computed((): Attribute[] => {
             <form class="relative bg-white rounded-lg shadow" @submit.prevent="saveRecord">
                 <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white overflow-ellipsis overflow-hidden whitespace-nowrap">
                         <template v-if="data">
                             {{ data.title }}
                         </template>
@@ -140,6 +142,10 @@ const availablePlaces = computed((): Attribute[] => {
                     <div class="mb-5 relative">
                         <img class="aspect-video rounded-md h-[120px] block" :src="data.source_thumbnail_url" alt="">
                         <div class="absolute bottom-2 left-2 text-white text-sm leading-none bg-black bg-opacity-30 px-2 py-0.5 rounded-md">{{ videoDurationText }}</div>
+                        <a
+                            :href="`https://youtu.be/${ data.source_vid }`"
+                            target="_blank"
+                            class="absolute top-0 left-0 w-full h-full"></a>
                     </div>
                     <div class="mb-5">
                         <InputLabel value="Lied Name" />
@@ -204,10 +210,18 @@ const availablePlaces = computed((): Attribute[] => {
                             </div>
                         </div>
                     </div>
+                    <div class="text-sm">
+                        <div>
+                            Video was added {{ formatDateTime(data.created_at) }}
+                        </div>
+                        <div>
+                            Modified {{ formatDateTime(data.updated_at) }}
+                        </div>
+                    </div>
                 </div>
                 <Skeleton v-else />
                 <!-- Modal footer -->
-                <div class="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b">
+                <div class="flex items-center justify-between px-6 py-3 space-x-2 border-t border-gray-200 rounded-b">
                     <div class="">
                         <PrimaryButton type="submit" :processing="processing">Save</PrimaryButton>
                         <PrimaryButton type="button" button-style="simple" class="ml-2" @click="closeModal">Close</PrimaryButton>

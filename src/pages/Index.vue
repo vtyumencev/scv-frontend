@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, h, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from "vue";
+import { defineAsyncComponent, onBeforeUnmount, onUnmounted, ref, type VNode, watch } from "vue";
 import { useIdle, useIntersectionObserver } from '@vueuse/core'
 import { useRouter, useRoute } from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
@@ -7,26 +7,12 @@ import type { BookObject } from "@/types/BookObject";
 import VideoModal from "@/components/frontend/VideoModal.vue";
 import LibraryButton from "@/components/frontend/LibraryButton.vue";
 
-import LeipzigMask from '../../public/images/homepage/masks/desk/leipzig.svg';
-import LeipzigMapMask from '../../public/images/homepage/masks/map/leipzig.svg';
-import DresdenMask from '../../public/images/homepage/masks/desk/dresden.svg';
-import DresdenMapMask from '../../public/images/homepage/masks/map/dresden.svg';
-import ChemnitzMask from '../../public/images/homepage/masks/desk/chemnitz.svg';
-import ChemnitzMapMask from '../../public/images/homepage/masks/map/chemnitz.svg';
-import OstMask from '../../public/images/homepage/masks/desk/ost.svg';
-import OstMapMask from '../../public/images/homepage/masks/map/ost.svg';
-import WestMask from '../../public/images/homepage/masks/desk/west.svg';
-import WestMapMask from '../../public/images/homepage/masks/map/west-2.svg';
-import NorthMask from '../../public/images/homepage/masks/desk/nord.svg';
-import NorthMapMask from '../../public/images/homepage/masks/map/north.svg';
-
-import KinderYouthMask from '../../public/images/homepage/masks/desk/kinder-jugend.svg';
-import RehearsalMask from '../../public/images/homepage/masks/desk/proberaum.svg';
-import LibraryMask from '../../public/images/homepage/masks/desk/mediathek.svg';
-import NeutralMask from '../../public/images/homepage/masks/desk/neutral.svg';
+import { useSettings } from "@/stores/settings";
+//import SvgLoader from "@/components/SvgLoader.vue";
 
 const router = useRouter();
 const route = useRoute();
+const settings = useSettings();
 
 const introSlide = ref<HTMLElement>();
 const deskSlide = ref<HTMLElement>();
@@ -64,13 +50,13 @@ const links = [
             bottom: 42,
             width: 25,
             asset_url: '/images/homepage/Leipzig.png',
-            asset_mask_component: LeipzigMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/leipzig.svg'))
         },
         map_mask: {
             left: 18.5,
             bottom: 19.65,
             width: 1.7,
-            asset_component: LeipzigMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/leipzig.svg')),
         }
     },
     {
@@ -83,13 +69,13 @@ const links = [
             bottom: 40,
             width: 21.5,
             asset_url: '/images/homepage/Dresden.png',
-            asset_mask_component: DresdenMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/dresden.svg')),
         },
         map_mask: {
             left: 24.8,
             bottom: 15.9,
             width: 2.3,
-            asset_component: DresdenMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/dresden.svg')),
         }
     },
     {
@@ -102,26 +88,26 @@ const links = [
             bottom: 38.3,
             width: 12,
             asset_url: '/images/homepage/SachsenOst.png',
-            asset_mask_component: OstMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/ost.svg'))
         },
         map_mask: {
             left: 22.8,
             bottom: 12.95,
             width: 11.3,
-            asset_component: OstMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/ost.svg'))
         }
     },
     {
         name: 'Seasonal',
         is_in_book: true,
-        route: null,
+        route: { name: 'presets-show', params: { presetName: 'neutral' } },
         order: 9,
         front_object: {
             left: 68,
             bottom: 34,
             width: 14,
             asset_url: '/images/homepage/Seasonal1.png',
-            asset_mask_component: NeutralMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/neutral.svg'))
         },
         map_mask: null
     },
@@ -135,7 +121,7 @@ const links = [
             bottom: 39.8,
             width: 16,
             asset_url: '/images/homepage/KinderJugend.png',
-            asset_mask_component: KinderYouthMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/kinder-jugend.svg'))
         },
         map_mask: null
     },
@@ -149,13 +135,13 @@ const links = [
             bottom: 35.5,
             width: 13,
             asset_url: '/images/homepage/SachsenNord.png',
-            asset_mask_component: NorthMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/nord.svg'))
         },
         map_mask: {
             left: 17.78,
             bottom: 16.45,
             width: 6.3,
-            asset_component: NorthMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/north.svg'))
         }
     },
     {
@@ -168,13 +154,13 @@ const links = [
             bottom: 38.7,
             width: 9,
             asset_url: '/images/homepage/Chemnitz.png',
-            asset_mask_component: ChemnitzMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/chemnitz.svg'))
         },
         map_mask: {
             left: 19.5,
             bottom: 13.91,
             width: 1.75,
-            asset_component: ChemnitzMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/chemnitz.svg')),
         }
     },
     {
@@ -187,13 +173,13 @@ const links = [
             bottom: 34,
             width: 21,
             asset_url: '/images/homepage/SachsenWest.png',
-            asset_mask_component: WestMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/west.svg')),
         },
         map_mask: {
             left: 13.8,
             bottom: 7.6,
             width: 10.6,
-            asset_component: WestMapMask,
+            asset_component: defineAsyncComponent(() => import('@/components/masks/map/west-2.svg')),
         }
     },
     {
@@ -206,7 +192,7 @@ const links = [
             bottom: 17,
             width: 14,
             asset_url: '/images/homepage/Mediathek.png',
-            asset_mask_component: LibraryMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/mediathek.svg')),
         },
         map_mask: null
     },
@@ -220,11 +206,17 @@ const links = [
             bottom: 8,
             width: 21,
             asset_url: '/images/homepage/Proberaum.png',
-            asset_mask_component: RehearsalMask
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/proberaum.svg')),
         },
         map_mask: null
     },
 ] as Array<BookObject>;
+
+const masksEvents: {
+    el: HTMLElement,
+    type: string,
+    fn: (() => void),
+}[] = [];
 
 useIntersectionObserver(
     deskSlide,
@@ -236,65 +228,13 @@ useIntersectionObserver(
     }
 );
 
-onMounted( async () => {
-
-    // document.querySelector('#desk')?.addEventListener('mouseover', (e) => {
-    //
-    //     console.log(1)
-    //
-    //     const objectInteract = (e.target as HTMLElement).closest('.object-interact') as HTMLElement;
-    //     if (objectInteract) {
-    //         objectMaskMouseEnter.call(objectInteract);
-    //         return;
-    //     }
-    //
-    //     const mapInteract = (e.target as HTMLElement).closest('.map-mask') as HTMLElement;
-    //     if ((e.target as HTMLElement).closest('.map-mask')) {
-    //         mapMaskMouseEnter.call(mapInteract);
-    //         return;
-    //     }
-    //
-    //
-    // });
-    //
-    // document.querySelector('#desk')?.addEventListener('mouseout', (e) => {
-    //     const objectInteract = (e.target as HTMLElement).closest('.object-interact') as HTMLElement;
-    //     if (objectInteract) objectMaskMouseLeave.call(objectInteract);
-    //     console.log(2)
-    // });
-
-    const maskElms = document.querySelectorAll<HTMLElement>('.object-interact');
-    maskElms.forEach((maskEl) => {
-        const maskID = parseInt(maskEl.getAttribute('data-object-id') ?? '');
-        const maskPathEl = maskEl?.querySelector(`svg path`);
-        maskPathEl?.addEventListener('mouseenter', objectMaskMouseEnter.bind(maskEl));
-        maskPathEl?.addEventListener('mouseleave', objectMaskMouseLeave.bind(maskEl));
-        maskPathEl?.addEventListener('click', routeToPreset.bind(null, maskID));
+onBeforeUnmount(() => {
+    masksEvents.forEach(event => {
+        event.el.removeEventListener(event.type, event.fn);
     });
-
-    const mapMaskElms = document.querySelectorAll<HTMLElement>('.map-mask');
-    mapMaskElms.forEach((mapMaskEl) =>{
-        const mapMaskID = parseInt(mapMaskEl.getAttribute('data-map-mask') ?? '');
-        const mapMaskPathEl = mapMaskEl?.querySelector(`path`);
-        mapMaskPathEl?.addEventListener('mouseenter', mapMaskMouseEnter.bind(mapMaskEl));
-        mapMaskPathEl?.addEventListener('mouseleave', mapMaskMouseLeave.bind(mapMaskEl));
-        mapMaskPathEl?.addEventListener('click', routeToPreset.bind(null, mapMaskID));
-    });
-});
+})
 
 onUnmounted(() => {
-    const masksElms = document.querySelectorAll<HTMLElement>('.object-mask');
-    masksElms.forEach((maskEl) => {
-        const maskID = parseInt(maskEl.getAttribute('data-object-id') ?? '');
-        maskEl.removeEventListener('mouseenter', objectMaskMouseEnter.bind(maskEl));
-        maskEl.removeEventListener('mouseleave', objectMaskMouseLeave.bind(maskEl));
-        maskEl?.addEventListener('click', routeToPreset.bind(null, maskID));
-    });
-    /**
-     *
-     *
-     */
-
     clearTimeout(deskShakeTimeout.value);
 });
 
@@ -340,6 +280,15 @@ const onDataIsReady = () => {
         }
     }, 100);
 
+    const seasonalPreset = links.find(link => link.name === 'Seasonal')
+    if (seasonalPreset) {
+        const seasonName = settings.currentSeason;
+        if (seasonName) {
+            seasonalPreset.route = { name: 'preset-stage', params: { presetName: seasonName } }
+        } else {
+            seasonalPreset.route = { name: 'index' }
+        }
+    }
 }
 
 const objectMaskMouseEnter = function (this: HTMLElement) {
@@ -410,6 +359,70 @@ const deskHelpHint = () => {
     }
 }
 
+const frontObjectMaskRendered = (e: VNode) => {
+    const el = e.el as HTMLElement;
+    const objectInteractEl = el.closest('.object-interact') as HTMLElement;
+    if (! objectInteractEl) {
+        return;
+    }
+    const maskID = parseInt(objectInteractEl.getAttribute('data-object-id') ?? '');
+    const maskPathEl = objectInteractEl.querySelector(`svg path`) as HTMLElement;
+
+    const mouseEnter = {
+        el: maskPathEl,
+        type: 'mouseenter',
+        fn: objectMaskMouseEnter.bind(objectInteractEl),
+    }
+    const mouseLeave = {
+        el: maskPathEl,
+        type: 'mouseleave',
+        fn: objectMaskMouseLeave.bind(objectInteractEl),
+    }
+    const click = {
+        el: maskPathEl,
+        type: 'click',
+        fn: routeToPreset.bind(null, maskID),
+    }
+
+    const objectEvents = [mouseEnter, mouseLeave, click];
+
+    masksEvents.push(...objectEvents);
+
+    objectEvents.forEach(event => {
+        event.el.addEventListener(event.type, event.fn);
+    });
+}
+const mapMaskRendered = (e: VNode) => {
+    const el = e.el as HTMLElement;
+    const mapEl = el.closest('.map-mask') as HTMLElement;
+    const mapMaskID = parseInt(mapEl.getAttribute('data-map-mask') ?? '');
+    const mapMaskPathEl = mapEl.querySelector(`svg path`) as HTMLElement;
+
+    const mouseEnter = {
+        el: mapMaskPathEl,
+        type: 'mouseenter',
+        fn: mapMaskMouseEnter.bind(mapEl),
+    }
+    const mouseLeave = {
+        el: mapMaskPathEl,
+        type: 'mouseleave',
+        fn: mapMaskMouseLeave.bind(mapEl),
+    }
+    const click = {
+        el: mapMaskPathEl,
+        type: 'click',
+        fn: routeToPreset.bind(null, mapMaskID),
+    }
+
+    const objectEvents = [mouseEnter, mouseLeave, click];
+
+    masksEvents.push(...objectEvents);
+
+    objectEvents.forEach(event => {
+        event.el.addEventListener(event.type, event.fn);
+    });
+}
+
 </script>
 
 <template>
@@ -432,7 +445,9 @@ const deskHelpHint = () => {
                         <div class="">
                             <div class="p-5 lg:p-10 bg-white bg-opacity-60">
                                 <div class="relative">
-                                    <h1 class="text-[1.5rem] sm:text-[2rem] lg:text-[3.4rem] font-serif mr-[140px] lg:mr-0">Deine Reise Beginnt hier!</h1>
+                                    <h1 class="text-[1.5rem] sm:text-[2rem] lg:text-[3.4rem] font-serif mr-[140px] lg:mr-0">
+                                        {{ settings.translations.welcome_title.value }}
+                                    </h1>
                                     <div class="absolute top-0 right-0 flex justify-end lg:hidden balloonWrapper">
                                         <div class="balloon">
                                             <img class="w-[100px] relative" src="/images/landing/Balloon_Play.png" alt="">
@@ -442,10 +457,8 @@ const deskHelpHint = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="space-y-10 mt-8 font-light lg:text-lg">
-                                    <p>Willkommen in der Chorwelt Sachsens!</p>
-                                    <p>Wir möchten Sie auf eine kleine Reise durch die Vielfalt der Sächsischen Chorlandschaft einladen. Erleben Sie unsere Chöre und lassen Sie sich einen kurzen Moment aus dem Alltag entführen. Reisen Sie in die eher ländlich geprägten Regionen Sachsens - Nordsachsen, Ostsachsen oder Westsachsen - oder in eine der drei größten Städte Sachsens nach Chemnitz, Dresden oder Leipzig. Lassen Sie sich von der Freude am Chorsingen von den dort ansässigen Chören anstecken. Als Besonderheit können Sie den Chören beim Proben im Probenraum zusehen. Alle Videos, die nicht an einem der Auftrittsorte präsentiert werden, finden Sie in unserer Mediathek.</p>
-                                    <p>Herzlich begrüßen möchte Sie die Präsidentin des Sächsischen Chorverbands, Luise Neuhaus-Wartenberg.</p>
+                                <div class="space-y-10 mt-8 font-light lg:text-lg" v-html="settings.translations.welcome_description.value">
+
                                 </div>
                             </div>
                         </div>
@@ -461,7 +474,7 @@ const deskHelpHint = () => {
                         </div>
                         <Teleport to="body">
                             <Transition>
-                                <VideoModal v-if="isIntroVideoShown" video-id="KsdAb06ZBTI" @close-modal="isIntroVideoShown = false" />
+                                <VideoModal v-if="isIntroVideoShown" :video-id="settings.translations.welcome_video.value" @close-modal="isIntroVideoShown = false" />
                             </Transition>
                         </Teleport>
                     </div>
@@ -536,27 +549,43 @@ const deskHelpHint = () => {
                             </div>
                         </div>
                         <component
-                            :is="object.front_object.asset_mask_component"
-                            v-if="object.front_object.asset_mask_component"
-                            :data-object-mask="key"
-                            class="object-mask absolute top-0 opacity-0 pointer-events-auto"
-                        />
+                                :is="object.front_object.asset_mask_component"
+                                v-if="object.front_object.asset_mask_component"
+                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"
+                                @vue:mounted="frontObjectMaskRendered($event)" />
+<!--                        <SvgLoader-->
+<!--                                v-if="object.front_object.asset_mask_component"-->
+<!--                                :name="object.front_object.asset_mask_component"-->
+<!--                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"-->
+<!--                                @on-rendered="frontObjectMaskRendered" />-->
                     </div>
 
                     <template
                         v-for="(object, key) in links">
                         <component
-                            :is="object.map_mask.asset_component"
-                            v-if="object.map_mask"
-                            :key="object"
-                            :data-map-mask="key"
-                            class="absolute map-mask opacity-0 transition"
-                            :style="{
-                                left: object.map_mask.left + '%',
-                                bottom: object.map_mask.bottom + '%',
-                                width: object.map_mask.width + '%'
-                            }"
-                        />
+                                :is="object.map_mask.asset_component"
+                                v-if="object.map_mask"
+                                :key="object"
+                                class="absolute map-mask opacity-0 transition"
+                                :data-map-mask="key"
+                                :style="{
+                                    left: object.map_mask.left + '%',
+                                    bottom: object.map_mask.bottom + '%',
+                                    width: object.map_mask.width + '%'
+                                }"
+                                @vue:mounted="mapMaskRendered($event)" />
+<!--                        <SvgLoader-->
+<!--                                v-if="object.map_mask"-->
+<!--                                :key="object"-->
+<!--                                :name="object.map_mask.asset_component"-->
+<!--                                class="absolute map-mask opacity-0 transition"-->
+<!--                                :data-map-mask="key"-->
+<!--                                :style="{-->
+<!--                                    left: object.map_mask.left + '%',-->
+<!--                                    bottom: object.map_mask.bottom + '%',-->
+<!--                                    width: object.map_mask.width + '%'-->
+<!--                                }"-->
+<!--                                @on-rendered="mapMaskRendered"/>-->
                     </template>
                 </div>
             </div>

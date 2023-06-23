@@ -2,13 +2,11 @@
     "footer": [
         {
             "name": "Impressum",
-            "routeName": "index",
-            "remoteLink": "/storage/Impressum.pdf"
+            "routeName": "impressum"
         },
         {
             "name": "Datenschutz",
-            "routeName": "index",
-            "remoteLink": "/storage/Datenschutz.pdf"
+            "routeName": "datenschutz"
         }
     ]
 }

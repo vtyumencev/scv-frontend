@@ -10,6 +10,7 @@ import { useUsers } from "@/stores/user";
 export declare type FetchResponse<T> = {
     error?: AxiosResponse,
     data?: T,
+    isSuccessful: boolean
 }
 
 const RESPONSE_UNAUTHORIZED = 401;
@@ -77,9 +78,10 @@ type HandlerOption = {
     formEl?: Element,
     notifyOptions?: NotifyCallbackOptions,
     processing?: Ref,
-    disableNotify?: boolean
+    disableNotify?: boolean,
     onSuccess?(response: AxiosResponse): void,
-    successMsg?: string
+    successMsg?: string,
+    postHandler?: () => void
 }
 type HandlerOptionFull = HandlerOption & {
     action: Action,
@@ -139,6 +141,12 @@ export function useAPI() {
 
         const userStore = useUsers();
 
+        //{
+        //             data?: object,
+        //             error? object,
+        //             status: string
+        //         }
+
         const response = await axios({
             method: method,
             url: path,
@@ -151,10 +159,10 @@ export function useAPI() {
             if (options?.onSuccess) {
                 options?.onSuccess(response);
             }
-            return { data: response.data };
+            return { data: response.data, isSuccessful: true };
         }).catch((error) => {
             console.log(error.response);
-            return { error: error.response };
+            return { error: error.response, isSuccessful: false };
         });
 
         if (options && !options.disableNotify) {
@@ -163,6 +171,10 @@ export function useAPI() {
 
         if (options?.processing) {
             options.processing.value = false;
+        }
+
+        if (response.isSuccessful && options?.postHandler) {
+            options.postHandler();
         }
 
         return response;
