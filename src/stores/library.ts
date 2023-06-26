@@ -480,6 +480,9 @@ export const useLibrary = defineStore('library', () => {
                     left: 13,
                     deathStrengthX: 0,
                     deathStrengthY: 0,
+                    onClick: () => {
+                        console.log(1)
+                    }
                 },
                 {
                     assets: {
@@ -587,7 +590,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     assets: {
                         light: '/images/stage/places/neutral/Background.png',
-                        dark: '/images/stage/places/neutral/Background-dark.png',
+                        dark: '/images/stage/places/neutral/Background-darkV2.png',
                     },
                     width: 100,
                     top: 0,
@@ -749,7 +752,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     assets: {
                         light: '/images/stage/places/winter/Ornaments2.png',
-                        dark: '/images/stage/places/winter/Ornaments2-dark.png',
+                        dark: '/images/stage/places/winter/Ornaments2-DARKnew.png',
                     },
                     width: 32,
                     top: -1,
@@ -760,7 +763,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     assets: {
                         light: '/images/stage/places/winter/Ornaments1.png',
-                        dark: '/images/stage/places/winter/Ornaments1-dark.png',
+                        dark: '/images/stage/places/winter/Ornaments1-DARKnew.png',
                     },
                     width: 27,
                     top: -1,

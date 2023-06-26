@@ -291,6 +291,53 @@ const backAction = () => {
                     </div>
                 </Transition>
             </div>
+            <template v-if="currentPlace">
+                <template v-for="element in currentPlace.stageElements">
+                    <button
+                        v-if="element.onClick"
+                        :key="element"
+                        class="absolute"
+                        :style="{
+                                'left': element.left + '%',
+                                'top': element.top + '%',
+                                'width': element.width + '%',
+                            }"
+                        @click="element.onClick"
+                    >Test</button>
+                </template>
+            </template>
+            <div class="absolute w-full h-full flex justify-center items-center">
+                <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50"></div>
+                <div class="absolute w-[50%] min-h-[200px] flex items-center justify-center">
+                    <div class="absolute w-[calc(115%)] h-[65%] ml-[-4%] mt-[-1.0%] bg-white shadow-lg border-[3px] border-black"></div>
+                    <img class="absolute h-full right-full" src="/images/mix/Scroll-A.png" alt="">
+                    <div class="relative w-full my-[20%]">
+                        <div class="">
+                            asdfasdf<br>
+                            asdfasdf<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                            asd<br>
+                        </div>
+                    </div>
+                    <img class="absolute h-full left-full" src="/images/mix/Scroll-B.png" alt="">
+                </div>
+            </div>
             <!-- Stage Navigation -->
             <StageNavigation
                 v-if="currentVideo"

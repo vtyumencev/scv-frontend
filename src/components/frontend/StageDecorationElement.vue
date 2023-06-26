@@ -1,12 +1,15 @@
 <script setup lang="ts">
 
 import type {PropType} from "vue";
+import type {Place} from "@/types/Place";
 
 type Mode = 'dark' | 'light';
 
+type stageElements = Place['stageElements'][0];
+
 defineProps({
     element: {
-        type: Object,
+        type: Object as PropType<stageElements>,
         default: Object
     },
     mode: {

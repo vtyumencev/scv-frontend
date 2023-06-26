@@ -8,6 +8,7 @@ export interface Place {
         assets: {
             light: string,
             dark: string
-        }
+        },
+        onClick?: void
     }>,
 }
