@@ -480,9 +480,7 @@ export const useLibrary = defineStore('library', () => {
                     left: 13,
                     deathStrengthX: 0,
                     deathStrengthY: 0,
-                    onClick: () => {
-                        console.log(1)
-                    }
+                    textBoxTranslation: 'rehearsal_description'
                 },
                 {
                     assets: {
@@ -601,7 +599,7 @@ export const useLibrary = defineStore('library', () => {
                 {
                     assets: {
                         light: '/images/stage/places/neutral/Stage.png',
-                        dark: '/images/stage/places/neutral/Stage-dark.png',
+                        dark: '/images/stage/places/neutral/Stage-darknew.png',
                     },
                     width: 100,
                     top: 1,

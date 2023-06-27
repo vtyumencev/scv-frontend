@@ -15,7 +15,10 @@ import StageNavigation from "@/components/frontend/StageNavigation.vue";
 import type { Place } from "@/types/Place";
 import type { Landscape } from "@/types/Landscape";
 import type { VideoController } from "@/types/VideoController";
+import TextBoxPopup from "@/components/frontend/TextBoxPopup.vue";
+import { useSettings } from "@/stores/settings";
 
+const settings = useSettings();
 const libraryStore = useLibrary();
 
 const router = useRouter();
@@ -39,6 +42,8 @@ const props = defineProps({
 const isMobile = ref(false);
 const dataIsReady = ref(false);
 const navigationComponent = ref();
+const textBoxIsOpen = ref(false);
+const textBoxBodyText = ref('');
 
 const videoID = computed(() => {
     return parseInt(props.videoID);
@@ -226,6 +231,15 @@ const backAction = () => {
     }
 };
 
+const textBoxOpen = (text: string) => {
+    textBoxBodyText.value = text;
+    textBoxIsOpen.value = true;
+}
+
+const textBoxClose = () => {
+    textBoxIsOpen.value = false;
+}
+
 </script>
 <template>
     <ConcertLayout
@@ -293,51 +307,20 @@ const backAction = () => {
             </div>
             <template v-if="currentPlace">
                 <template v-for="element in currentPlace.stageElements">
-                    <button
-                        v-if="element.onClick"
-                        :key="element"
-                        class="absolute"
-                        :style="{
-                                'left': element.left + '%',
-                                'top': element.top + '%',
-                                'width': element.width + '%',
-                            }"
-                        @click="element.onClick"
-                    >Test</button>
+                    <template v-if="element.textBoxTranslation">
+                        <button
+                            class="absolute"
+                            :style="{
+                                    'left': element.left + '%',
+                                    'top': element.top + '%',
+                                    'width': element.width + '%',
+                                }"
+                            @click="textBoxOpen(settings.translations[element.textBoxTranslation].value)">
+                            <img class="opacity-0" :src="element.assets.light" alt="">
+                        </button>
+                    </template>
                 </template>
             </template>
-            <div class="absolute w-full h-full flex justify-center items-center">
-                <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50"></div>
-                <div class="absolute w-[50%] min-h-[200px] flex items-center justify-center">
-                    <div class="absolute w-[calc(115%)] h-[65%] ml-[-4%] mt-[-1.0%] bg-white shadow-lg border-[3px] border-black"></div>
-                    <img class="absolute h-full right-full" src="/images/mix/Scroll-A.png" alt="">
-                    <div class="relative w-full my-[20%]">
-                        <div class="">
-                            asdfasdf<br>
-                            asdfasdf<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                            asd<br>
-                        </div>
-                    </div>
-                    <img class="absolute h-full left-full" src="/images/mix/Scroll-B.png" alt="">
-                </div>
-            </div>
             <!-- Stage Navigation -->
             <StageNavigation
                 v-if="currentVideo"
@@ -373,6 +356,11 @@ const backAction = () => {
                     </div>
                 </div>
             </div>
+            <TextBoxPopup
+                v-if="textBoxIsOpen"
+                :body-text="textBoxBodyText"
+                :is-mobile="isMobile"
+                @close-window="textBoxClose" />
             <div class="transition-bg pointer-events-none absolute top-0 left-0 w-full h-full opacity-100 bg-white z-[100]"></div>
         </div>
     </ConcertLayout>

@@ -9,6 +9,6 @@ export interface Place {
             light: string,
             dark: string
         },
-        onClick?: void
+        textBoxTranslation?: string
     }>,
 }

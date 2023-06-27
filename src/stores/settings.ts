@@ -64,6 +64,11 @@ export const useSettings = defineStore('settings', () => {
                 type: 'text',
                 default: '',
                 value: ref('')
+            },
+            rehearsal_description: {
+                type: 'editor',
+                default: '',
+                value: ref('')
             }
         } as Record<string, Translation>
     }
