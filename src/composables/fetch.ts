@@ -3,7 +3,7 @@ import type { Method } from 'axios';
 import { toast, type ToastOptions } from "vue3-toastify";
 import { h, type Ref, type RendererElement } from "vue";
 import NotifyCallback from "@/components/backend/NotifyCallback.vue";
-import type NotifyCallbackOptions from "@/components/backend/NotifyCallback.vue";
+import type {NotifyCallbackOptions} from "@/types/NotifyCallbackOptions";
 import type { AxiosResponse } from "axios";
 import { useUsers } from "@/stores/user";
 

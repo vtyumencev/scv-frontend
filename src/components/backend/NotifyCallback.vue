@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import type { ToastOptions } from 'vue3-toastify';
 import { ref, type PropType } from 'vue';
-
-export type NotifyCallbackOptions = {
-    comment?: string,
-    buttonName?: string,
-    onClick(): void
-};
+import type {NotifyCallbackOptions} from "@/types/NotifyCallbackOptions";
 
 const processing = ref(false);
 

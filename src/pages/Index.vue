@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onBeforeUnmount, onUnmounted, ref, type VNode, watch } from "vue";
-import { useIdle, useIntersectionObserver } from '@vueuse/core'
+import {defineAsyncComponent, onBeforeUnmount, onUnmounted, ref, unref, type VNode, watch} from "vue";
+import {toRef, toValue, useIdle, useIntersectionObserver} from '@vueuse/core'
 import { useRouter, useRoute } from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
 import type { BookObject } from "@/types/BookObject";
@@ -24,6 +24,8 @@ const isIntroVideoShown = ref(false);
 const deskSlideView = ref(false);
 const deskShakeTimeout = ref();
 const hintsEnabled = ref(false);
+
+const test = ref('test');
 
 const links = [
     {
@@ -183,7 +185,7 @@ const links = [
         }
     },
     {
-        name: 'Mediathek',
+        name: toRef(() => settings.translations['library_title'].value),
         is_in_book: false,
         route: { name: 'library-index' },
         order: 1,
@@ -268,7 +270,6 @@ const shakeDesk = () => {
 }
 
 const onDataIsReady = () => {
-
     setTimeout(() => {
         dataIsReady.value = true;
     }, 0);
@@ -282,7 +283,7 @@ const onDataIsReady = () => {
 
     const seasonalPreset = links.find(link => link.name === 'Seasonal')
     if (seasonalPreset) {
-        const seasonName = settings.currentSeason;
+        const seasonName = settings.currentSeason.value;
         if (seasonName) {
             seasonalPreset.route = { name: 'preset-stage', params: { presetName: seasonName } }
         } else {
@@ -427,7 +428,7 @@ const mapMaskRendered = (e: VNode) => {
 
 <template>
 
-    <LibraryLayout @on-data-is-ready="onDataIsReady">
+    <LibraryLayout :enable-language-selector="true" @on-data-is-ready="onDataIsReady">
         <div class="relative">
             <div ref="introSlide" class="lg:h-screen flex justify-center pt-20 lg:pt-0 lg:items-center lg:min-h-[900px] relative">
                 <div class="absolute bottom-[0] flex items-end overflow-hidden lg:top-0 lg:bottom-auto lg:h-screen">
@@ -446,7 +447,7 @@ const mapMaskRendered = (e: VNode) => {
                             <div class="p-5 lg:p-10 bg-white bg-opacity-60">
                                 <div class="relative">
                                     <h1 class="text-[1.5rem] sm:text-[2rem] lg:text-[3.4rem] font-serif mr-[140px] lg:mr-0">
-                                        {{ settings.translations.welcome_title.value }}
+                                        {{ settings.translations['welcome_title'].value }}
                                     </h1>
                                     <div class="absolute top-0 right-0 flex justify-end lg:hidden balloonWrapper">
                                         <div class="balloon">
@@ -458,7 +459,6 @@ const mapMaskRendered = (e: VNode) => {
                                     </div>
                                 </div>
                                 <div class="space-y-10 mt-8 font-light lg:text-lg" v-html="settings.translations.welcome_description.value">
-
                                 </div>
                             </div>
                         </div>
@@ -480,7 +480,9 @@ const mapMaskRendered = (e: VNode) => {
                     </div>
                     <div class="mt-[60px] flex justify-center">
                         <div class="relative">
-                            <LibraryButton @click="scrollToDesk">Reise beginnen</LibraryButton>
+                            <LibraryButton @click="scrollToDesk">
+                                {{ settings.translations['welcome_start_label'].value }}
+                            </LibraryButton>
                             <div class="absolute w-full flex justify-center bottom-[-120px]">
                                 <div class="grid pointer-events-none double-arrow">
                                     <img src="/images/icons/blue-arrow.svg" alt="">
@@ -507,7 +509,7 @@ const mapMaskRendered = (e: VNode) => {
                     }">
                     <div
                         v-for="(object, key) in links"
-                        :key="object"
+                        :key="key"
                         :data-object-id="key"
                         class="group absolute pointer-events-none"
                         :class="{'object-interact' : object.route}"
@@ -544,7 +546,7 @@ const mapMaskRendered = (e: VNode) => {
                                 transition
                                 group-[.book-objects--idle]:duration-[2000ms]">
                             <div class="flex flex-col items-center">
-                                <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ object.name }}</span>
+                                <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ unref(object.name) }}</span>
                                 <img class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg" alt="">
                             </div>
                         </div>
@@ -593,7 +595,7 @@ const mapMaskRendered = (e: VNode) => {
         <template #footer-left>
             <button class="grid grid-flow-col gap-3 items-center uppercase" @click="deskHelpHint">
                 <img class="w-3.5 lg:w-5" src="/images/icons/question-mark-box.svg" alt="">
-                <span class="">Hilfe</span>
+                <span class="">{{ settings.translations['footer_help_button'].value }}</span>
             </button>
         </template>
     </LibraryLayout>

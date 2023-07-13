@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { useSettings } from "@/stores/settings";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
+import {computed} from "vue";
+import type {TranslationStrings} from "@/types/TranslationStrings";
 
-defineProps<{
+const props = defineProps<{
     translationName: string
 }>();
 
 const settings = useSettings();
 
+const translate = computed(() => {
+    return settings.translations[props.translationName as TranslationStrings ].value;
+});
+
 </script>
 <template>
-    <LibraryLayout>
+    <LibraryLayout :enable-language-selector="true">
         <div class="mx-auto max-w-3xl pl-container-library-inline px-10 py-32">
-            <div class="article" v-html="settings.translations[translationName].value"></div>
+            <div class="article" v-html="translate"></div>
         </div>
     </LibraryLayout>
 </template>

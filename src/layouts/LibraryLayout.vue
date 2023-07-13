@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import FrontendLayout from "@/layouts/FrontendLayout.vue";
 import FooterNav from "@/components/frontend/FooterNav.vue";
+import LanguageSelector from "@/components/frontend/LanguageSelector.vue";
+
+defineProps<{
+    enableLanguageSelector?: boolean
+}>();
 
 </script>
 
@@ -27,6 +32,7 @@ import FooterNav from "@/components/frontend/FooterNav.vue";
                                 <img src="/logo-title-white.svg" class="inline absolute left-0 opacity-0 dark:opacity-100 transition" alt="">
                             </div>
                         </router-link>
+                        <LanguageSelector v-if="enableLanguageSelector" :icon="true" :styled="true" />
                     </div>
                 </div>
             </div>

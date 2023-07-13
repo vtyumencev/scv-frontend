@@ -5,6 +5,7 @@ import { onUnmounted, ref } from "vue";
 import ApplicationLogo from "@/components/ApplicationLogo.vue";
 import navigation from '../../public/storage/navigation.json';
 import type { SiteNavigation } from "@/types/SiteNavigation";
+import LanguageSelector from "@/components/frontend/LanguageSelector.vue";
 
 const navigationLinks = navigation as SiteNavigation;
 
@@ -131,6 +132,12 @@ const concertSize = () : void => {
                         <slot/>
                         <div class="absolute left-0 top-0">
                             <ApplicationLogo class="mt-5 ml-5" />
+                        </div>
+                        <div class="absolute right-0 top-0">
+                            <LanguageSelector
+                                class="mt-5 mr-5 border-[rgba(0,0,0,0.1)] bg-[rgba(255,255,255,0.8)] text-[14px]"
+                                :icon="true"
+                                :styled="true" />
                         </div>
                         <div class="absolute bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="grid grid-flow-col gap-2">

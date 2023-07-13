@@ -9,6 +9,7 @@ import { useLibrary } from "@/stores/library";
 import LibraryVideoPreview from "@/components/frontend/LibraryVideoPreview.vue";
 import type { Video } from "@/types/Video";
 import { useFrontend } from "@/stores/frontend";
+import {useSettings} from "@/stores/settings";
 
 defineProps<{
     backgroundImg?: string | null,
@@ -25,6 +26,7 @@ const searchInput = ref('');
 
 const library = useLibrary();
 const frontend = useFrontend();
+const settings = useSettings();
 
 const { results, fuse } = useFuse(searchInput, [] as Video[], {
     fuseOptions: {
@@ -81,7 +83,7 @@ const onDataIsReady = () => {
                     <input
                             v-model="searchInput"
                             class="focus:ring-theme-alpha bg-black transition border-0 text-white rounded-full pl-12 pr-10 py-2 w-full"
-                            placeholder="Suchen"
+                            :placeholder="settings.translations['search'].value"
                             type="text" />
                     <Transition name="search-clear-button">
                         <button
@@ -128,7 +130,9 @@ const onDataIsReady = () => {
                                         <img class="mr-4 w-7" src="/images/icons/library.svg" alt="">
                                         <img class="absolute left-0 top-0 opacity-0 dark:opacity-100 transition" src="/images/icons/library-white.svg" alt="">
                                     </span>
-                                    <span>Filtern</span>
+                                    <span>
+                                        {{ settings.translations['filter'].value }}
+                                    </span>
                                 </button>
                                 <Transition name="filter">
                                     <LibraryFilter v-if="isFilterSelectorShown" class="ml-11 mt-3" :filter-route-name="filterRouteName" />

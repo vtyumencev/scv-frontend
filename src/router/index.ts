@@ -30,6 +30,10 @@ import Article from "@/pages/Article.vue";
 import VideosIndex from "@/pages/backend/VideosIndex.vue";
 import Landscapes from "@/pages/backend/Landscapes.vue";
 import LandscapesIndex from "@/pages/backend/LandscapesIndex.vue";
+import SettingsTranslationsShow from "@/pages/backend/SettingsTranslationsShow.vue";
+import SettingsTranslationsIndex from "@/pages/backend/SettingsTranslationsIndex.vue";
+import SettingsTranslationsNew from "@/pages/backend/SettingsTranslationsNew.vue";
+import SettingsTranslationsSettings from "@/pages/backend/SettingsTranslationsSettings.vue";
 
 
 
@@ -186,7 +190,32 @@ const routes : Array<RouteRecordRaw> = [
             {
                 path: 'translations',
                 name: 'settings-translations',
-                component: SettingsTranslations
+                component: SettingsTranslations,
+                children: [
+                    {
+                        path: '',
+                        name: 'settings-translations-index',
+                        component: SettingsTranslationsIndex,
+                    },
+                    {
+                        path: ':lang/show',
+                        name: 'settings-translations-show',
+                        component: SettingsTranslationsShow,
+                        props: true,
+                    },
+                    {
+                        path: ':lang/settings',
+                        name: 'settings-translations-settings',
+                        component: SettingsTranslationsSettings,
+                        props: true,
+                    },
+                    {
+                        path: 'new',
+                        name: 'settings-translations-new',
+                        component: SettingsTranslationsNew,
+                        props: true,
+                    }
+                ]
             },
         ]
     },

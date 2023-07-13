@@ -64,7 +64,7 @@ const isFilteredMode = computed(() => {
 });
 
 const seasonalVideos = computed(() => {
-    const seasonName = settings.currentSeason as LandscapeNames;
+    const seasonName = settings.currentSeason.value as LandscapeNames;
     if (seasonName) {
         return library.presets[seasonName].videos_filter();
     }
@@ -94,7 +94,7 @@ const seasonalVideos = computed(() => {
                 <div
                         class="grid grid-cols-3"
                         :class="{ 'gap-[14px]': frontend.isMobile, 'gap-[38px]': !frontend.isMobile }">
-                    <LibraryVideoPreview v-for="video in filteredVideos" :key="video" :video="video" />
+                    <LibraryVideoPreview v-for="video in filteredVideos" :key="video.id" :video="video" />
                 </div>
             </template>
             <LibraryVideoFilterNotFound v-else />

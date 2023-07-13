@@ -20,6 +20,13 @@ module.exports = {
                 'theme-alpha-dim': '#FFF9E3',
                 'theme-beta': '#66C6EF',
                 'theme-omega': '#151515',
+            },
+            fontSize: {
+                'size-inherit': ['inherit', {
+                    lineHeight: 'inherit',
+                    letterSpacing: 'inherit',
+                    fontWeight: 'inherit',
+                }]
             }
         },
     },

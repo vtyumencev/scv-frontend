@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, onUnmounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch, unref } from "vue";
 import { useLibrary } from "@/stores/library";
-import { useScrollLock, useStorage } from "@vueuse/core";
+import {useScrollLock, useStorage} from "@vueuse/core";
 import LibraryButton from "@/components/frontend/LibraryButton.vue";
 import { useSettings } from "@/stores/settings";
 import { useFrontend } from "@/stores/frontend";
+import type { LanguageProfile } from "@/types/LanguageProfile";
 
 const emits = defineEmits<{
     (e: 'onDataIsReady'): void,
@@ -15,7 +16,8 @@ const isOrientationLandscape = ref(true);
 const matchMediaOrientation = window.matchMedia("(orientation: portrait) and (max-width: 700px)");
 const matchMediaMobile = window.matchMedia("(max-width: 1279px)");
 
-const cookiesAccepted = useStorage('isCookiesAccepted', false)
+const cookiesAccepted = useStorage('isCookiesAccepted', false);
+const currentLanguageCode = useStorage<null | string>('language', null);
 const isLocked = useScrollLock(document.documentElement);
 if (cookiesAccepted.value === false) {
     isLocked.value = true;
@@ -52,7 +54,28 @@ onMounted( async () => {
             return;
         }
 
-        await stageStore.videos.forEach((video) => {
+
+        /**
+         * Language
+         */
+
+        if (currentLanguageCode.value === null && navigator.language) {
+            currentLanguageCode.value = navigator.language;
+        }
+
+        const profiles = unref<LanguageProfile[]>(settings.general.translation_profiles.value);
+
+        const defaultProfile = profiles.find(profile => profile.is_default);
+
+        const selectedProfile = profiles.find(profile => profile.code === currentLanguageCode.value);
+
+        if (! selectedProfile && defaultProfile) {
+            currentLanguageCode.value = defaultProfile.code;
+        }
+
+        await settings.fetchTranslations(currentLanguageCode.value as string);
+
+        stageStore.videos.forEach((video) => {
             video.choir_name = stageStore.getChoirByID(video.choir_id)?.name ?? '';
         })
 

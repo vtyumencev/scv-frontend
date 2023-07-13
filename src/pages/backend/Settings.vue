@@ -8,7 +8,7 @@ const settings = useSettings();
 
 onMounted(async () => {
     await settings.fetch();
-})
+});
 
 </script>
 
@@ -34,7 +34,7 @@ onMounted(async () => {
                         </router-link>
                         <router-link
                             v-slot="{ href, isActive, navigate }"
-                            :to="{ name: 'settings-translations' }" custom>
+                            :to="{ name: 'settings-translations-index' }" custom>
                             <NavLink
                                 :href="href"
                                 :active="isActive"

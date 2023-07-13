@@ -50,7 +50,7 @@ const onQueryUpdated = () => {
     });
 }
 
-const filterChange = (e: SubmitEvent) => {
+const filterChange = (e: Event) => {
     const formEl = e.currentTarget as HTMLFormElement;
 
     const form = new FormData(formEl);
