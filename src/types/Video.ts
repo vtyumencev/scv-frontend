@@ -15,9 +15,10 @@ export interface Video {
     is_rehearsal?: boolean,
     choir_id: number,
     choir_name: string,
-    choir_leader: string | null,
-    landscape_id: number | null,
+    choir_leader: string,
+    landscape_id: number|null,
     created_at: string,
     updated_at: string,
     order_index?: number,
+    published_at: string
 }

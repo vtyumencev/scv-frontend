@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useAPI } from "@/composables/fetch";
 import { computed, onBeforeMount, ref, watch } from "vue";
-import Select from "@/components/Select.vue";
+import SelectSimple from "@/components/SelectSimple.vue";
 import type { Video } from "@/types/Video";
 import { useRouter } from "vue-router";
 import Checkbox from "@/components/Checkbox.vue";
@@ -175,7 +175,7 @@ const resetUpload = () => {
                             <div v-if="uploadResult" class="mt-5">
                                 <div class="mb-5 pb-2 border-b">Step 2</div>
                                 <form @submit.prevent="selectDataSource">
-                                    <Select
+                                    <SelectSimple
                                         class="w-full"
                                         name="data_source"
                                         null-option="Select data for saving" :items="[

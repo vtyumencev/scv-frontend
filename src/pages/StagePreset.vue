@@ -136,8 +136,8 @@ const toggleMobile = (value: boolean) => {
                         }"
                         style="font-size: var(--font-size-base);">
                     <div
-                        v-for="video in relatedVideos"
-                        :key="video"
+                        v-for="(video, index) in relatedVideos"
+                        :key="index"
                         class="relative">
                         <div class="relative pb-[56.25%]">
                             <img

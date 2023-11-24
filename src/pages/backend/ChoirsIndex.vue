@@ -4,7 +4,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import { computed, onMounted } from 'vue';
 import Skeleton from '../../components/backend/Skeleton.vue';
 import TextInput from "@/components/TextInput.vue";
-import Select from "@/components/Select.vue";
+import SelectSimple from "@/components/SelectSimple.vue";
 import type { Choir } from "@/types/Choir";
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -82,7 +82,7 @@ const filteredList = computed(() : Choir[] => {
                         <div class="max-w-3xl mx-auto">
                             <div class="mb-5 grid grid-flow-col gap-4 grid-cols-[1fr_auto]">
                                 <TextInput v-model="backend.choirsFilterSearchInput" type="text" class="block w-full" placeholder="Filter name" autocomplete="name" />
-                                <Select v-model="backend.choirsFilterOrder" :items="backend.choirsFilterOrderOptions"></Select>
+                                <SelectSimple v-model="backend.choirsFilterOrder" :items="backend.choirsFilterOrderOptions"></SelectSimple>
                             </div>
                             <div class="grid grid-cols-[3fr_1fr_1fr] font-bold mb-2">
                                 <div

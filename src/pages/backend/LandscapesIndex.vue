@@ -65,7 +65,7 @@ const saveList = () => {
                     <div class="px-10 py-10 bg-white border-b border-gray-200 grid grid-cols-[1fr_5fr]">
                         <div class="border-r-2">
                             <ul>
-                                <li v-for="item in Object.entries(library.presets)" :key="item">
+                                <li v-for="(item, index) in Object.entries(library.presets)" :key="index">
                                     <router-link
                                             :to="{ name: 'landscapes-show', params: { landscapeName: item[0] } }"
                                             class="group block py-[1px]">
@@ -102,8 +102,8 @@ const saveList = () => {
                                     <div class="text-xl">Reihenfolge der Einträge</div>
                                     <div ref="el" class="mt-5">
                                         <div
-                                                v-for="item in list"
-                                                :key="item"
+                                                v-for="(item, index) in list"
+                                                :key="index"
                                                 class="bg-white px-3 -mx-3 py-2 flex items-center rounded">
                                             <div class="handle pr-5 cursor-move">
                                                 <div class="w-[13px] h-[2px] bg-gray-500 my-[2px] rounded"></div>

@@ -51,9 +51,9 @@ const videoID = computed(() => {
 
 const videoController = reactive({
     isPlaying: false,
-    videoToggle: () => undefined,
-    pause: () => undefined,
-    play: () => undefined,
+    videoToggle: () => null,
+    pause: () => null,
+    play: () => null,
     navigatePrev: () => navigatePrev(),
     navigateNext: () => navigateNext()
 } as VideoController);
@@ -182,20 +182,6 @@ const navigateToVideo = async (video: Video) => {
     await router.push({ params: { videoID: video.id } });
 }
 
-const playlist = computed(() : Video[] => {
-    if (!dataIsReady.value) {
-        return [];
-    }
-
-    const playListRawIDs = props.playListIDs.split(',');
-
-    return playListRawIDs
-        .map(item => Number.parseInt(item))
-        .filter(item => !isNaN(item))
-        .map(item => libraryStore.videos?.find(video => video.id === item) as Video)
-        .filter(item => item !== undefined);
-});
-
 const background = computed(() => {
 
     let landscape = currentPreset.value as Landscape | null;
@@ -264,7 +250,7 @@ const textBoxClose = () => {
                             <div class="grid grid-cols-2 gap-2 p-3" style="font-size: var(--font-size-base, 16px);">
                                 <div
                                     v-for="video in currentPreset.videos_filter()"
-                                    :key="video"
+                                    :key="video.id"
                                     class="aspect-video relative">
                                     <img
                                         :src="video.source_thumbnail_url"
@@ -287,8 +273,8 @@ const textBoxClose = () => {
                 <Transition name="stage-elements-light">
                     <div v-show="!videoController.isPlaying">
                         <StageDecorationElement
-                            v-for="element in currentPlace.stageElements"
-                            :key="element"
+                            v-for="(element, index) in currentPlace.stageElements"
+                            :key="index"
                             :element="element"
                             mode="light"
                         />
@@ -297,8 +283,8 @@ const textBoxClose = () => {
                 <Transition name="stage-elements-dark">
                     <div v-show="videoController.isPlaying">
                         <StageDecorationElement
-                            v-for="element in currentPlace.stageElements"
-                            :key="element"
+                            v-for="(element, index) in currentPlace.stageElements"
+                            :key="index"
                             :element="element"
                             mode="dark"
                         />
@@ -306,56 +292,33 @@ const textBoxClose = () => {
                 </Transition>
             </div>
             <template v-if="currentPlace">
-                <template v-for="element in currentPlace.stageElements">
+                <template v-for="(element, index) in currentPlace.stageElements">
                     <template v-if="element.textBoxTranslation">
                         <button
+                            :key="index"
                             class="absolute"
                             :style="{
                                     'left': element.left + '%',
                                     'top': element.top + '%',
                                     'width': element.width + '%',
                                 }"
-                            @click="textBoxOpen(settings.translations[element.textBoxTranslation].value)">
+                            @click="textBoxOpen(settings.translate(element.textBoxTranslation))">
                             <img class="opacity-0" :src="element.assets.light" alt="">
                         </button>
                     </template>
                 </template>
             </template>
             <!-- Stage Navigation -->
-            <StageNavigation
-                v-if="currentVideo"
-                ref="navigationComponent"
-                :video-controller="videoController"
-                :video-data="currentVideo"
-                :is-mobile="isMobile"
-                @back-action="backAction"
-            />
-            <!-- ! Stage Navigation -->
-            <div class="w-full absolute flex justify-between items-center py-5 px-8">
-                <div class=""></div>
-                <div class="flex space-x-2">
-                    <div v-show="playlist.length">
-                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                            Playlist
-                            <svg class="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <!-- Dropdown menu -->
-                        <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[300px] dark:bg-gray-700">
-                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-                                <li
-                                    v-for="item in playlist"
-                                    :key="item"
-                                    class="px-5 py-1 flex space-x-2 hover:bg-gray-100 cursor-pointer">
-                                    <img :src="item.source_thumbnail_url" class="h-[40px] rounded-md" alt="">
-                                    <div class="">
-                                        {{ item.title }}
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Transition name="navigation-wrapper">
+                <StageNavigation
+                    v-if="currentVideo"
+                    ref="navigationComponent"
+                    :video-controller="videoController"
+                    :video-data="currentVideo"
+                    :is-mobile="isMobile"
+                    @back-action="backAction"
+                />
+            </Transition>
             <TextBoxPopup
                 v-if="textBoxIsOpen"
                 :body-text="textBoxBodyText"
@@ -397,5 +360,15 @@ const textBoxClose = () => {
     .stage-elements-light-enter-from,
     .stage-elements-light-leave-to {
         opacity: 0;
+    }
+
+    .navigation-wrapper-enter-active,
+    .navigation-wrapper-leave-active {
+        transition: all 0.4s 0.4s;
+    }
+
+    .navigation-wrapper-enter-from,
+    .navigation-wrapper-leave-to {
+        transform: translateY(100%);
     }
 </style>

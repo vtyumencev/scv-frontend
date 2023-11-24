@@ -14,4 +14,15 @@ export type TranslationStrings =
     'rehearsal_description' |
     'filter' |
     'search' |
-    'footer_help_button';
+    'footer_help_button' |
+    'leipzig' |
+    'seasonal' |
+    'west_sachsen' |
+    'east_sachsen' |
+    'north_sachsen' |
+    'proberaum' |
+    'children_youth' |
+    'main_page' |
+    'back_to' |
+    'to_choir_website'
+    ;

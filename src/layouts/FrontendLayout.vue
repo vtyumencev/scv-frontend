@@ -9,7 +9,6 @@ import type { LanguageProfile } from "@/types/LanguageProfile";
 
 const emits = defineEmits<{
     (e: 'onDataIsReady'): void,
-    (e: 'isMobile', value: boolean): void,
 }>();
 
 const isOrientationLandscape = ref(true);
@@ -37,23 +36,11 @@ watch(cookiesAccepted, (newValue) => {
     }
 })
 
-onMounted( async () => {
+onMounted(async () => {
 
     if (! stageStore.dataIsReady) {
 
-        const responses = await Promise.all([
-            settings.fetch(),
-            stageStore.getChoirs(),
-            stageStore.getAttributes(),
-            stageStore.getVideos()
-        ]);
-
-        const errors = responses.find(response => response.error);
-
-        if (errors) {
-            return;
-        }
-
+        await settings.fetch();
 
         /**
          * Language
@@ -73,7 +60,18 @@ onMounted( async () => {
             currentLanguageCode.value = defaultProfile.code;
         }
 
-        await settings.fetchTranslations(currentLanguageCode.value as string);
+        const responses = await Promise.all([
+            stageStore.getChoirs(),
+            stageStore.getAttributes(currentLanguageCode.value as string),
+            stageStore.getVideos(),
+            settings.fetchTranslations(currentLanguageCode.value as string)
+        ]);
+
+        const errors = responses.find(response => response.error);
+
+        if (errors) {
+            return;
+        }
 
         stageStore.videos.forEach((video) => {
             video.choir_name = stageStore.getChoirByID(video.choir_id)?.name ?? '';
@@ -138,7 +136,7 @@ const acceptCookies = () => {
         </div>
         <Transition>
             <div
-                v-if="!stageStore.dataIsReady"
+                v-if="! stageStore.dataIsReady"
                 class="fixed top-0 left-0 w-full h-full bg-white z-[20]">
                 <div class="w-full h-full flex items-center justify-center">
                     <div role="status">

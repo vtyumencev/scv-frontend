@@ -14,7 +14,7 @@ const fetch = useAPI();
 
 export declare type PlacesNames = 'cultural_stage' | 'open_air' | 'sacred' | 'rehearsal' | 'neutral' | 'spring' | 'winter';
 
-export declare type LandscapeNames = 'dresden' | 'leipzig' | 'chemnitz' | 'west' | 'north' | 'east' | 'rehearsal' | LANDSCAPES.SEASON_NEUTRAL | LANDSCAPES.SEASON_SPRING | LANDSCAPES.SEASON_WINTER | LANDSCAPES.KINDER_YOUTH;
+export declare type LandscapeNames = LANDSCAPES.DRESDEN | LANDSCAPES.LEIPZIG | LANDSCAPES.CHEMNITZ | LANDSCAPES.WEST | LANDSCAPES.NORTH | LANDSCAPES.EAST | LANDSCAPES.REHEARSAL | LANDSCAPES.SEASON_NEUTRAL | LANDSCAPES.SEASON_SPRING | LANDSCAPES.SEASON_WINTER | LANDSCAPES.KINDER_YOUTH | LANDSCAPES.ADVENT;
 
 export declare type Places = Record<PlacesNames, Place>;
 
@@ -811,56 +811,48 @@ export const useLibrary = defineStore('library', () => {
             name: 'Leipzig',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_Leipzigs.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_LeipzigNacht.jpg',
-            title_gen: 'Leipziger',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.LEIPZIG)
         },
         [LANDSCAPES.DRESDEN]: {
             name: 'Dresden',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_Dresden.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_DresdenNight.jpg',
-            title_gen: 'Dresdener',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.DRESDEN)
         },
         [LANDSCAPES.CHEMNITZ]: {
             name: 'Chemnitz',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_Chemnitz.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_ChemnitzNacht.jpg',
-            title_gen: 'Chemnitzer',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.CHEMNITZ)
         },
         [LANDSCAPES.NORTH]: {
             name: 'Nord',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_Nord.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_NordNacht.jpg',
-            title_gen: 'Norder',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.NORTH)
         },
         [LANDSCAPES.WEST]: {
             name: 'West',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_West.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_WestNacht.jpg',
-            title_gen: 'Westen',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.WEST)
         },
         [LANDSCAPES.EAST]: {
             name: 'Ost',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_SachsenOst.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_SachsenOstNacht.jpg',
-            title_gen: 'Osten',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.EAST)
         },
         [LANDSCAPES.KINDER_YOUTH]: {
             name: 'Kinder Jugend',
             background_image: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugend.jpg',
             background_image_dark: '/images/stage/landscapes/SCV_Website_Landschaften_KinderJugendNacht.jpg',
-            title_gen: '',
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.KINDER_YOUTH)
         },
         [LANDSCAPES.SEASON_NEUTRAL]: {
             name: 'Saison Neutral',
             background_image: '/images/landing/Clouds.jpg',
             background_image_dark: null,
-            title_gen: '',
             bound_place: places.neutral,
             has_no_enter_room: true,
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.SEASON_NEUTRAL)
@@ -869,7 +861,6 @@ export const useLibrary = defineStore('library', () => {
             name: 'Saison Frühling',
             background_image: null,
             background_image_dark: null,
-            title_gen: '',
             bound_place: places.spring,
             has_no_enter_room: true,
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.SEASON_SPRING)
@@ -878,7 +869,6 @@ export const useLibrary = defineStore('library', () => {
             name: 'Saison Winter',
             background_image: null,
             background_image_dark: null,
-            title_gen: '',
             bound_place: places.winter,
             has_no_enter_room: true,
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.SEASON_WINTER)
@@ -887,10 +877,16 @@ export const useLibrary = defineStore('library', () => {
             name: 'Proberaum',
             background_image: null,
             background_image_dark: null,
-            title_gen: '',
             has_no_enter_room: true,
             bound_place: places.rehearsal,
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.REHEARSAL)
+        },
+        [LANDSCAPES.ADVENT]: {
+            name: 'Advent Calender',
+            background_image: null,
+            background_image_dark: null,
+            has_no_enter_room: true,
+            videos_filter: () => sortLandscapeVideos(LANDSCAPES.ADVENT)
         },
     } as Presets;
 
@@ -945,8 +941,10 @@ export const useLibrary = defineStore('library', () => {
         return response;
     };
 
-    const getAttributes = async () => {
-        const response = await fetch.index<Attributes>('attributes');
+    const getAttributes = async (langCode?: string) => {
+        const response = await fetch.index<Attributes>('attributes', {
+            lang: langCode
+        });
         if (! response.error) {
             attributes.value = response.data;
         }

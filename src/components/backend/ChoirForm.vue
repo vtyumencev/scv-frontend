@@ -3,7 +3,7 @@ import type {Choir} from '@/types/Choir';
 import {onMounted, type PropType, ref} from 'vue';
 import TextInput from '@/components/TextInput.vue';
 import InputLabel from '@/components/InputLabel.vue';
-import Select from '@/components/Select.vue';
+import SelectSimple from '@/components/SelectSimple.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import {useLibrary} from '@/stores/library';
 import Editor from '@tinymce/tinymce-vue';
@@ -84,7 +84,7 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel value="Region" />
-            <Select
+            <SelectSimple
                 v-model="data.region_id"
                 class="mt-1 block w-full"
                 null-option="Region ist nicht ausgewählt"
@@ -96,7 +96,7 @@ const deleteRecord = async () => {
         </div>
         <div class="mb-5">
             <InputLabel value="Chortyp" />
-            <Select
+            <SelectSimple
                 v-model="data.type_id"
                 class="mt-1 block w-full"
                 null-option="Chortyp ist nicht ausgewählt"

@@ -10,10 +10,12 @@ import LibraryVideosSlider from "@/components/frontend/LibraryVideosSlider.vue";
 import LibraryButton from "@/components/frontend/LibraryButton.vue";
 import type { RouteLocationRaw } from "vue-router";
 import LibraryVideoFilterNotFound from "@/components/frontend/LibraryVideoFilterNotFound.vue";
+import {useSettings} from "@/stores/settings";
 
 const library = useLibrary();
 const router = useRouter();
 const route = useRoute();
+const settings = useSettings();
 type Query = Record<string, string>;
 
 const props = defineProps({
@@ -100,7 +102,7 @@ const applyFilters = (value: Query) => {
 <template>
     <LibraryVideosLayout
         :background-img="preset?.background_image ?? null"
-        :backtrack-route="{ title: 'Mediathek', name: 'library-index', query: originalLibraryQuery } as RouteLocationRaw"
+        :backtrack-route="{ title: settings.translations.library_title.value, name: 'library-index', query: originalLibraryQuery } as RouteLocationRaw"
         filter-route-name="library-choirs-show"
         @on-data-is-ready="onDataIsReady">
         <template #sidebarContent>
@@ -109,7 +111,7 @@ const applyFilters = (value: Query) => {
             </div>
             <a v-if="choir?.contact_website" :href="choir?.contact_website" target="_blank">
                 <LibraryButton class="mt-5 xl:mt-10 text-black">
-                    Zur Chorseite
+                    {{ settings.translations.to_choir_website.value }}
                 </LibraryButton>
             </a>
         </template>

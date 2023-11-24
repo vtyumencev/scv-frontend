@@ -110,15 +110,17 @@ const concertSize = () : void => {
 <template>
     <FrontendLayout @on-data-is-ready="onDataIsReady">
         <div class="h-screen">
-            <div id="concert-container" class="concert-container mx-auto h-full">
+            <div id="concert-container" class="concert-container mx-auto h-full overflow-hidden">
                 <div class="concert-container__wrapper concert-wrapper h-full flex justify-center items-center">
                     <div class="concert relative w-full">
                         <div class="pointer-events-none">
+                            <Transition>
                             <img
                                 v-if="backgroundImage"
                                 :src="backgroundImage"
                                 class="absolute w-full h-full object-cover object-center"
                                 alt="">
+                            </Transition>
                             <Transition>
                                 <template v-if="isDark && backgroundImageDark">
                                         <img
@@ -141,7 +143,7 @@ const concertSize = () : void => {
                         </div>
                         <div class="absolute bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="grid grid-flow-col gap-2">
-                                <span v-for="navLink in navigationLinks.footer" :key="navLink">
+                                <span v-for="(navLink, index) in navigationLinks.footer" :key="index">
                                     <a
                                         v-if="navLink.remoteLink"
                                         :href="navLink.remoteLink"

@@ -124,7 +124,7 @@ defineExpose({
 </script>
 
 <template>
-    <div style="font-size: var(--font-size-base);">
+    <div class="h-full" style="font-size: var(--font-size-base);">
         <Transition name="id-card-mobile">
             <StageChoirID
                 v-if="choir && IDShown && isMobile"

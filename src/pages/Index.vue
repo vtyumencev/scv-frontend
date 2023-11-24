@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onBeforeUnmount, onUnmounted, ref, unref, type VNode, watch} from "vue";
-import {toRef, toValue, useIdle, useIntersectionObserver} from '@vueuse/core'
+import {toRef, useIdle, useIntersectionObserver} from '@vueuse/core'
 import { useRouter, useRoute } from "vue-router";
 import LibraryLayout from "@/layouts/LibraryLayout.vue";
 import type { BookObject } from "@/types/BookObject";
@@ -25,8 +25,6 @@ const deskSlideView = ref(false);
 const deskShakeTimeout = ref();
 const hintsEnabled = ref(false);
 
-const test = ref('test');
-
 const links = [
     {
         name: null,
@@ -43,7 +41,7 @@ const links = [
         map_mask: null
     },
     {
-        name: 'Leipzig',
+        name: toRef(() => settings.translations.leipzig.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'leipzig' } },
         order: 6,
@@ -81,7 +79,7 @@ const links = [
         }
     },
     {
-        name: 'Ostsachsen',
+        name: toRef(() => settings.translations.east_sachsen.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'east' } },
         order: 8,
@@ -100,7 +98,7 @@ const links = [
         }
     },
     {
-        name: 'Seasonal',
+        name: toRef(() => settings.translations.seasonal.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'neutral' } },
         order: 9,
@@ -114,7 +112,7 @@ const links = [
         map_mask: null
     },
     {
-        name: 'Kinder Jugend',
+        name: toRef(() => settings.translations.children_youth.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'kinder-youth' } },
         order: 3,
@@ -128,7 +126,7 @@ const links = [
         map_mask: null
     },
     {
-        name: 'Nordsachsen',
+        name: toRef(() => settings.translations.north_sachsen.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'north' } },
         order: 2,
@@ -166,7 +164,7 @@ const links = [
         }
     },
     {
-        name: 'Westsachsen',
+        name: toRef(() => settings.translations['west_sachsen'].value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'west' } },
         order: 5,
@@ -185,7 +183,7 @@ const links = [
         }
     },
     {
-        name: toRef(() => settings.translations['library_title'].value),
+        name: toRef(() => settings.translations.library_title.value),
         is_in_book: false,
         route: { name: 'library-index' },
         order: 1,
@@ -199,7 +197,7 @@ const links = [
         map_mask: null
     },
     {
-        name: 'Proberaum',
+        name: toRef(() => settings.translations.proberaum.value),
         is_in_book: false,
         route: null,
         order: 10,
@@ -281,7 +279,7 @@ const onDataIsReady = () => {
         }
     }, 100);
 
-    const seasonalPreset = links.find(link => link.name === 'Seasonal')
+    const seasonalPreset = links.find(link => link.order === 9)
     if (seasonalPreset) {
         const seasonName = settings.currentSeason.value;
         if (seasonName) {
@@ -474,7 +472,10 @@ const mapMaskRendered = (e: VNode) => {
                         </div>
                         <Teleport to="body">
                             <Transition>
-                                <VideoModal v-if="isIntroVideoShown" :video-id="settings.translations.welcome_video.value" @close-modal="isIntroVideoShown = false" />
+                                <VideoModal
+                                    v-if="isIntroVideoShown"
+                                    :video-id="settings.translate('welcome_video')"
+                                    @close-modal="isIntroVideoShown = false" />
                             </Transition>
                         </Teleport>
                     </div>

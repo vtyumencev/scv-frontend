@@ -1,5 +1,38 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
+import {isReactive, isRef, onMounted, reactive, ref} from "vue";
+import {toRef, toValue} from "@vueuse/core";
+import {useSettings} from "@/stores/settings";
+
+// const settings = useSettings();
+//
+// onMounted(async () => {
+//     await settings.fetchTranslations('de-DE');
+// })
+//
+// const value = reactive({
+//     foo: 1,
+//     bar: 2,
+//     array: [1, 2]
+// });
+
+
+
+// const valueR = reactive({
+//     foo: 1,
+//     bar: 2,
+//     array: [1, 2]
+// });
+// const valueN = ref(1);
+//
+// const value2 = toRef(value);
+// const value3 = toRef(() => value); // readonly
+// const value4 = toRef(value, 'foo');
+// console.log(value);
+// console.log(value2);
+// console.log(value3);
+// console.log(value4);
+
 </script>
 
 <template>

@@ -10,4 +10,5 @@ export enum LANDSCAPES {
     SEASON_WINTER = 'winter',
     SEASON_SPRING = 'spring',
     SEASON_NEUTRAL = 'neutral',
+    ADVENT = 'advent',
 }

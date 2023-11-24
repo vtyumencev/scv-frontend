@@ -3,6 +3,7 @@ import { useSettings } from "@/stores/settings";
 import {toRef, useStorage} from "@vueuse/core";
 import {computed, type Ref} from "vue";
 import type {LanguageProfile} from "@/types/LanguageProfile";
+import {useLibrary} from "@/stores/library";
 
 defineProps<{
     icon?: boolean
@@ -11,6 +12,7 @@ defineProps<{
     uppercase?: boolean,
 }>();
 
+const stageStore = useLibrary();
 const settings = useSettings();
 const currentLanguageCode = useStorage<null | string>('language', null);
 
@@ -20,10 +22,11 @@ const selectedProfile = computed(() => {
     return profiles.value.find(profile => profile.code === currentLanguageCode.value);
 });
 
-const change = async (e: Event) => {
+const change = (e: Event) => {
     const el = e.target as HTMLFormElement;
     currentLanguageCode.value = el.value;
-    await settings.fetchTranslations(currentLanguageCode.value as string);
+    settings.fetchTranslations(currentLanguageCode.value as string);
+    stageStore.getAttributes(currentLanguageCode.value as string);
 }
 
 </script>
@@ -48,7 +51,7 @@ const change = async (e: Event) => {
                 alt="">
         </template>
         <select
-            class="appearance-none p-0 border-0 focus:ring-0 bg-transparent bg-none text-size-inherit"
+            class="appearance-none p-0 border-0 focus:ring-0 bg-transparent text-size-inherit"
             :class="{
                 'mr-[-2.5rem]': ! styled,
                 'uppercase': uppercase
@@ -58,6 +61,7 @@ const change = async (e: Event) => {
                 <option
                     v-if="! profile.is_hidden"
                     :key="profile.code"
+                    class="text-black"
                     :selected="selectedProfile && selectedProfile.code === profile.code"
                     :value="profile.code">
                     {{ profile.name }}

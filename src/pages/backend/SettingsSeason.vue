@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Select from "@/components/Select.vue";
+import SelectSimple from "@/components/SelectSimple.vue";
 import InputLabel from "@/components/InputLabel.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { ref } from "vue";
@@ -18,7 +18,7 @@ const saveSettings = () => {
     <form @submit.prevent="saveSettings">
         <input type="hidden" name="group" value="general">
         <InputLabel value="Aktuelle Saison" />
-        <Select
+        <SelectSimple
             v-model="settings.general.current_season.value"
             class="mt-1 w-full"
             name="current_season"

@@ -30,7 +30,9 @@ const settings = useSettings();
 
 const { results, fuse } = useFuse(searchInput, [] as Video[], {
     fuseOptions: {
-        keys: [ "title", "composer", "choir_name" ]
+        keys: [ "title", "composer", "choir_name" ],
+        threshold: 0.2,
+        ignoreLocation: true,
     }
 });
 
@@ -160,7 +162,7 @@ const onDataIsReady = () => {
                                         <img class="mr-4 w-7" src="/images/icons/prev.svg" alt="">
                                         <img class="absolute left-0 top-0 w-7 opacity-0 dark:opacity-100 transition" src="/images/icons/prev-white.svg" alt="">
                                     </span>
-                                    <span>zurück zur<br>{{ backtrackRoute.title }}</span>
+                                    <span>{{ settings.translations.back_to.value }}<br>{{ backtrackRoute.title }}</span>
                                 </router-link>
                             </div>
                         </div>

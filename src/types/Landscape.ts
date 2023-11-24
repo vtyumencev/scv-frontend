@@ -5,7 +5,6 @@ export interface Landscape {
     name: string,
     background_image: string | null,
     background_image_dark: string | null,
-    title_gen: string,
     videos_filter: () => Video[],
     has_no_enter_room?: boolean,
     /**

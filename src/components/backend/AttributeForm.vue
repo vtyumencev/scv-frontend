@@ -10,10 +10,14 @@ import type { Attribute } from '@/types/Attribute';
 import { useAPI } from "@/composables/fetch";
 import { useLibrary } from "@/stores/library";
 import type { EditableAttributes } from "@/types/EditableAttributes";
+import {useSettings} from "@/stores/settings";
+import type {LanguageProfile} from "@/types/LanguageProfile";
+import {toRef} from "@vueuse/core";
 
 const router = useRouter();
 const library = useLibrary();
 const api = useAPI();
+const settings = useSettings();
 
 const props = defineProps({
     attributeName: {
@@ -34,6 +38,13 @@ const props = defineProps({
     }
 });
 
+interface AttributeExtended {
+    name: Record<string, string>;
+    id: number|null,
+}
+
+const attributeExtended = ref<AttributeExtended>();
+const selectedLanguageCode = ref();
 const processing = ref(false);
 const deleteProcessing = ref(false);
 
@@ -46,6 +57,29 @@ onMounted(async () => {
         }
     })
     modal.show();
+
+    await settings.fetch();
+
+    const defaultProfile = settings.general.translation_profiles.value.find((profile: LanguageProfile) => profile.is_default);
+
+    if (defaultProfile) {
+        selectedLanguageCode.value = defaultProfile.code;
+    }
+
+    const response = await api.show<AttributeExtended>(`attributes/${props.attributeName}`, parseInt(props.attributeID));
+    attributeExtended.value = response.data;
+
+    if (! attributeExtended.value) {
+        return;
+    }
+
+    if (
+        typeof attributeExtended.value.name !== 'object' ||
+        Array.isArray(attributeExtended.value.name) ||
+        attributeExtended.value.name === null
+    ) {
+        attributeExtended.value.name = {};
+    }
 })
 
 onUnmounted(() => {
@@ -58,23 +92,27 @@ const closeModal = () => {
     modal.hide();
 };
 
-const attribute = ref(Object.assign({}, props.data) ?? {
-    'id': 0,
-    'name': ''
-});
+const attribute = toRef(props, 'data');
 
 const saveRecord = async () => {
     processing.value = true;
+
+    console.log(attributeExtended.value)
+
+    const post = {
+      ...attributeExtended.value,
+    };
+
     if (props.isAddNew) {
-        await api.store(`attributes/${props.attributeName}`, attribute.value,{
+        await api.store(`attributes/${props.attributeName}`, post,{
             onSuccess() {
                 library.getAttributes();
                 router.push({ name: 'attribute' });
             }
         });
     } else {
-        await api.update(`attributes/${props.attributeName}`, attribute.value.id, attribute.value,{
-            onSuccess () {
+        await api.update(`attributes/${props.attributeName}`, attribute.value.id, post,{
+            onSuccess() {
                 library.getAttributes();
             }
         });
@@ -100,29 +138,40 @@ const deleteRecord = async () => {
             <!-- Modal content -->
             <form class="relative bg-white rounded-lg shadow" @submit.prevent="saveRecord">
                 <!-- Modal header -->
-                <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+                <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
                     <div class="text-xl font-semibold text-gray-900 dark:text-white">
                         <h3 v-if="props.isAddNew">
                             New value
                         </h3>
                         <h3 v-else-if="attribute">
-                            Edit {{ attribute.name }}
+                            Edit {{ data.name }}
                         </h3>
                         <div v-else role="status" class="max-w-sm animate-pulse">
                             <div class="h-2.5 bg-gray-200 rounded-full w-64 mt-3"></div>
                         </div>
                     </div>
+                    <select
+                        v-model="selectedLanguageCode"
+                        class="ml-5 rounded-md border border-gray-300 bg-white bg-opacity-60 py-1.5 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        name="lang">
+                        <option
+                            v-for="translation in settings.general.translation_profiles.value"
+                            :key="translation"
+                            :value="translation.code">
+                          {{ translation.name }}
+                        </option>
+                    </select>
                     <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" @click="closeModal">
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                         <span class="sr-only">Close modal</span>
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div v-if="attribute" class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto">
+                <div v-if="attributeExtended" class="p-6 space-y-6 max-h-[calc(100vh-220px)] overflow-auto">
                     <div class="mb-5">
                         <InputLabel value="Name" />
                         <TextInput
-                            v-model="attribute.name"
+                            v-model="attributeExtended.name[selectedLanguageCode]"
                             type="text"
                             class="mt-1 block w-full"
                             autofocus

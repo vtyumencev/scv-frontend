@@ -78,8 +78,8 @@ const filteredList = computed(() : Video[] => {
                                 <div v-if="filteredList.length" >
                                     <ul>
                                         <li
-                                                v-for="item in filteredList"
-                                                :key="item"
+                                                v-for="(item, index) in filteredList"
+                                                :key="index"
                                                 class="py-3 border-b last:border-0 grid grid-cols-[4fr_3fr_2fr_1fr] gap-4">
                                             <div class="">
                                                 <router-link
@@ -101,7 +101,9 @@ const filteredList = computed(() : Video[] => {
                                                 {{ dateCalc(item.created_at) }}
                                             </div>
                                             <div class="text-gray-500">
-                                                {{ library.getLandscapeById(item.landscape_id)?.name ?? '' }}
+                                                <template v-if="item.landscape_id">
+                                                    {{ library.getLandscapeById(item.landscape_id)?.name ?? '' }}
+                                                </template>
                                             </div>
                                         </li>
                                     </ul>

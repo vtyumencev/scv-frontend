@@ -8,3 +8,8 @@ export const formatDateTime = (rowDateTime: string) => {
         second: "numeric"
     })
 }
+
+export const formatDateForm = (rowDateTime: string) => {
+    const date = new Date(rowDateTime);
+    return `${date.getFullYear()}-${('0' + (date.getMonth()+1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+}

@@ -76,7 +76,7 @@ const seasonalVideos = computed(() => {
 <template>
     <LibraryVideosLayout
         :query="query"
-        :backtrack-route="{ title: 'Startseite', name: 'index' } as RouteLocationRaw"
+        :backtrack-route="{ title: settings.translations.main_page.value, name: 'index' } as RouteLocationRaw"
         @on-data-is-ready="onDataIsReady">
         <template #sidebarContent>
             <h1 class="text-6xl mb-10 font-serif">

@@ -31,11 +31,11 @@ import VideosIndex from "@/pages/backend/VideosIndex.vue";
 import Landscapes from "@/pages/backend/Landscapes.vue";
 import LandscapesIndex from "@/pages/backend/LandscapesIndex.vue";
 import SettingsTranslationsShow from "@/pages/backend/SettingsTranslationsShow.vue";
+import SettingsTranslationsValue from "@/pages/backend/SettingsTranslationsValue.vue";
 import SettingsTranslationsIndex from "@/pages/backend/SettingsTranslationsIndex.vue";
 import SettingsTranslationsNew from "@/pages/backend/SettingsTranslationsNew.vue";
 import SettingsTranslationsSettings from "@/pages/backend/SettingsTranslationsSettings.vue";
-
-
+import AdventCalendar from "@/pages/AdventCalendar.vue";
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
 
@@ -67,6 +67,15 @@ const routes : Array<RouteRecordRaw> = [
         meta: {
             title: 'Impressum',
         },
+    },
+    {
+        path: '/advent/:videoId?',
+        name: 'advent',
+        component: AdventCalendar,
+        meta: {
+            title: 'Advent Calendar',
+        },
+        props: true,
     },
     {
         path: '/library',
@@ -201,6 +210,12 @@ const routes : Array<RouteRecordRaw> = [
                         path: ':lang/show',
                         name: 'settings-translations-show',
                         component: SettingsTranslationsShow,
+                        props: true,
+                    },
+                    {
+                        path: ':lang/value',
+                        name: 'settings-translations-value',
+                        component: SettingsTranslationsValue,
                         props: true,
                     },
                     {

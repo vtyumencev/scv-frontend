@@ -6,12 +6,13 @@ import { useRouter } from 'vue-router'
 import InputLabel from '@/components/InputLabel.vue'
 import TextInput from '@/components/TextInput.vue'
 import PrimaryButton from '@/components/PrimaryButton.vue'
-import Select from '@/components/Select.vue'
+import SelectSimple from '@/components/SelectSimple.vue'
 import { useLibrary } from '@/stores/library';
 import Skeleton from './Skeleton.vue'
 import { useAPI } from "@/composables/fetch";
 import type { Attribute } from "@/types/Attribute";
-import { formatDateTime } from "@/helpers/datetime";
+import {formatDateForm, formatDateTime} from "@/helpers/datetime";
+import SelectDate from "@/components/backend/SelectDate.vue";
 
 const emits = defineEmits(['updateVideos', 'closeModal']);
 const props = defineProps({
@@ -175,7 +176,7 @@ const availablePlaces = computed((): Attribute[] => {
                     </div>
                     <div class="mb-5">
                         <InputLabel value="Genre" />
-                        <Select
+                        <SelectSimple
                             v-model="data.genre_id"
                             class="mt-1 block w-full"
                             null-option="Genre ist nicht ausgewählt"
@@ -183,18 +184,25 @@ const availablePlaces = computed((): Attribute[] => {
                     </div>
                     <div class="mb-5">
                         <InputLabel value="Stil" />
-                        <Select
+                        <SelectSimple
                             v-model="data.style_id"
                             class="mt-1 block w-full"
                             null-option="Stil ist nicht ausgewählt"
                             :items="stageStore.attributes?.styles ?? []" />
+                    </div>
+                    <div class="mb-5">
+                        <InputLabel value="Published at" />
+                        <SelectDate
+                            v-model="data.published_at"
+                            class="mt-1 block w-full"
+                        />
                     </div>
                     <div class="border-t pt-5">
                         <h3 class="text-lg">Stage preferences</h3>
                         <div class="mt-3" :class="{ 'grid grid-cols-2 gap-5' : showPlaceSelector }">
                             <div class="">
                                 <InputLabel value="Landscape" />
-                                <Select
+                                <SelectSimple
                                     v-model="data.landscape_id"
                                     class="mt-1 block w-full"
                                     null-option="Landscape ist nicht ausgewählt"
@@ -202,7 +210,7 @@ const availablePlaces = computed((): Attribute[] => {
                             </div>
                             <div v-if="showPlaceSelector" class="">
                                 <InputLabel value="Veranstaltungsort" />
-                                <Select
+                                <SelectSimple
                                     v-model="data.place_id"
                                     class="mt-1 block w-full"
                                     null-option="Veranstaltungsort ist nicht ausgewählt"
