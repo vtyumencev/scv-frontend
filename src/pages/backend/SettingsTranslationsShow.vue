@@ -33,7 +33,7 @@ const languageProfile = computed(() => {
     <div class="">
         <h2 class="mb-5 text-xl">Translations of the “<code class="font-mono bg-gray-100 px-1">{{ props.lang }}</code>: {{ languageProfile?.name }}” profile</h2>
         <div v-if="isReady">
-            <div v-for="block in Object.entries(settings.preset_translations)" :key="block[0]">
+            <div v-for="block in Object.entries(settings.translations)" :key="block[0]">
                 <router-link
                     :to="{ name: 'settings-translations-value', query: { key: block[0] } }"
                     class="mb-4 grid grid-cols-[4fr_9fr_1fr] gap-5 hover:bg-gray-100 transition py-2 px-4 -mx-4 rounded-md group cursor-pointer">

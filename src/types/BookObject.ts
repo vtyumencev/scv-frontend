@@ -17,5 +17,6 @@ export interface BookObject {
         bottom: number,
         width: number,
         asset_component: string,
-    } | null
+    } | null,
+    display_condition?: () => boolean
 }

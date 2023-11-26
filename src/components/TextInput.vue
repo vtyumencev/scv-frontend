@@ -8,12 +8,12 @@ defineProps({
     }
 });
 
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['update:modelValue']);
 
-const input = ref<HTMLTextAreaElement | null>(null)
+const input = ref<HTMLTextAreaElement | null>(null);
 
 const onUpdated = (event : Event) => {
-    emits('update:modelValue', (<HTMLTextAreaElement>event.target).value)
+    emits('update:modelValue', (<HTMLTextAreaElement>event.target).value);
 }
 
 onMounted(() => {

@@ -24,6 +24,9 @@ export const useSettings = defineStore('settings', () => {
             current_season: {
                 value: ref('')
             },
+            is_advent_time: {
+                value: ref(false)
+            },
             translation_profiles: {
                 type: 'list',
                 default: '',

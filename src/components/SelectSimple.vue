@@ -1,33 +1,13 @@
 <script setup lang="ts">
 
-import type { PropType } from "vue";
-
 defineProps<{
     items: {
         id: number|string,
         name: string,
     }[],
     nullOption?: string,
-    modelValue?: string|number|null
+    modelValue: string|number|null
 }>();
-
-// defineProps({
-//     items: {
-//         type: Array as PropType<Array<{
-//             id: number,
-//             name: string,
-//         }>>,
-//         default: null
-//     },
-//     nullOption: {
-//         type: String,
-//         default: null
-//     },
-//     modelValue: {
-//         type: [ String, Number ],
-//         default: null,
-//     }
-// })
 
 const emit = defineEmits(['update:modelValue'])
 

@@ -10,12 +10,26 @@ import StageNavigation from "@/components/frontend/StageNavigation.vue";
 import {useLibrary} from "@/stores/library";
 import type {Landscape} from "@/types/Landscape";
 
+interface AdventDay {
+    id: number,
+    pos: number,
+    video: null|Video,
+    notesStreamPos: number,
+    picture: {
+        top: number,
+        left: number,
+        width: number,
+    },
+    active?: boolean
+}
+
 const dataIsReady = ref(false);
 
 const router = useRouter();
 const libraryStore = useLibrary();
 const isMobile = ref(false);
 const adventDays = ref();
+let adventVideos: Video[] = [];
 
 const props = defineProps<{
     videoId?: string
@@ -31,7 +45,25 @@ const videoController = reactive({
 } as VideoController);
 
 const navigatePrev = () => {
+    const currentVideoIndex = adventVideos.findIndex(video => video.id === currentVideo.value?.id);
+    if (currentVideoIndex === 0) {
+        navigateToVideo(adventVideos[adventVideos.length - 1]);
+    } else {
+        navigateToVideo(adventVideos[currentVideoIndex - 1]);
+    }
+}
 
+const navigateNext = () => {
+    const currentVideoIndex = adventVideos.findIndex(video => video.id === currentVideo.value?.id);
+    if (currentVideoIndex === adventVideos.length - 1) {
+        navigateToVideo(adventVideos[0]);
+    } else {
+        navigateToVideo(adventVideos[currentVideoIndex + 1]);
+    }
+}
+
+const navigateToVideo = async (video: Video) => {
+    await router.push({ params: { videoId: video.id } });
 }
 
 const currentVideo = computed(() : Video | null => {
@@ -47,11 +79,7 @@ const currentLandscape = computed(() : Landscape => {
 });
 
 const backAction = () => {
-
-}
-
-const navigateNext = () => {
-
+    router.push({ name: 'advent' });
 }
 
 const toggleMobile = (value: boolean) => {
@@ -76,6 +104,7 @@ const adventDates = [
     {
         id: 21,
         pos: 6,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 43.1,
@@ -87,6 +116,7 @@ const adventDates = [
         id: 22,
         pos: 7,
         video: null as null|Video,
+        notesStreamPos: 80,
         picture: {
             top: 43.1,
             left: 69.8,
@@ -136,6 +166,7 @@ const adventDates = [
     {
         id: 16,
         pos: 3,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 52.1,
@@ -146,6 +177,7 @@ const adventDates = [
     {
         id: 17,
         pos: 4,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 51.6,
@@ -156,6 +188,7 @@ const adventDates = [
     {
         id: 18,
         pos: 5,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 51.3,
@@ -167,6 +200,7 @@ const adventDates = [
         id: 19,
         pos: 6,
         video: null as null|Video,
+        notesStreamPos: 80,
         picture: {
             top: 51.9,
             left: 74.1,
@@ -196,6 +230,7 @@ const adventDates = [
     {
         id: 1,
         pos: 7,
+        notesStreamPos: 10,
         video: null as null|Video,
         picture: {
             top: 59,
@@ -236,6 +271,7 @@ const adventDates = [
     {
         id: 7,
         pos: 2,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 61.5,
@@ -245,6 +281,7 @@ const adventDates = [
     },
     {
         id: 8,
+        notesStreamPos: 80,
         video: null as null|Video,
         pos: 3,
         picture: {
@@ -256,6 +293,7 @@ const adventDates = [
     {
         id: 9,
         pos: 4,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 61.6,
@@ -266,6 +304,7 @@ const adventDates = [
     {
         id: 10,
         pos: 5,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 61.6,
@@ -276,6 +315,7 @@ const adventDates = [
     {
         id: 11,
         pos: 6,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 58.6,
@@ -286,6 +326,7 @@ const adventDates = [
     {
         id: 12,
         pos: 7,
+        notesStreamPos: 80,
         video: null as null|Video,
         picture: {
             top: 58.7,
@@ -296,6 +337,7 @@ const adventDates = [
     {
         id: 23,
         pos: 1,
+        notesStreamPos: 40,
         video: null as null|Video,
         picture: {
             top: 67.4,
@@ -303,16 +345,17 @@ const adventDates = [
             width: 11.1,
         }
     },
-];
+] as AdventDay[];
 
 const onFrontendDataIsReady = async () => {
-    const currentDate = new Date();
+    //const currentDate = new Date();
+    const currentDate = new Date('12/12/2023');
 
-    currentLandscape.value.videos_filter().sort(function(a, b){
+    adventVideos = currentLandscape.value.videos_filter().sort(function(a, b){
         return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
     });
 
-    for (const video of currentLandscape.value.videos_filter()) {
+    for (const video of adventVideos) {
         const videoDate = new Date(video.published_at);
 
         if (videoDate > currentDate) {
@@ -327,10 +370,15 @@ const onFrontendDataIsReady = async () => {
             if (adventDate.id === videoDate.getDate()) {
                 adventDate.video = video;
 
-                if (adventDate.id === 1) {
+                if (
+                    videoDate.getFullYear() === currentDate.getFullYear() &&
+                    videoDate.getMonth() === currentDate.getMonth() &&
+                    videoDate.getDate() === currentDate.getDate()
+                ) {
                     adventDate.active = true;
                 }
             }
+            //adventDate.active = true;
         }
 
     }
@@ -356,43 +404,64 @@ const onFrontendDataIsReady = async () => {
         @on-data-is-ready="onFrontendDataIsReady"
         @toggle-mobile="toggleMobile">
         <div class="h-full w-full absolute">
-            <img class="h-full w-full absolute" src="/public/advent/background.png" alt="">
-            <img class="top-[54%] left-[5%] w-[90%] absolute" src="/public/advent/Podest.png" alt="">
-            <img class="top-[0] left-[38%] w-[24%] absolute" src="/public/advent/Orgel.png" alt="">
+            <img class="h-full w-full absolute" src="/advent/background.png" alt="">
+            <img
+                class="top-[2%] left-[1%] w-[98%] absolute"
+                data-depth
+                data-depth-strength-x="0.15"
+                data-depth-strength-y="0.0"
+                src="/advent/misc/decoration.png"
+                alt="">
+            <img
+                class="top-[2%] left-[1%] w-[98%] absolute"
+                data-depth
+                data-depth-strength-x="0.05"
+                data-depth-strength-y="0.0"
+                src="/advent/misc/arch.png"
+                alt="">
+            <img class="top-[54%] left-[5%] w-[90%] absolute" src="/advent/Podest.png" alt="">
+            <img class="top-[0] left-[38%] w-[24%] absolute" src="/advent/Orgel.png" alt="">
         </div>
-        <div v-if="dataIsReady" ref="adventDays" class="advent-days">
+        <div v-if="dataIsReady" ref="adventDays" class="advent-days" :style="{ fontSize: 'var(--font-size-base)' }">
             <div
                 v-for="(day, index) in adventDates"
                 :key="index"
                 :data-id="day.id"
                 :class="{'active': day.active ?? false}"
-                class="day"
+                class="day absolute opacity-0 flex justify-center"
                 :style="{
                     '--pos': day.pos ?? 0,
                     top: day.picture.top + '%',
                     left: day.picture.left + '%',
                     width: day.picture.width + '%',
                     }">
-                <div class="date">
-                    <div class="">
-                        {{ day.id }}. Dec
+                <div class="date absolute top-[-13%] text-[2em]">
+                    <div class="bg"></div>
+                    <div class="relative">
+                        {{ day.id }}. Dez.
                     </div>
                 </div>
-                <div v-if="day.active ?? false" class="notes-stream">
-                    <img src="/public/advent/music-note-1.svg" alt="">
-                    <img src="/public/advent/music-note-2.svg" alt="">
-                    <img src="/public/advent/music-note-1.svg" alt="">
-                    <img src="/public/advent/music-note-2.svg" alt="">
-                    <img src="/public/advent/music-note-1.svg" alt="">
+                <div v-if="day.active ?? false" class="notes-stream" :style="{ left: (day.notesStreamPos ?? 10) + '%' }">
+                    <img src="/advent/music-note-1.svg" alt="">
+                    <img src="/advent/music-note-2.svg" alt="">
+                    <img src="/advent/music-note-1.svg" alt="">
+                    <img src="/advent/music-note-2.svg" alt="">
+                    <img src="/advent/music-note-1.svg" alt="">
                 </div>
                 <template v-if="day.video">
-                    <img class="pic" :src="'/public/advent/angels/' + (day.id) + '.png'" alt="" />
+                    <div v-if="day.active ?? false" class="relative">
+                        <img class="reveal-pic-cd" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
+                        <div class="reveal-pic-ph overflow-hidden absolute top-0 left-0 right-0 bottom-0 h-[100%] rounded-[0_20%_20%_0]">
+                            <img class="reveal-pic-bw absolute top-0 left-0 right-auto w-full h-auto max-w-none" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+                        </div>
+                    </div>
+                    <img v-else class="pic" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
                     <router-link
                         class="link"
                         :to="{ params: { videoId: day.video.id } }">
                     </router-link>
                 </template>
-                <img v-else class="pic" :src="'/public/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+                <img v-else class="pic" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
             </div>
             
             <div class="absolute top-[65%] left-[20%]">
@@ -433,37 +502,29 @@ const onFrontendDataIsReady = async () => {
 
 <style scoped lang="postcss">
     .day {
-        @apply absolute opacity-0 flex justify-center;
         transform: translateY(10px) scale(0.9);
         transform-origin: bottom;
         transition: 0.8s calc(var(--pos) * 0.07s) cubic-bezier(0.65, 0.05, 0.36, 1);
-        //transform: perspective(1000px) rotateX(90deg);
-        //opacity: 0;
     }
     .date {
-        font-size: 14px;
-        @apply absolute top-[-13%];
-        &:before {
-            content: "";
+        pointer-events: none;
+        transition: 0.2s;
+        .bg {
             position: absolute;
             z-index: 0;
             top: -15%;
             bottom: -15%;
             right: -35%;
             left: -35%;
-            //background: rgba(255, 232, 117, 1);
             background: linear-gradient(45deg, hsl(54.8, 100%, 77.3%) 0%, hsl(33, 89%, 68%) 100%);
             border-radius: 12px 17px/5px 20px;
-            //border: 2px solid rgba(255, 232, 117, 1);
             transform: skewX(0deg) skewY(-2deg);
             box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, 0.08);
         }
-        div {
-            position: relative;
-        }
     }
-    .day:not(.active) .date {
+    .day:not(.active):not(:hover) .date {
         opacity: 0;
+        transform: translateY(5%);
     }
     .shown .day {
         @apply absolute opacity-100 transform-none;
@@ -472,16 +533,23 @@ const onFrontendDataIsReady = async () => {
         @apply absolute top-0 left-0 w-full h-full;
     }
     .day .pic {
+        pointer-events: none;
         width: 100%;
     }
-    .day.active .pic {
-        animation: glowing 3s infinite;
+
+    .reveal-pic-ph {
+        transition: 0.6s 1.2s cubic-bezier(0.65, 0.05, 0.36, 1);
+    }
+    .shown .reveal-pic-ph {
+        height: 0;
+    }
+    .shown .reveal-pic-cd {
+        animation: glowing 3s 1.6s infinite;
     }
 
     .notes-stream {
         --stream-speed: 4;
         position: absolute;
-        left: 10%;
         top: 8%;
         width: 10%;
         height: 10%;

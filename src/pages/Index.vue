@@ -27,6 +27,54 @@ const hintsEnabled = ref(false);
 
 const links = [
     {
+        name: toRef(() => settings.translations.library_title.value),
+        is_in_book: false,
+        route: { name: 'library-index' },
+        order: 1,
+        front_object: {
+            left: -1,
+            bottom: 17,
+            width: 14,
+            asset_url: '/images/homepage/Mediathek.png',
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/mediathek.svg')),
+        },
+        map_mask: null
+    },
+    {
+        name: 'Arch',
+        is_in_book: false,
+        route: null,
+        order: 1,
+        front_object: {
+            left: 0.1,
+            bottom: 9.5,
+            width: 90,
+            asset_url: '/advent/misc/arch.png',
+            asset_mask_component: null,
+        },
+        map_mask: null,
+        display_condition: () => {
+            return settings.general.is_advent_time.value;
+        }
+    },
+    {
+        name: 'Adventskalender',
+        is_in_book: false,
+        route: { name: 'advent' },
+        order: 1,
+        front_object: {
+            left: 36.6,
+            bottom: 72.5,
+            width: 19,
+            asset_url: '/advent/misc/star.png',
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/west.svg')),
+        },
+        map_mask: null,
+        display_condition: () => {
+            return settings.general.is_advent_time.value;
+        }
+    },
+    {
         name: null,
         is_in_book: false,
         route: null,
@@ -183,24 +231,10 @@ const links = [
         }
     },
     {
-        name: toRef(() => settings.translations.library_title.value),
-        is_in_book: false,
-        route: { name: 'library-index' },
-        order: 1,
-        front_object: {
-            left: -1,
-            bottom: 17,
-            width: 14,
-            asset_url: '/images/homepage/Mediathek.png',
-            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/mediathek.svg')),
-        },
-        map_mask: null
-    },
-    {
         name: toRef(() => settings.translations.proberaum.value),
         is_in_book: false,
         route: null,
-        order: 10,
+        order: 11,
         front_object: {
             left: 79,
             bottom: 8,
@@ -209,6 +243,23 @@ const links = [
             asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/proberaum.svg')),
         },
         map_mask: null
+    },
+    {
+        name: '',
+        is_in_book: false,
+        route: { name: 'advent' },
+        order: 12,
+        front_object: {
+            left: 91,
+            bottom: 12,
+            width: 7,
+            asset_url: '/advent/misc/Schleife.png',
+            asset_mask_component: null,
+        },
+        map_mask: null,
+        display_condition: () => {
+            return settings.general.is_advent_time.value;
+        }
     },
 ] as Array<BookObject>;
 
@@ -520,54 +571,56 @@ const mapMaskRendered = (e: VNode) => {
                                 bottom: object.front_object.bottom + '%',
                                 width: object.front_object.width + '%'
                             }">
-                        <div
-                            class="
-                                transition
-                                group-[.object-interact--active-idle]:-translate-y-1
-                                group-[.object-interact--active]:-translate-y-1
-                                group-[.book-objects--idle]:duration-[2000ms]">
-                            <img
-                                class="w-full"
-                                :class="{ 'book-inner-object': object.is_in_book }"
-                                :src="object.front_object.asset_url"
-                                alt="">
-                        </div>
-                        <div
-                            class="
-                                object-hint
-                                absolute
-                                top-[-70px]
-                                lg:top-[-80px]
-                                w-full
-                                flex
-                                justify-center
-                                opacity-0
-                                group-[.object-interact--active-idle]:opacity-100
-                                group-[.object-interact--active]:opacity-100
-                                transition
-                                group-[.book-objects--idle]:duration-[2000ms]">
-                            <div class="flex flex-col items-center">
-                                <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ unref(object.name) }}</span>
-                                <img class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg" alt="">
+                        <template v-if="object.display_condition ? object.display_condition() : true">
+                            <div
+                                class="
+                                    transition
+                                    group-[.object-interact--active-idle]:-translate-y-1
+                                    group-[.object-interact--active]:-translate-y-1
+                                    group-[.book-objects--idle]:duration-[2000ms]">
+                                <img
+                                    class="w-full"
+                                    :class="{ 'book-inner-object': object.is_in_book }"
+                                    :src="object.front_object.asset_url"
+                                    alt="">
                             </div>
-                        </div>
-                        <component
-                                :is="object.front_object.asset_mask_component"
-                                v-if="object.front_object.asset_mask_component"
-                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"
-                                @vue:mounted="frontObjectMaskRendered($event)" />
-<!--                        <SvgLoader-->
-<!--                                v-if="object.front_object.asset_mask_component"-->
-<!--                                :name="object.front_object.asset_mask_component"-->
-<!--                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"-->
-<!--                                @on-rendered="frontObjectMaskRendered" />-->
+                            <div
+                                class="
+                                    object-hint
+                                    absolute
+                                    top-[-70px]
+                                    lg:top-[-80px]
+                                    w-full
+                                    flex
+                                    justify-center
+                                    opacity-0
+                                    group-[.object-interact--active-idle]:opacity-100
+                                    group-[.object-interact--active]:opacity-100
+                                    transition
+                                    group-[.book-objects--idle]:duration-[2000ms]">
+                                <div class="flex flex-col items-center">
+                                    <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ unref(object.name) }}</span>
+                                    <img class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg" alt="">
+                                </div>
+                            </div>
+                            <component
+                                    :is="object.front_object.asset_mask_component"
+                                    v-if="object.front_object.asset_mask_component"
+                                    class="object-mask absolute top-0 opacity-0 pointer-events-auto"
+                                    @vue:mounted="frontObjectMaskRendered($event)" />
+    <!--                        <SvgLoader-->
+    <!--                                v-if="object.front_object.asset_mask_component"-->
+    <!--                                :name="object.front_object.asset_mask_component"-->
+    <!--                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"-->
+    <!--                                @on-rendered="frontObjectMaskRendered" />-->
+                        </template>
                     </div>
 
                     <template
                         v-for="(object, key) in links">
                         <component
                                 :is="object.map_mask.asset_component"
-                                v-if="object.map_mask"
+                                v-if="object.map_mask && (object.display_condition ? object.display_condition() : true)"
                                 :key="object"
                                 class="absolute map-mask opacity-0 transition"
                                 :data-map-mask="key"
