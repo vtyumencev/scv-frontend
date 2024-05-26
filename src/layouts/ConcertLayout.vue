@@ -112,7 +112,7 @@ const concertSize = () : void => {
         <div class="h-screen">
             <div id="concert-container" class="concert-container mx-auto h-full overflow-hidden">
                 <div class="concert-container__wrapper concert-wrapper h-full flex justify-center items-center">
-                    <div class="concert relative w-full">
+                    <div class="concert relative w-full overflow-hidden">
                         <div class="pointer-events-none">
                             <Transition>
                             <img
@@ -136,10 +136,10 @@ const concertSize = () : void => {
                             <ApplicationLogo class="mt-5 ml-5" />
                         </div>
                         <div class="absolute right-0 top-0">
-                            <LanguageSelector
-                                class="mt-5 mr-5 border-[rgba(0,0,0,0.1)] bg-[rgba(255,255,255,0.8)] text-[14px]"
-                                :icon="true"
-                                :styled="true" />
+<!--                            <LanguageSelector-->
+<!--                                class="mt-5 mr-5 border-[rgba(0,0,0,0.1)] bg-[rgba(255,255,255,0.8)] text-[14px]"-->
+<!--                                :icon="true"-->
+<!--                                :styled="true" />-->
                         </div>
                         <div class="absolute bottom-0 flex justify-between text-white text-xs px-3 py-1 font-serif">
                             <div class="grid grid-flow-col gap-2">

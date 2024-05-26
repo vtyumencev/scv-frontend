@@ -1,22 +1,24 @@
 import type {RouteLocationRaw} from "vue-router";
+import type {Component, Ref} from "vue";
 
 export interface BookObject {
-    name: string | null,
-    is_in_book: boolean,
-    route: RouteLocationRaw | null,
+    name: string | null|Ref,
+    is_in_book?: boolean,
+    route?: RouteLocationRaw,
     order: number,
+    z_index: number,
     front_object: {
         left: number,
         bottom: number,
         width: number,
         asset_url: string,
-        asset_mask_component: string | null
+        asset_mask_component?: string | Component
     },
-    map_mask: {
+    map_mask?: {
         left: number,
         bottom: number,
         width: number,
         asset_component: string,
-    } | null,
-    display_condition?: () => boolean
+    },
+    is_label_centered?: boolean
 }

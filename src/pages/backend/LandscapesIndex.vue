@@ -7,6 +7,8 @@ import { useSortable } from "@vueuse/integrations/useSortable";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useAPI } from "@/composables/fetch";
 import Skeleton from "@/components/backend/Skeleton.vue";
+import {formatDate} from "../../helpers/datetime";
+import {LANDSCAPES} from "@/enums/landscapes";
 
 const route = useRoute();
 const library = useLibrary();
@@ -17,11 +19,11 @@ const el = ref<HTMLElement | null>(null);
 const processing = ref(false);
 
 const currentLandscape = computed(() => {
-    return route.params.landscapeName as LandscapeNames
+    return route.params.landscapeName as LandscapeNames;
 });
 
 const list = computed(() => {
-    return  library.presets[currentLandscape.value]?.videos_filter() ?? [];
+    return library.presets[currentLandscape.value]?.videos_filter() ?? [];
 });
 
 useSortable(el, list, {
@@ -102,22 +104,27 @@ const saveList = () => {
                                     <div class="text-xl">Reihenfolge der Einträge</div>
                                     <div ref="el" class="mt-5">
                                         <div
-                                                v-for="(item, index) in list"
-                                                :key="index"
+                                                v-for="item in list"
+                                                :key="item.id"
                                                 class="bg-white px-3 -mx-3 py-2 flex items-center rounded">
                                             <div class="handle pr-5 cursor-move">
                                                 <div class="w-[13px] h-[2px] bg-gray-500 my-[2px] rounded"></div>
                                                 <div class="w-[13px] h-[2px] bg-gray-500 my-[2px] rounded"></div>
                                                 <div class="w-[13px] h-[2px] bg-gray-500 my-[2px] rounded"></div>
                                             </div>
-                                            <div class="">
-                                                <router-link
-                                                        v-if="item.choir_id"
-                                                        :to="{ name: 'choirs-edit-videos-edit', params: { id: item.choir_id, videoID: item.id }}"
-                                                        class="text-indigo-500">
-                                                    {{ item.title }}
-                                                </router-link>
-                                                <div class="text-sm uppercase">{{ item.choir_name }}</div>
+                                            <div class="flex w-full">
+                                                <div class="w-full flex-grow ">
+                                                    <router-link
+                                                            v-if="item.choir_id"
+                                                            :to="{ name: 'choirs-edit-videos-edit', params: { id: item.choir_id, videoID: item.id }}"
+                                                            class="text-indigo-500">
+                                                        {{ item.title }}
+                                                    </router-link>
+                                                    <div class="text-sm uppercase">{{ item.choir_name }}</div>
+                                                </div>
+                                                <div class="whitespace-nowrap">
+                                                    <div v-if="item.landscape_id ? library.getLandscapeById(item.landscape_id)?.slug === LANDSCAPES.ADVENT : false" class="">{{ formatDate(item.published_at) }}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

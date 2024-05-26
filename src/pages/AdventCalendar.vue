@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ConcertLayout from "@/layouts/ConcertLayout.vue";
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, reactive, ref} from "vue";
 import HighlightedRays from "@/components/frontend/HighlightedRays.vue";
 import StageVideoPlayer from "@/components/frontend/StageVideoPlayer.vue";
 import type {VideoController} from "@/types/VideoController";
@@ -13,6 +13,7 @@ import type {Landscape} from "@/types/Landscape";
 interface AdventDay {
     id: number,
     pos: number,
+    dayIndex: number,
     video: null|Video,
     notesStreamPos: number,
     picture: {
@@ -20,7 +21,7 @@ interface AdventDay {
         left: number,
         width: number,
     },
-    active?: boolean
+    active?: boolean,
 }
 
 const dataIsReady = ref(false);
@@ -29,6 +30,7 @@ const router = useRouter();
 const libraryStore = useLibrary();
 const isMobile = ref(false);
 const adventDays = ref();
+const navigationComponent = ref();
 let adventVideos: Video[] = [];
 
 const props = defineProps<{
@@ -93,6 +95,7 @@ const closeVideo = () => {
 const adventDates = [
     {
         id: 20,
+        dayIndex: 13,
         pos: 6,
         video: null as null|Video,
         picture: {
@@ -103,6 +106,7 @@ const adventDates = [
     },
     {
         id: 21,
+        dayIndex: 10,
         pos: 6,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -114,6 +118,7 @@ const adventDates = [
     },
     {
         id: 22,
+        dayIndex: 4,
         pos: 7,
         video: null as null|Video,
         notesStreamPos: 80,
@@ -124,7 +129,8 @@ const adventDates = [
         }
     },
     {
-        id: 24,
+        id: 23,
+        dayIndex: 24,
         pos: 5,
         video: null as null|Video,
         picture: {
@@ -135,6 +141,7 @@ const adventDates = [
     },
     {
         id: 13,
+        dayIndex: 7,
         pos: 6,
         video: null as null|Video,
         picture: {
@@ -145,6 +152,7 @@ const adventDates = [
     },
     {
         id: 14,
+        dayIndex: 1,
         pos: 5,
         video: null as null|Video,
         picture: {
@@ -155,6 +163,7 @@ const adventDates = [
     },
     {
         id: 15,
+        dayIndex: 5,
         pos: 4,
         video: null as null|Video,
         picture: {
@@ -165,6 +174,7 @@ const adventDates = [
     },
     {
         id: 16,
+        dayIndex: 17,
         pos: 3,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -176,6 +186,7 @@ const adventDates = [
     },
     {
         id: 17,
+        dayIndex: 20,
         pos: 4,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -187,6 +198,7 @@ const adventDates = [
     },
     {
         id: 18,
+        dayIndex: 22,
         pos: 5,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -198,6 +210,7 @@ const adventDates = [
     },
     {
         id: 19,
+        dayIndex: 18,
         pos: 6,
         video: null as null|Video,
         notesStreamPos: 80,
@@ -209,6 +222,7 @@ const adventDates = [
     },
     {
         id: 3,
+        dayIndex: 3,
         pos: 5,
         video: null as null|Video,
         picture: {
@@ -219,6 +233,7 @@ const adventDates = [
     },
     {
         id: 2,
+        dayIndex: 11,
         pos: 6,
         video: null as null|Video,
         picture: {
@@ -229,6 +244,7 @@ const adventDates = [
     },
     {
         id: 1,
+        dayIndex: 15,
         pos: 7,
         notesStreamPos: 10,
         video: null as null|Video,
@@ -240,6 +256,7 @@ const adventDates = [
     },
     {
         id: 4,
+        dayIndex: 19,
         video: null as null|Video,
         pos: 4,
         picture: {
@@ -250,6 +267,7 @@ const adventDates = [
     },
     {
         id: 5,
+        dayIndex: 9,
         pos: 3,
         video: null as null|Video,
         picture: {
@@ -260,6 +278,7 @@ const adventDates = [
     },
     {
         id: 6,
+        dayIndex: 21,
         pos: 2,
         video: null as null|Video,
         picture: {
@@ -270,6 +289,7 @@ const adventDates = [
     },
     {
         id: 7,
+        dayIndex: 16,
         pos: 2,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -281,6 +301,7 @@ const adventDates = [
     },
     {
         id: 8,
+        dayIndex: 2,
         notesStreamPos: 80,
         video: null as null|Video,
         pos: 3,
@@ -292,6 +313,7 @@ const adventDates = [
     },
     {
         id: 9,
+        dayIndex: 8,
         pos: 4,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -303,6 +325,7 @@ const adventDates = [
     },
     {
         id: 10,
+        dayIndex: 14,
         pos: 5,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -314,6 +337,7 @@ const adventDates = [
     },
     {
         id: 11,
+        dayIndex: 12,
         pos: 6,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -325,6 +349,7 @@ const adventDates = [
     },
     {
         id: 12,
+        dayIndex: 23,
         pos: 7,
         notesStreamPos: 80,
         video: null as null|Video,
@@ -335,7 +360,8 @@ const adventDates = [
         }
     },
     {
-        id: 23,
+        id: 24,
+        dayIndex: 6,
         pos: 1,
         notesStreamPos: 40,
         video: null as null|Video,
@@ -348,26 +374,28 @@ const adventDates = [
 ] as AdventDay[];
 
 const onFrontendDataIsReady = async () => {
-    //const currentDate = new Date();
-    const currentDate = new Date('12/12/2023');
+    const currentDate = new Date();
 
-    adventVideos = currentLandscape.value.videos_filter().sort(function(a, b){
-        return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
-    });
+    adventVideos = currentLandscape.value.videos_filter()
+        .filter((video) => {
+            const videoDate = new Date(video.published_at);
+
+            if (
+                videoDate.getMonth() === 11 &&
+                videoDate <= currentDate
+            ) {
+                return video;
+            }
+        })
+        .sort(function(a, b) {
+            return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
+        });
 
     for (const video of adventVideos) {
         const videoDate = new Date(video.published_at);
 
-        if (videoDate > currentDate) {
-            continue;
-        }
-
-        if (videoDate.getMonth() !== 11) {
-            continue;
-        }
-
         for (const adventDate of adventDates) {
-            if (adventDate.id === videoDate.getDate()) {
+            if (adventDate.dayIndex === videoDate.getDate()) {
                 adventDate.video = video;
 
                 if (
@@ -382,14 +410,11 @@ const onFrontendDataIsReady = async () => {
         }
 
     }
-    //console.log(adventDates)
-    //console.log(`${videoDate.getFullYear()}-${videoDate.getMonth() + 1}-${videoDate.getDate()}`)
     dataIsReady.value = true;
 
+    navigationComponent.value?.onDataIsReady();
 
     setTimeout(() => {
-        // adventDays.value.querySelectorAll('.day').forEach((dayEl: HTMLDivElement) => {
-        // });
         adventDays.value.classList.add('shown');
     }, 0);
 }
@@ -403,75 +428,98 @@ const onFrontendDataIsReady = async () => {
         :is-dark="false"
         @on-data-is-ready="onFrontendDataIsReady"
         @toggle-mobile="toggleMobile">
-        <div class="h-full w-full absolute">
-            <img class="h-full w-full absolute" src="/advent/background.png" alt="">
-            <img
-                class="top-[2%] left-[1%] w-[98%] absolute"
-                data-depth
-                data-depth-strength-x="0.15"
-                data-depth-strength-y="0.0"
-                src="/advent/misc/decoration.png"
-                alt="">
-            <img
-                class="top-[2%] left-[1%] w-[98%] absolute"
-                data-depth
-                data-depth-strength-x="0.05"
-                data-depth-strength-y="0.0"
-                src="/advent/misc/arch.png"
-                alt="">
-            <img class="top-[54%] left-[5%] w-[90%] absolute" src="/advent/Podest.png" alt="">
-            <img class="top-[0] left-[38%] w-[24%] absolute" src="/advent/Orgel.png" alt="">
-        </div>
-        <div v-if="dataIsReady" ref="adventDays" class="advent-days" :style="{ fontSize: 'var(--font-size-base)' }">
-            <div
-                v-for="(day, index) in adventDates"
-                :key="index"
-                :data-id="day.id"
-                :class="{'active': day.active ?? false}"
-                class="day absolute opacity-0 flex justify-center"
-                :style="{
-                    '--pos': day.pos ?? 0,
-                    top: day.picture.top + '%',
-                    left: day.picture.left + '%',
-                    width: day.picture.width + '%',
-                    }">
-                <div class="date absolute top-[-13%] text-[2em]">
-                    <div class="bg"></div>
-                    <div class="relative">
-                        {{ day.id }}. Dez.
-                    </div>
-                </div>
-                <div v-if="day.active ?? false" class="notes-stream" :style="{ left: (day.notesStreamPos ?? 10) + '%' }">
-                    <img src="/advent/music-note-1.svg" alt="">
-                    <img src="/advent/music-note-2.svg" alt="">
-                    <img src="/advent/music-note-1.svg" alt="">
-                    <img src="/advent/music-note-2.svg" alt="">
-                    <img src="/advent/music-note-1.svg" alt="">
-                </div>
-                <template v-if="day.video">
-                    <div v-if="day.active ?? false" class="relative">
-                        <img class="reveal-pic-cd" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
-                        <div class="reveal-pic-ph overflow-hidden absolute top-0 left-0 right-0 bottom-0 h-[100%] rounded-[0_20%_20%_0]">
-                            <img class="reveal-pic-bw absolute top-0 left-0 right-auto w-full h-auto max-w-none" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+        <div :style="{ fontSize: 'var(--font-size-base)' }">
+            <div class="h-full w-full absolute">
+                <img class="h-full w-full absolute" src="/advent/background.png" alt="">
+                <div class="top-[1%] left-[2%] w-[28%] absolute">
+                    <img class="h-full w-full" src="/advent/star.png" alt="">
+                    <div class="absolute flex items-center justify-center w-full h-full top-0 left-0">
+                        <div class="relative text-[1.8em]">
+                            <div
+                                class="
+                                left-[-15%]
+                                right-[-15%]
+                                top-[-5%]
+                                bottom-[-5%]
+                                absolute
+                                bg-[linear-gradient(45deg,_hsl(54.8,100%,77.3%)_0%,_hsl(33,_89%,_68%)_100%)]
+                                rounded-[12px_17px/5px_20px]
+                                transform-[skewX(0deg)_skewY(-2deg)]
+                                shadow-[3px_3px_5px_0_rgba(0,0,0,0.08)]">
+                            </div>
+                            <div class="relative">Zur Chorwelt</div>
                         </div>
                     </div>
-                    <img v-else class="pic" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
-                    <router-link
-                        class="link"
-                        :to="{ params: { videoId: day.video.id } }">
-                    </router-link>
-                </template>
-                <img v-else class="pic" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+                    <RouterLink class="w-full h-full absolute top-0 left-0" :to="{ name: 'index' }"/>
+                </div>
+                <img
+                    class="top-[2%] left-[1%] w-[98%] absolute pointer-events-none"
+                    data-depth
+                    data-depth-strength-x="0.15"
+                    data-depth-strength-y="0.0"
+                    src="/advent/decoration.png"
+                    alt="">
+                <img
+                    class="top-[2%] left-[1%] w-[98%] absolute pointer-events-none"
+                    data-depth
+                    data-depth-strength-x="0.05"
+                    data-depth-strength-y="0.0"
+                    src="/advent/arch.png"
+                    alt="">
+                <img class="top-[54%] left-[5%] w-[90%] absolute" src="/advent/Podest.png" alt="">
+                <img class="top-[0] left-[38.6%] w-[23%] absolute" src="/advent/orgel-new.png" alt="">
             </div>
-            
-            <div class="absolute top-[65%] left-[20%]">
-                <HighlightedRays />
+            <div v-if="dataIsReady" ref="adventDays" class="advent-days">
+                <div
+                    v-for="(day, index) in adventDates"
+                    :key="index"
+                    :data-id="day.id"
+                    :class="{'active': day.active ?? false}"
+                    class="day absolute opacity-0 flex justify-center"
+                    :style="{
+                        '--pos': day.pos ?? 0,
+                        top: day.picture.top + '%',
+                        left: day.picture.left + '%',
+                        width: day.picture.width + '%',
+                        }">
+                    <div class="date absolute top-[-13%] text-[1.5em]">
+                        <div class="bg"></div>
+                        <div class="relative">
+                            {{ day.dayIndex }}. Dez.
+                        </div>
+                    </div>
+                    <div v-if="day.active ?? false" class="notes-stream" :style="{ left: (day.notesStreamPos ?? 10) + '%' }">
+                        <img src="/advent/music-note-1.svg" alt="">
+                        <img src="/advent/music-note-2.svg" alt="">
+                        <img src="/advent/music-note-1.svg" alt="">
+                        <img src="/advent/music-note-2.svg" alt="">
+                        <img src="/advent/music-note-1.svg" alt="">
+                    </div>
+                    <template v-if="day.video">
+                        <div v-if="day.active ?? false" class="relative">
+                            <img class="reveal-pic-cd" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
+                            <div class="reveal-pic-ph overflow-hidden absolute top-0 left-0 right-0 bottom-0 h-[100%] rounded-[0_20%_20%_0]">
+                                <img class="reveal-pic-bw absolute top-0 left-0 right-auto w-full h-auto max-w-none" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+                            </div>
+                        </div>
+                        <img v-else class="pic" :src="'/advent/angels/' + (day.id) + '.png'" alt="" />
+                        <router-link
+                            class="link"
+                            :to="{ params: { videoId: day.video.id } }">
+                        </router-link>
+                    </template>
+                    <img v-else class="pic" :src="'/advent/angels/' + (day.id) + ' bw.png'" alt="" />
+                </div>
+
+                <div class="absolute top-[65%] left-[20%]">
+                    <HighlightedRays />
+                </div>
             </div>
         </div>
         <Transition name="video">
             <div v-if="currentVideo" class="absolute w-full grow-1 h-full flex justify-center items-center">
-                <div class="bg-black bg-opacity-60 absolute w-full h-full" @click="closeVideo"></div>
-                <div class="frame aspect-video bg-black -mt-[5%] w-[60%] relative text">
+                <div class="bg-[rgb(0_9_36_/_82%)] bg-opacity-90 mix-blend-multiply absolute w-full h-full" @click="closeVideo"></div>
+                <div class="frame aspect-video bg-black -mt-[1%] w-[69%] relative text">
                     <div class="h-full">
                         <StageVideoPlayer
                             v-if="currentVideo"
@@ -479,8 +527,8 @@ const onFrontendDataIsReady = async () => {
                             :video-id="currentVideo?.source_vid"
                             :video-controller="videoController"
                         />
-                        <div class="top-[-15%] left-[-15%] w-[123%] absolute pointer-events-none">
-                            <img class="w-full" src="/public/advent/frame.png" alt="">
+                        <div class="top-[-41.8%] left-[-42.9%] w-[181.5%] absolute pointer-events-none">
+                            <img class="w-full" src="/advent/frame-v2.png" alt="">
                         </div>
                     </div>
                 </div>
@@ -649,11 +697,11 @@ const onFrontendDataIsReady = async () => {
         }
         30% {
             filter: drop-shadow(0 0 40px rgb(217, 174, 65));
-            transform: translateY(-2px);
+            transform: translateY(-7px) scale(1.05);
         }
         50% {
             filter: drop-shadow(0 0 40px rgb(217, 174, 65));
-            transform: translateY(-2px);
+            transform: translateY(-7px) scale(1.05);
         }
         100% {
             filter: none;

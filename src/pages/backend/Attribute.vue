@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import AttributesNavbar from '../../components/backend/AttributesNavbar.vue';
-import { type EditableAttributes } from '@/types/EditableAttributes';
+import type { EditableAttributes } from '@/types/EditableAttributes';
 import { type PropType, computed } from 'vue';
 import Skeleton from '../../components/backend/Skeleton.vue';
 import AttributeForm from '../../components/backend/AttributeForm.vue'
 import { useRoute } from 'vue-router';
 import { useLibrary } from "@/stores/library";
+import AttributeNew from "@/components/backend/AttributeNew.vue";
 
 const route = useRoute()
 const library = useLibrary();
@@ -39,8 +40,8 @@ const isAddNew = computed(() => {
                     <div class="px-6 py-10 bg-white sm:rounded-lg border-b border-gray-200">
                         <div v-if="library.dataIsReady" class="max-w-3xl mx-auto">
                             <router-link
-                                v-for="attributeItem in library.attributes[attributeName]"
-                                :key="attributeItem"
+                                v-for="(attributeItem, index) in (library.attributes ? library.attributes[attributeName] : [])"
+                                :key="index"
                                 :to="{ name: 'attribute-values', params: { attributeID: attributeItem.id } }"
                                 class="block py-3 text-indigo-500 border-b last:border-0">
                                 {{ attributeItem.name }}
@@ -53,11 +54,14 @@ const isAddNew = computed(() => {
         </div>
         <template #modals>
             <AttributeForm
-                    v-if="library.dataIsReady && (attributeID || isAddNew)"
-                    :is-add-new="isAddNew"
+                    v-if="library.dataIsReady && attributeID && library.attributes"
                     :attributeName="attributeName"
                     :attribute-i-d="attributeID"
                     :data="library.attributes[attributeName].find(elm => elm.id === parseInt(attributeID))"
+            />
+            <AttributeNew
+                v-if="library.dataIsReady && isAddNew && library.attributes"
+                :attributeName="attributeName"
             />
         </template>
     </AuthenticatedLayout>

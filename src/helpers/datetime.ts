@@ -1,11 +1,19 @@
 export const formatDateTime = (rowDateTime: string) => {
-    return new Date(rowDateTime).toLocaleDateString('en-en', {
+    return new Date(rowDateTime).toLocaleDateString('de-DE', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
         hour: "numeric",
         minute: "numeric",
         second: "numeric"
+    })
+}
+
+export const formatDate = (rowDateTime: string) => {
+    return new Date(rowDateTime).toLocaleDateString('de-DE', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
     })
 }
 

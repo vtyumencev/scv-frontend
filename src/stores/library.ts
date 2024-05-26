@@ -14,33 +14,13 @@ const fetch = useAPI();
 
 export declare type PlacesNames = 'cultural_stage' | 'open_air' | 'sacred' | 'rehearsal' | 'neutral' | 'spring' | 'winter';
 
-export declare type LandscapeNames = LANDSCAPES.DRESDEN | LANDSCAPES.LEIPZIG | LANDSCAPES.CHEMNITZ | LANDSCAPES.WEST | LANDSCAPES.NORTH | LANDSCAPES.EAST | LANDSCAPES.REHEARSAL | LANDSCAPES.SEASON_NEUTRAL | LANDSCAPES.SEASON_SPRING | LANDSCAPES.SEASON_WINTER | LANDSCAPES.KINDER_YOUTH | LANDSCAPES.ADVENT;
+export declare type LandscapeNames = LANDSCAPES.DRESDEN | LANDSCAPES.LEIPZIG | LANDSCAPES.CHEMNITZ | LANDSCAPES.WEST | LANDSCAPES.NORTH | LANDSCAPES.EAST | LANDSCAPES.REHEARSAL | LANDSCAPES.SEASON_NEUTRAL | LANDSCAPES.SEASON_SPRING | LANDSCAPES.SEASON_WINTER | LANDSCAPES.KINDER_YOUTH | LANDSCAPES.ADVENT | LANDSCAPES.EM2024;
 
 export declare type Places = Record<PlacesNames, Place>;
 
 export declare type Presets = Record<LandscapeNames, Landscape>;
 
 export declare type FilterNames = 'genres' | 'styles' | 'regions';
-
-// class Vdo implements Video {
-//     choir_id = 0;
-//     choir_leader = '';
-//     choir_name = '';
-//     composer = '';
-//     created_at = '';
-//     duration = 0;
-//     genre_id = 0;
-//     id = 0;
-//     landscape_id = null;
-//     place_id = 0;
-//     season_id = 0;
-//     source_id = 0;
-//     source_thumbnail_url = '';
-//     source_vid = '';
-//     style_id = 0;
-//     text = '';
-//     title = '';
-// }
 
 export const useLibrary = defineStore('library', () => {
     const attributes = ref<Attributes>();
@@ -803,7 +783,7 @@ export const useLibrary = defineStore('library', () => {
                     deathStrengthY: 0.03,
                 },
             ]
-        }
+        },
     } as Places;
 
     const landscapes = {
@@ -882,11 +862,18 @@ export const useLibrary = defineStore('library', () => {
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.REHEARSAL)
         },
         [LANDSCAPES.ADVENT]: {
-            name: 'Advent Calender',
+            name: 'Adventskalender',
             background_image: null,
             background_image_dark: null,
             has_no_enter_room: true,
             videos_filter: () => sortLandscapeVideos(LANDSCAPES.ADVENT)
+        },
+        [LANDSCAPES.EM2024]: {
+            name: 'EM2024',
+            background_image: null,
+            background_image_dark: null,
+            has_no_enter_room: true,
+            videos_filter: () => sortLandscapeVideos(LANDSCAPES.EM2024)
         },
     } as Presets;
 

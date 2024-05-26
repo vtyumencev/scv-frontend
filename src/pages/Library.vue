@@ -21,6 +21,7 @@ type Query = Record<string, string>;
 
 const filteredVideos = ref<Video[]>([]);
 const dataIsReady = ref(false);
+const seasonalVideos = ref<Video[]>([]);
 
 const props = defineProps({
     query: {
@@ -32,6 +33,11 @@ const props = defineProps({
 const onDataIsReady = () => {
     dataIsReady.value = true;
     applyFilters(route.query as Query);
+
+    const seasonName = settings.currentSeason.value as LandscapeNames;
+    if (seasonName) {
+        seasonalVideos.value =  library.presets[seasonName].videos_filter();
+    }
 };
 
 watch(() => props.query, (newValue) => {
@@ -63,13 +69,6 @@ const isFilteredMode = computed(() => {
     return Object.keys(props.query).length !== 0;
 });
 
-const seasonalVideos = computed(() => {
-    const seasonName = settings.currentSeason.value as LandscapeNames;
-    if (seasonName) {
-        return library.presets[seasonName].videos_filter();
-    }
-    return [];
-});
 
 </script>
 
@@ -107,7 +106,7 @@ const seasonalVideos = computed(() => {
                 <h2 class="uppercase mb-2 text-black dark:text-white text-opacity-70 dark:text-opacity-70 transition">
                     Videos
                 </h2>
-                <LibraryVideosSliderGrid :videos="frontend.personalVideoCompilation.slice(0, 36)" :rows="3" />
+                <LibraryVideosSliderGrid :videos="frontend.personalVideoCompilation" :rows="3" />
                 <button
                         ref="buttonNext"
                         class="absolute z-10 bottom-[-4px] left-[calc(50%_+_90px)] cursor-pointer"

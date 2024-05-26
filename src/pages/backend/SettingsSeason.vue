@@ -49,6 +49,14 @@ const saveSettings = () => {
                 </CheckboxCustom>
             </div>
         </div>
+        <div class="mt-5">
+            <InputLabel value="EM2024"/>
+            <div class="mt-2">
+                <CheckboxCustom v-model="settings.general.is_em2024_time.value">
+                    Is active
+                </CheckboxCustom>
+            </div>
+        </div>
         <PrimaryButton :processing="processing" class="mt-5">Speichern</PrimaryButton>
     </form>
 </template>

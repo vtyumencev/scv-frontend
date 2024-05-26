@@ -27,10 +27,21 @@ const hintsEnabled = ref(false);
 
 const links = [
     {
+        name: null,
+        order: 0,
+        z_index: 5,
+        front_object: {
+            left: 1,
+            bottom: 1,
+            width: 90,
+            asset_url: '/images/homepage/Book.png',
+        },
+    },
+    {
         name: toRef(() => settings.translations.library_title.value),
-        is_in_book: false,
         route: { name: 'library-index' },
         order: 1,
+        z_index: 5,
         front_object: {
             left: -1,
             bottom: 17,
@@ -38,61 +49,13 @@ const links = [
             asset_url: '/images/homepage/Mediathek.png',
             asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/mediathek.svg')),
         },
-        map_mask: null
-    },
-    {
-        name: 'Arch',
-        is_in_book: false,
-        route: null,
-        order: 1,
-        front_object: {
-            left: 0.1,
-            bottom: 9.5,
-            width: 90,
-            asset_url: '/advent/misc/arch.png',
-            asset_mask_component: null,
-        },
-        map_mask: null,
-        display_condition: () => {
-            return settings.general.is_advent_time.value;
-        }
-    },
-    {
-        name: 'Adventskalender',
-        is_in_book: false,
-        route: { name: 'advent' },
-        order: 1,
-        front_object: {
-            left: 36.6,
-            bottom: 72.5,
-            width: 19,
-            asset_url: '/advent/misc/star.png',
-            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/west.svg')),
-        },
-        map_mask: null,
-        display_condition: () => {
-            return settings.general.is_advent_time.value;
-        }
-    },
-    {
-        name: null,
-        is_in_book: false,
-        route: null,
-        order: 0,
-        front_object: {
-            left: 1,
-            bottom: 1,
-            width: 90,
-            asset_url: '/images/homepage/Book.png',
-            asset_mask_component: null
-        },
-        map_mask: null
     },
     {
         name: toRef(() => settings.translations.leipzig.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'leipzig' } },
         order: 6,
+        z_index: 5,
         front_object: {
             left: 34,
             bottom: 42,
@@ -105,13 +68,15 @@ const links = [
             bottom: 19.65,
             width: 1.7,
             asset_component: defineAsyncComponent(() => import('@/components/masks/map/leipzig.svg')),
-        }
+        },
+        is_label_centered: true,
     },
     {
         name: 'Dresden',
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'dresden' } },
         order: 7,
+        z_index: 5,
         front_object: {
             left: 48,
             bottom: 40,
@@ -131,6 +96,7 @@ const links = [
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'east' } },
         order: 8,
+        z_index: 5,
         front_object: {
             left: 57.5,
             bottom: 38.3,
@@ -146,24 +112,11 @@ const links = [
         }
     },
     {
-        name: toRef(() => settings.translations.seasonal.value),
-        is_in_book: true,
-        route: { name: 'presets-show', params: { presetName: 'neutral' } },
-        order: 9,
-        front_object: {
-            left: 68,
-            bottom: 34,
-            width: 14,
-            asset_url: '/images/homepage/Seasonal1.png',
-            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/neutral.svg'))
-        },
-        map_mask: null
-    },
-    {
         name: toRef(() => settings.translations.children_youth.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'kinder-youth' } },
         order: 3,
+        z_index: 5,
         front_object: {
             left: 23.5,
             bottom: 39.8,
@@ -171,13 +124,13 @@ const links = [
             asset_url: '/images/homepage/KinderJugend.png',
             asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/kinder-jugend.svg'))
         },
-        map_mask: null
     },
     {
         name: toRef(() => settings.translations.north_sachsen.value),
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'north' } },
         order: 2,
+        z_index: 5,
         front_object: {
             left: 19.3,
             bottom: 35.5,
@@ -197,6 +150,7 @@ const links = [
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'chemnitz' } },
         order: 4,
+        z_index: 5,
         front_object: {
             left: 31,
             bottom: 38.7,
@@ -216,6 +170,7 @@ const links = [
         is_in_book: true,
         route: { name: 'presets-show', params: { presetName: 'west' } },
         order: 5,
+        z_index: 5,
         front_object: {
             left: 34.6,
             bottom: 34,
@@ -232,9 +187,9 @@ const links = [
     },
     {
         name: toRef(() => settings.translations.proberaum.value),
-        is_in_book: false,
-        route: null,
         order: 11,
+        route: { name: 'preset-stage', params: { presetName: 'rehearsal' } },
+        z_index: 5,
         front_object: {
             left: 79,
             bottom: 8,
@@ -242,24 +197,6 @@ const links = [
             asset_url: '/images/homepage/Proberaum.png',
             asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/proberaum.svg')),
         },
-        map_mask: null
-    },
-    {
-        name: '',
-        is_in_book: false,
-        route: { name: 'advent' },
-        order: 12,
-        front_object: {
-            left: 91,
-            bottom: 12,
-            width: 7,
-            asset_url: '/advent/misc/Schleife.png',
-            asset_mask_component: null,
-        },
-        map_mask: null,
-        display_condition: () => {
-            return settings.general.is_advent_time.value;
-        }
     },
 ] as Array<BookObject>;
 
@@ -319,6 +256,91 @@ const shakeDesk = () => {
 }
 
 const onDataIsReady = () => {
+
+    let seasonalRoute;
+    if (settings.currentSeason.value) {
+        seasonalRoute = { name: 'preset-stage', params: { presetName: settings.currentSeason.value } }
+    } else {
+        seasonalRoute = { name: 'index' }
+    }
+
+    let seasonalImage = '/images/homepage/Seasonal1.png';
+    if (settings.currentSeason.value === 'spring') {
+        seasonalImage = '/images/homepage/Seasonal2.png';
+    }
+    else if (settings.currentSeason.value === 'winter') {
+        seasonalImage = '/images/homepage/Seasonal3.png';
+    }
+
+    links.push({
+        name: toRef(() => settings.translations.seasonal.value),
+        is_in_book: true,
+        route: seasonalRoute,
+        order: 9,
+        z_index: 5,
+        front_object: {
+            left: 68,
+            bottom: 34,
+            width: 14,
+            asset_url: seasonalImage,
+            asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/neutral.svg'))
+        },
+    });
+
+    if (settings.general.is_em2024_time.value) {
+        links.push({
+            name: 'EM2024',
+            route: {name: 'em2024'},
+            z_index: 5,
+            order: 1,
+            front_object: {
+                left: 55.6,
+                bottom: 70.5,
+                width: 19,
+                asset_url: '/em2024/ball.png',
+                asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/em2024-ball.svg')),
+            },
+            is_label_centered: true,
+        });
+    }
+
+    if (settings.general.is_advent_time.value) {
+        links.push({
+            name: null,
+            order: 1,
+            z_index: 1,
+            front_object: {
+                left: 4,
+                bottom: 9.5,
+                width: 80,
+                asset_url: '/advent/start-page-arch.png',
+            },
+        }, {
+            name: null,
+            order: 12,
+            z_index: 5,
+            front_object: {
+                left: 91,
+                bottom: 12,
+                width: 7,
+                asset_url: '/advent/Schleife.png',
+            }
+        }, {
+            name: 'Adventskalender',
+            route: { name: 'advent' },
+            z_index: 5,
+            order: 1,
+            front_object: {
+                left: 36.6,
+                bottom: 70.5,
+                width: 19,
+                asset_url: '/advent/star.png',
+                asset_mask_component: defineAsyncComponent(() => import('@/components/masks/desk/star.svg')),
+            },
+            is_label_centered: true,
+        });
+    }
+
     setTimeout(() => {
         dataIsReady.value = true;
     }, 0);
@@ -329,16 +351,6 @@ const onDataIsReady = () => {
             deskSlide.value?.scrollIntoView({  });
         }
     }, 100);
-
-    const seasonalPreset = links.find(link => link.order === 9)
-    if (seasonalPreset) {
-        const seasonName = settings.currentSeason.value;
-        if (seasonName) {
-            seasonalPreset.route = { name: 'preset-stage', params: { presetName: seasonName } }
-        } else {
-            seasonalPreset.route = { name: 'index' }
-        }
-    }
 }
 
 const objectMaskMouseEnter = function (this: HTMLElement) {
@@ -347,16 +359,17 @@ const objectMaskMouseEnter = function (this: HTMLElement) {
     }
     this.classList.add('object-interact--active');
     const objectID = this.getAttribute('data-object-id');
-    const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${ objectID }"]`);
+    const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${objectID}"]`);
     mapMaskEl?.classList.add('opacity-100');
 }
+
 const objectMaskMouseLeave = function (this: HTMLElement) {
     if (hintsEnabled.value) {
         return;
     }
     this.classList.remove('object-interact--active');
     const objectID = this.getAttribute('data-object-id');
-    const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${ objectID }"]`);
+    const mapMaskEl = document.querySelector<HTMLElement>(`.map-mask[data-map-mask="${objectID}"]`);
     mapMaskEl?.classList.remove('opacity-100');
 }
 
@@ -365,23 +378,24 @@ const mapMaskMouseEnter = function (this: HTMLElement) {
         return;
     }
     const objectID = this.getAttribute('data-map-mask');
-    const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${ objectID }"]`);
+    const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${objectID}"]`);
     objectMaskEl?.classList.add('object-interact--active');
     this.classList.add('opacity-100');
 }
+
 const mapMaskMouseLeave = function (this: HTMLElement) {
     if (hintsEnabled.value) {
         return;
     }
     const objectID = this.getAttribute('data-map-mask');
-    const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${ objectID }"]`);
+    const objectMaskEl = document.querySelector<HTMLElement>(`.object-interact[data-object-id="${objectID}"]`);
     objectMaskEl?.classList.remove('object-interact--active');
     this.classList.remove('opacity-100');
 }
 
 const routeToPreset = function (objectID: number) {
     const routeObject = links[objectID].route;
-    if (routeObject !== null) {
+    if (routeObject) {
         router.push(routeObject);
     }
 }
@@ -476,7 +490,6 @@ const mapMaskRendered = (e: VNode) => {
 </script>
 
 <template>
-
     <LibraryLayout :enable-language-selector="true" @on-data-is-ready="onDataIsReady">
         <div class="relative">
             <div ref="introSlide" class="lg:h-screen flex justify-center pt-20 lg:pt-0 lg:items-center lg:min-h-[900px] relative">
@@ -496,7 +509,7 @@ const mapMaskRendered = (e: VNode) => {
                             <div class="p-5 lg:p-10 bg-white bg-opacity-60">
                                 <div class="relative">
                                     <h1 class="text-[1.5rem] sm:text-[2rem] lg:text-[3.4rem] font-serif mr-[140px] lg:mr-0">
-                                        {{ settings.translations['welcome_title'].value }}
+                                        {{ settings.translate('welcome_title') }}
                                     </h1>
                                     <div class="absolute top-0 right-0 flex justify-end lg:hidden balloonWrapper">
                                         <div class="balloon">
@@ -507,7 +520,9 @@ const mapMaskRendered = (e: VNode) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="space-y-10 mt-8 font-light lg:text-lg" v-html="settings.translations.welcome_description.value">
+                                <div
+                                    class="space-y-10 mt-8 font-light lg:text-lg"
+                                    v-html="settings.translations.welcome_description.value">
                                 </div>
                             </div>
                         </div>
@@ -533,7 +548,7 @@ const mapMaskRendered = (e: VNode) => {
                     <div class="mt-[60px] flex justify-center">
                         <div class="relative">
                             <LibraryButton @click="scrollToDesk">
-                                {{ settings.translations['welcome_start_label'].value }}
+                                {{ settings.translate('welcome_start_label') }}
                             </LibraryButton>
                             <div class="absolute w-full flex justify-center bottom-[-120px]">
                                 <div class="grid pointer-events-none double-arrow">
@@ -552,6 +567,7 @@ const mapMaskRendered = (e: VNode) => {
                     <img class=" absolute bottom-0" src="/images/homepage/Desk.png" alt="">
                 </div>
                 <div
+                    v-if="dataIsReady"
                     id="desk-objects"
                     ref="deskSlide"
                     class="absolute w-full h-full group"
@@ -564,63 +580,65 @@ const mapMaskRendered = (e: VNode) => {
                         :key="key"
                         :data-object-id="key"
                         class="group absolute pointer-events-none"
-                        :class="{'object-interact' : object.route}"
+                        :class="{
+                            'object-interact': object.front_object.asset_mask_component ?? false,
+                            'has-link' : object.route,
+                        }"
                         :data-order="object.order"
                         :style="{
-                                left: object.front_object.left + '%',
-                                bottom: object.front_object.bottom + '%',
-                                width: object.front_object.width + '%'
+                            zIndex: object.z_index,
+                            left: object.front_object.left + '%',
+                            bottom: object.front_object.bottom + '%',
+                            width: object.front_object.width + '%'
                             }">
-                        <template v-if="object.display_condition ? object.display_condition() : true">
-                            <div
-                                class="
-                                    transition
-                                    group-[.object-interact--active-idle]:-translate-y-1
-                                    group-[.object-interact--active]:-translate-y-1
-                                    group-[.book-objects--idle]:duration-[2000ms]">
+                        <div
+                            class="
+                                transition
+                                group-[.object-interact--active-idle]:-translate-y-1
+                                group-[.object-interact--active]:-translate-y-1
+                                group-[.book-objects--idle]:duration-[2000ms]">
+                            <img
+                                class="w-full"
+                                :class="{ 'book-inner-object': object.is_in_book }"
+                                :src="object.front_object.asset_url"
+                                alt="">
+                        </div>
+                        <div
+                            :class="{
+                                'top-[-70px] lg:top-[-80px]': object.is_label_centered ? !object.is_label_centered : true,
+                                'top-[50%] translate-y-[-50%]': object.is_label_centered ? object.is_label_centered : false,
+                            }"
+                            class="
+                                object-hint
+                                absolute
+                                w-full
+                                flex
+                                justify-center
+                                opacity-0
+                                group-[.object-interact--active-idle]:opacity-100
+                                group-[.object-interact--active]:opacity-100
+                                transition
+                                group-[.book-objects--idle]:duration-[2000ms]">
+                            <div class="flex flex-col items-center">
+                                <span class="bg-white bg-opacity-90 px-3 py-1 text-xs lg:text-base">{{ unref(object.name) }}</span>
                                 <img
-                                    class="w-full"
-                                    :class="{ 'book-inner-object': object.is_in_book }"
-                                    :src="object.front_object.asset_url"
+                                    v-if="object.is_label_centered ? !object.is_label_centered : true"
+                                    class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg"
                                     alt="">
                             </div>
-                            <div
-                                class="
-                                    object-hint
-                                    absolute
-                                    top-[-70px]
-                                    lg:top-[-80px]
-                                    w-full
-                                    flex
-                                    justify-center
-                                    opacity-0
-                                    group-[.object-interact--active-idle]:opacity-100
-                                    group-[.object-interact--active]:opacity-100
-                                    transition
-                                    group-[.book-objects--idle]:duration-[2000ms]">
-                                <div class="flex flex-col items-center">
-                                    <span class="bg-white bg-opacity-80 px-3 py-1 text-xs lg:text-base">{{ unref(object.name) }}</span>
-                                    <img class="w-[15px] lg:w-[30px] mt-[10px]" src="/images/icons/double-arrow.svg" alt="">
-                                </div>
-                            </div>
-                            <component
-                                    :is="object.front_object.asset_mask_component"
-                                    v-if="object.front_object.asset_mask_component"
-                                    class="object-mask absolute top-0 opacity-0 pointer-events-auto"
-                                    @vue:mounted="frontObjectMaskRendered($event)" />
-    <!--                        <SvgLoader-->
-    <!--                                v-if="object.front_object.asset_mask_component"-->
-    <!--                                :name="object.front_object.asset_mask_component"-->
-    <!--                                class="object-mask absolute top-0 opacity-0 pointer-events-auto"-->
-    <!--                                @on-rendered="frontObjectMaskRendered" />-->
-                        </template>
+                        </div>
+                        <component
+                                :is="object.front_object.asset_mask_component"
+                                v-if="object.front_object.asset_mask_component"
+                                class="object-mask absolute top-0 opacity-0"
+                                @vue:mounted="frontObjectMaskRendered($event)" />
                     </div>
 
                     <template
                         v-for="(object, key) in links">
                         <component
                                 :is="object.map_mask.asset_component"
-                                v-if="object.map_mask && (object.display_condition ? object.display_condition() : true)"
+                                v-if="object.map_mask"
                                 :key="object"
                                 class="absolute map-mask opacity-0 transition"
                                 :data-map-mask="key"
@@ -630,18 +648,6 @@ const mapMaskRendered = (e: VNode) => {
                                     width: object.map_mask.width + '%'
                                 }"
                                 @vue:mounted="mapMaskRendered($event)" />
-<!--                        <SvgLoader-->
-<!--                                v-if="object.map_mask"-->
-<!--                                :key="object"-->
-<!--                                :name="object.map_mask.asset_component"-->
-<!--                                class="absolute map-mask opacity-0 transition"-->
-<!--                                :data-map-mask="key"-->
-<!--                                :style="{-->
-<!--                                    left: object.map_mask.left + '%',-->
-<!--                                    bottom: object.map_mask.bottom + '%',-->
-<!--                                    width: object.map_mask.width + '%'-->
-<!--                                }"-->
-<!--                                @on-rendered="mapMaskRendered"/>-->
                     </template>
                 </div>
             </div>
@@ -649,7 +655,7 @@ const mapMaskRendered = (e: VNode) => {
         <template #footer-left>
             <button class="grid grid-flow-col gap-3 items-center uppercase" @click="deskHelpHint">
                 <img class="w-3.5 lg:w-5" src="/images/icons/question-mark-box.svg" alt="">
-                <span class="">{{ settings.translations['footer_help_button'].value }}</span>
+                <span class="">{{ settings.translate('footer_help_button') }}</span>
             </button>
         </template>
     </LibraryLayout>
@@ -697,7 +703,6 @@ const mapMaskRendered = (e: VNode) => {
 }
 
 .object-interact {
-    z-index: 5;
     .book-inner-object {
         transform: perspective(1000px) rotateX(90deg);
         opacity: 0;
@@ -720,8 +725,11 @@ const mapMaskRendered = (e: VNode) => {
         pointer-events: none;
     }
     svg path {
-        cursor: pointer;
         pointer-events: auto;
+    }
+    .map-mask path,
+    .has-link svg path {
+        cursor: pointer;
     }
 }
 

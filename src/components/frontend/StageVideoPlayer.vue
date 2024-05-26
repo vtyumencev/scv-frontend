@@ -110,6 +110,6 @@ videoController.play.value = () => {
 
 <template>
     <div>
-        <div class="w-full h-full" id="stage-video-player"></div>
+        <div id="stage-video-player" class="w-full h-full"></div>
     </div>
 </template>

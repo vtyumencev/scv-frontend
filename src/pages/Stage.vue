@@ -234,7 +234,7 @@ const textBoxClose = () => {
         :is-dark="videoController.isPlaying"
         @on-data-is-ready="onDataIsReady"
         @toggle-mobile="toggleMobile">
-        <div id="concert-view" class="relative flex flex-col h-full overflow-hidden">
+        <div id="concert-view" class="relative flex flex-col h-full">
             <div class="absolute w-full grow-1 h-full flex justify-center items-center">
                 <div class="aspect-video bg-black -mt-[10%] ml-[-11px] w-[42%] text">
                     <div class="h-full">

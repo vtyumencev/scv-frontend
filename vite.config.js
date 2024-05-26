@@ -41,6 +41,7 @@ export default defineConfig({
                         '/src/components/masks/desk/proberaum.svg',
                         '/src/components/masks/desk/mediathek.svg',
                         '/src/components/masks/desk/neutral.svg',
+                        '/src/components/masks/desk/star.svg',
                     ]
                 },
             },

@@ -36,6 +36,7 @@ import SettingsTranslationsIndex from "@/pages/backend/SettingsTranslationsIndex
 import SettingsTranslationsNew from "@/pages/backend/SettingsTranslationsNew.vue";
 import SettingsTranslationsSettings from "@/pages/backend/SettingsTranslationsSettings.vue";
 import AdventCalendar from "@/pages/AdventCalendar.vue";
+import EM2024 from "@/pages/EM2024.vue";
 
 const APP_NAME = import.meta.env.VITE_APP_NAME;
 
@@ -69,11 +70,20 @@ const routes : Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/advent/:videoId?',
+        path: '/adventskalender/:videoId?',
         name: 'advent',
         component: AdventCalendar,
         meta: {
-            title: 'Advent Calendar',
+            title: 'Adventskalender',
+        },
+        props: true,
+    },
+    {
+        path: '/em2024/:videoId?',
+        name: 'em2024',
+        component: EM2024,
+        meta: {
+            title: 'EM2024',
         },
         props: true,
     },

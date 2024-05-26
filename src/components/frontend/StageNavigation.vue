@@ -28,6 +28,7 @@ const props = defineProps({
 
 const emits = defineEmits(['backAction']);
 
+
 const onDataIsReady = () => {
     setTimeout(() => {
         if (isShakeEnabled.value) shakeMenu();
@@ -116,11 +117,14 @@ const toggleIDCard = () => {
 
 const choir = computed(() => {
     return library.getChoirByID(props.videoData.choir_id);
-})
+});
+
 
 defineExpose({
-    onDataIsReady
+    onDataIsReady,
+    showMenu
 });
+
 </script>
 
 <template>
@@ -131,13 +135,12 @@ defineExpose({
                 class="bottom-[34%] right-[0] text-[2em] w-[40%] absolute"
                 :choir-data="choir" />
         </Transition>
-        <div class="absolute w-full bottom-0 h-[39%] overflow-hidden">
-            <div ref="stageMenuEl" class="w-full h-full flex justify-center">
+        <div ref="stageMenuEl" class="w-full h-full flex justify-center">
                 <Transition name="menu">
                     <div
                         v-show="isShown"
                         ref="stageMenuWrapperEl"
-                        class="w-[58%] flex justify-center absolute">
+                        class="h-[40%] bottom-0 flex justify-center absolute">
                         <Transition name="id-card">
                             <StageChoirID
                                 v-if="choir && IDShown && ! isMobile"
@@ -147,7 +150,7 @@ defineExpose({
 
                         <template v-if="isMobile">
                             <img
-                                class="w-full relative pointer-events-none"
+                                class="h-full relative pointer-events-none"
                                 src="/images/stage/navigation/Menu_empty.png"
                                 alt="">
                             <button
@@ -168,7 +171,7 @@ defineExpose({
                         </template>
                         <template v-else>
                             <img
-                                class="w-full relative pointer-events-none"
+                                class="h-full relative pointer-events-none"
                                 src="/images/stage/navigation/Menu_offen_full.png"
                                 alt="">
                             <img
@@ -216,8 +219,8 @@ defineExpose({
                     </div>
                 </Transition>
                 <div
-                    class="w-full h-full left-0 top-0 flex justify-center translate-y-[76%] transition absolute"
-                    :class="{ 'hover:translate-y-[30%]': !isShaking }">
+                    class="w-full h-[10%] left-0 flex justify-center bottom-0 transition absolute"
+                    :class="{ 'hover:translate-y-[-170%]': !isShaking }">
                     <Transition name="menu-preview">
                         <div
                             v-show="!isShown"
@@ -232,7 +235,6 @@ defineExpose({
                     </Transition>
                 </div>
             </div>
-        </div>
     </div>
 </template>
 

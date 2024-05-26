@@ -8,6 +8,7 @@ import type {LanguageProfile} from "@/types/LanguageProfile";
 import {toRef} from "@vueuse/core";
 import {useRoute} from "vue-router";
 import type { TranslationStrings } from "@/types/TranslationStrings";
+import {useAPI} from "@/composables/fetch";
 
 const props = defineProps<{
     lang: string,
@@ -15,6 +16,7 @@ const props = defineProps<{
 
 const route = useRoute();
 
+const api = useAPI();
 const settings = useSettings();
 
 const isReady = ref(false);
@@ -28,8 +30,12 @@ onMounted(async () => {
 });
 
 
-const save = async (e: Event) => {
-    await settings.saveTranslations(props.lang, processing);
+const save = async () => {
+    await api.store('translation-strings', {
+        lang: props.lang,
+        key:  route.query.key,
+        text: currentLanguageString.value,
+    }, { successMsg: 'Translations are saved', processing: processing });
 }
 
 const languageProfile = computed(() => {

@@ -28,9 +28,9 @@ const navigation = [
             <div
                 class="space-x-5 ml-10 flex">
                 <router-link
-                    v-for="attribute in navigation"
+                    v-for="(attribute, index) in navigation"
                     v-slot="{ href, isActive, navigate }"
-                    :key="attribute"
+                    :key="index"
                     :to="{ name: 'attribute', params: { attributeName: attribute.slug } }"
                     custom>
                     <NavLink

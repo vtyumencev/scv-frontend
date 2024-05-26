@@ -27,6 +27,9 @@ export const useSettings = defineStore('settings', () => {
             is_advent_time: {
                 value: ref(false)
             },
+            is_em2024_time: {
+                value: ref(false)
+            },
             translation_profiles: {
                 type: 'list',
                 default: '',
@@ -199,7 +202,7 @@ export const useSettings = defineStore('settings', () => {
         const api = useAPI();
 
         const response = await api.index<Record<string, string>>(
-            'translations',
+            'translation-strings',
             { 'lang': langCode }
         );
 
@@ -219,25 +222,12 @@ export const useSettings = defineStore('settings', () => {
         return response;
     }
 
-    const saveTranslations = async (langCode: string, processing?: Ref) => {
-        const api = useAPI();
-
-        const formData = new FormData();
-        formData.set('lang', langCode);
-        Object.entries(translations).forEach(item => {
-            formData.set(item[0], item[1].value.value);
-        });
-
-        await api.store('translations', formData, { successMsg: 'Translations are saved', processing: processing });
-    }
-
     return {
         general: settings.general,
         translations,
         currentSeason,
         fetch,
         fetchTranslations,
-        saveTranslations,
         saveGroup,
         translate,
         t,

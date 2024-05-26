@@ -32,10 +32,6 @@ const props = defineProps({
         type: Object as PropType<Attribute>,
         default: null
     },
-    isAddNew: {
-        type: Boolean,
-        default: true
-    }
 });
 
 interface AttributeExtended {
@@ -97,26 +93,16 @@ const attribute = toRef(props, 'data');
 const saveRecord = async () => {
     processing.value = true;
 
-    console.log(attributeExtended.value)
-
     const post = {
       ...attributeExtended.value,
     };
 
-    if (props.isAddNew) {
-        await api.store(`attributes/${props.attributeName}`, post,{
-            onSuccess() {
-                library.getAttributes();
-                router.push({ name: 'attribute' });
-            }
-        });
-    } else {
-        await api.update(`attributes/${props.attributeName}`, attribute.value.id, post,{
-            onSuccess() {
-                library.getAttributes();
-            }
-        });
-    }
+    await api.update(`attributes/${props.attributeName}`, attribute.value.id, post,{
+        onSuccess() {
+            library.getAttributes();
+        }
+    });
+
     processing.value = false;
 };
 
@@ -140,10 +126,7 @@ const deleteRecord = async () => {
                 <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
                     <div class="text-xl font-semibold text-gray-900 dark:text-white">
-                        <h3 v-if="props.isAddNew">
-                            New value
-                        </h3>
-                        <h3 v-else-if="attribute">
+                        <h3 v-if="attribute">
                             Edit {{ data.name }}
                         </h3>
                         <div v-else role="status" class="max-w-sm animate-pulse">
@@ -173,9 +156,7 @@ const deleteRecord = async () => {
                         <TextInput
                             v-model="attributeExtended.name[selectedLanguageCode]"
                             type="text"
-                            class="mt-1 block w-full"
-                            autofocus
-                            autocomplete="title" />
+                            class="mt-1 block w-full" />
                     </div>
                 </div>
                 <Skeleton v-else />
@@ -185,7 +166,7 @@ const deleteRecord = async () => {
                         <PrimaryButton type="submit" :processing="processing">Save</PrimaryButton>
                         <PrimaryButton type="button" button-style="simple" class="ml-2" @click="closeModal">Close</PrimaryButton>
                     </div>
-                    <PrimaryButton v-if="! isAddNew" type="button" button-style="danger" :processing="deleteProcessing" class="ml-2" @click="deleteRecord">Delete value</PrimaryButton>
+                    <PrimaryButton type="button" button-style="danger" :processing="deleteProcessing" class="ml-2" @click="deleteRecord">Delete value</PrimaryButton>
                 </div>
             </form>
         </div>
